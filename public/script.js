@@ -1171,7 +1171,28 @@ function initNewsletterPrompt() {
      dismissed it: the same key silences it for thirty days across every
      page, so "it never appears" and "it appeared and I closed it last
      Tuesday" are indistinguishable from the outside. */
-  const forced = new URLSearchParams(window.location.search).get('newsletter') === 'now';
+  const mode = new URLSearchParams(window.location.search).get('newsletter');
+  const forced = mode === 'now';
+
+  // ?newsletter=reset forgets the stored state and then behaves exactly like
+  // a first visit — real delay, real scroll trigger, no devtools.
+  if (mode === 'reset') {
+    try {
+      localStorage.removeItem(NEWSLETTER.KEY);
+    } catch (e) {
+      /* nothing stored to clear */
+    }
+  }
+
+  /* Previewing must not write to the thing being previewed. With
+     ?newsletter=now a dismissal still persisted, so looking at the modal
+     twice meant clearing localStorage by hand in between — which defeats
+     the point of having a preview at all. */
+  const remember = (patch) => {
+    if (!forced) {
+      rememberNewsletter(patch);
+    }
+  };
 
   if (!forced) {
     const state = newsletterState();
@@ -1254,7 +1275,7 @@ function initNewsletterPrompt() {
   function dismiss() {
     pop.classList.remove('isVisible');
     document.body.classList.remove('newsletterOpen');
-    rememberNewsletter({ dismissedAt: Date.now() });
+    remember({ dismissedAt: Date.now() });
 
     // Focus must not be left on an element that is about to be hidden, or
     // a keyboard user is stranded with nothing selected.
@@ -1287,7 +1308,7 @@ function initNewsletterPrompt() {
   // Following the link is not a dismissal, but it should not reappear on
   // the way there either.
   pop.querySelector('.ctaButton').addEventListener('click', () => {
-    rememberNewsletter({ dismissedAt: Date.now() });
+    remember({ dismissedAt: Date.now() });
     document.body.classList.remove('newsletterOpen');
   });
 
