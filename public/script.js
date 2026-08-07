@@ -1115,7 +1115,7 @@ syncNavContrast();
 const NEWSLETTER = {
   KEY: 'ikshaa.newsletter',
   QUIET_DAYS: 30,     // how long a dismissal is respected
-  DELAY_MS: 12000,    // or a scroll past SCROLL_AT, whichever lands first
+  DELAY_MS: 3000,     // or a scroll past SCROLL_AT, whichever lands first
   SCROLL_AT: 0.3,
 };
 
