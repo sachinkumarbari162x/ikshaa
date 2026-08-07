@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Heritage — Ikshaa</title>
+    <!-- Cormorant Garamond for display, Jost for text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Jost:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="chat/chat.css">
+    <link rel="preload" as="image" href="./heritagePageImages/IkshaaDoor.jpg" fetchpriority="high">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false"
+            aria-controls="navPanel">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="villaName"><a href="index.html">Ikshaa</a></div>
+
+        <a class="navBook" href="stayWithUs.html">Book Now</a>
+
+        <div class="nav-panel" id="navPanel">
+            <ul class="nav-links" id="navLinks">
+                <li><a href="ourHeritage.html" data-preview="ourHeritage">Our Heritage</a></li>
+                <li><a href="gallery.html" data-preview="gallery">Gallery</a></li>
+                <li><a href="exploreIkshaa.html" data-preview="villaTour">Villa Tour</a></li>
+                <li><a href="exploreGoa.html" data-preview="exploreGoa">Explore Goa</a></li>
+                <li><a href="goanCuisine.html" data-preview="goanCuisine">Goan Cuisine</a></li>
+                <li><a href="index.html#outdoor" data-preview="outdoor">Outdoor</a></li>
+                <li><a href="index.html#local-eateries" data-preview="localEateries">Local Eateries</a></li>
+                <li><a href="index.html#life-in-goa" data-preview="lifeInGoa">Life in Goa</a></li>
+                <li><a href="index.html#goa-fit" data-preview="goaFit">Goa Fit</a></li>
+                <li><a href="guestBook.html" data-preview="guestBook">Guest Book</a></li>
+                <li><a href="findingUs.html" data-preview="findingUs">Finding Us</a></li>
+                <li><a href="stayWithUs.html" data-preview="stayWithUs">Stay With Us</a></li>
+            </ul>
+
+            <div class="nav-preview" id="navPreview">
+                <img class="previewImage isVisible" data-preview="ourHeritage"
+                    data-src="./hamBurgerDropImages/OurHeritage/IkshaaDoor.jpg" alt="">
+                <img class="previewImage" data-preview="gallery"
+                    data-src="./hamBurgerDropImages/Gallery/IkshaaPool.jpg" alt="">
+                <img class="previewImage" data-preview="villaTour"
+                    data-src="./hamBurgerDropImages/VillaTour/mainGateOfIkshaa.avif" alt="">
+                <img class="previewImage" data-preview="exploreGoa"
+                    data-src="./hamBurgerDropImages/ExploreGoa/goaRoads.jpg" alt="">
+                <img class="previewImage" data-preview="goanCuisine"
+                    data-src="./hamBurgerDropImages/GoanCuisine/dining.jpg" alt="">
+                <img class="previewImage" data-preview="outdoor"
+                    data-src="./hamBurgerDropImages/Outdoor/paragliding.jpg" alt="">
+                <img class="previewImage" data-preview="localEateries"
+                    data-src="./hamBurgerDropImages/localEatery/eclairs.jpg" alt="">
+                <img class="previewImage" data-preview="lifeInGoa"
+                    data-src="./hamBurgerDropImages/lifeInGoa/boatingGoa.jpg" alt="">
+                <img class="previewImage" data-preview="goaFit"
+                    data-src="./hamBurgerDropImages/GoAfiT/ParraRoadGoa.jpg" alt="">
+                <img class="previewImage" data-preview="guestBook"
+                    data-src="./hamBurgerDropImages/GuestBook/toasting.jpg" alt="">
+                <img class="previewImage" data-preview="findingUs"
+                    data-src="./hamBurgerDropImages/FindingUs/chorlaghat.jpg" alt="">
+                <img class="previewImage" data-preview="stayWithUs"
+                    data-src="./hamBurgerDropImages/StayWithUs/Courtyard.jpg" alt="">
+            </div>
+        </div>
+    </nav>
+
+    <header class="pageHero" data-nav-dark>
+        <img class="pageHeroImage" src="./heritagePageImages/IkshaaDoor.jpg" alt="" fetchpriority="high"
+            decoding="async">
+        <div class="pageHeroScrim"></div>
+        <h1 class="pageHeroTitle">Our Heritage</h1>
+        <p class="scrollCue">Scroll</p>
+    </header>
+
+    <main class="siteContent">
+
+        <section class="welcomeIntro">
+            <h2 class="welcomeIntroTitle">A house that was never only a house</h2>
+            <p class="welcomeIntroLede">Heritage is not replication. It is the thoughtful continuation of
+                proportion, material, climate and ritual — and it is what Ikshaa was built to carry forward.</p>
+        </section>
+
+        <!-- The About paragraph from ikshaa.com, in its own words -->
+        <section class="squareRoundCard" data-nav-dark>
+            <div class="image-container">
+                <img src="./imagesIkshaa/Courtyard.jpg" alt="" loading="lazy" decoding="async">
+            </div>
+            <div class="card-content">
+                <p class="eyebrow eyebrow--light">Loutolim &middot; South Goa</p>
+                <h2 class="sectionTitle">A hidalgo’s villa? A mansion? A temple?</h2>
+                <p class="bodyText">Ikshaa in pristine Loutolim is a harmonious blend of all of these, and is the
+                    ultimate heritage luxury villa accommodation in Goa for people seeking refuge from big-city
+                    stress. It has the comforts of modern living, but all the earthy charm of the Goa of yesteryears —
+                    down to the little recesses in the walls for the old <em>ponttios</em>, or paraffin lamps.</p>
+                <a class="ctaButton ctaButton--onImage" href="gallery.html">See the house</a>
+            </div>
+        </section>
+
+        <!-- From the notes in trailOurHeritage.html -->
+        <section class="splitSection">
+            <div class="splitMedia">
+                <img src="./imagesIkshaa/CourtyardNight.jpg" alt="" loading="lazy" decoding="async">
+            </div>
+            <div class="splitBody">
+                <p class="eyebrow">The plan</p>
+                <h2 class="sectionTitle">Houses around a courtyard</h2>
+                <p class="bodyText">Ikshaa was converted from a <em>hidalgo</em>’s house — the home of a family of
+                    the old landed gentry. It is not one building but several, arranged around a courtyard, with a
+                    focus on spirituality and on finding one’s self.</p>
+                <p class="bodyText">A courtyard brings the sky into the centre of domestic life. It is the oldest
+                    idea in the house and still the one that shapes every day spent here.</p>
+            </div>
+        </section>
+
+        <div class="tileRule" role="presentation"></div>
+
+        <article class="article">
+
+            <p class="articleLede">A home is shaped not only by walls and rooms, but by the landscape, memories and
+                everyday rituals it chooses to carry forward.</p>
+
+            <p class="articleMeta">Words by Ikshaa &nbsp;·&nbsp; Reading time: 7 minutes</p>
+
+            <p>Heritage can be mistaken for something distant: a monument protected behind a gate, an heirloom stored
+                carefully away, or a story that belongs entirely to another generation.</p>
+
+            <p>At Ikshaa, we understand it differently.</p>
+
+            <p>Heritage is alive. It is present in how a doorway frames the afternoon, how a shaded verandah slows the
+                day and how a house sits gently within the land around it.</p>
+
+            <blockquote>The past matters most when it continues to make the present feel richer.</blockquote>
+
+            <h2>A House That Belongs to Its Setting</h2>
+
+            <p>Goa reveals itself slowly. Beyond its beaches are villages shaped by red earth, coconut groves, old
+                houses, chapels, temples, orchards and winding roads. Life follows the seasons. Summer asks for shade.
+                The monsoon changes the colour and sound of everything. Winter opens the house to long, unhurried
+                evenings.</p>
+
+            <p>Architecture in such a place cannot be separated from climate. The most memorable homes do not simply
+                resist the elements; they negotiate with them. Roofs extend outward. Windows invite air to pass
+                through. Transitional spaces soften the line between indoors and outdoors.</p>
+
+            <p class="articleCallout">Heritage is not replication. It is the thoughtful continuation of proportion,
+                material, climate and ritual.</p>
+
+            <h2>The Beauty of Many Influences</h2>
+
+            <!-- Rotating frame: two stacked layers crossfaded from FIGURE_POOL -->
+            <figure class="articleFigure randomFigure">
+                <div class="figureFrame">
+                    <img class="figureLayer isVisible" src="./heritagePageImages/IkshaaSitting2.jpg" alt=""
+                        loading="lazy" decoding="async">
+                    <img class="figureLayer" alt="" decoding="async">
+                </div>
+            </figure>
+
+            <p>Goan architecture has never belonged to a single visual tradition. Its character emerged over centuries
+                through local craft, Indian building customs and Iberian influence. That layered history is visible in
+                decorative pediments, internal courtyards, verandahs, niches, columns, timber details and the
+                expressive use of colour.</p>
+
+            <p>What makes this architecture distinct is not any one motif. It is the ease with which different ideas
+                coexist. Formal façades open into deeply personal interiors. Ornament sits beside practical solutions
+                to heat and rain.</p>
+
+            <h2>Material, Memory and Touch</h2>
+
+            <p>A house is remembered through touch as much as sight: the coolness of a floor under bare feet, the
+                grain of timber, the weight of a latch and the unevenness that proves a surface was made by hand.</p>
+
+            <p>Natural materials age visibly. They collect marks and soften over time, allowing the building to feel
+                lived in rather than preserved. This is one of heritage’s quiet lessons.</p>
+
+            <blockquote>A home remains alive when it is allowed to change without forgetting what first gave it
+                character.</blockquote>
+
+            <h2>Hospitality as a Tradition</h2>
+
+            <!-- Rotating frame, as above -->
+            <figure class="articleFigure randomFigure">
+                <div class="figureFrame">
+                    <img class="figureLayer isVisible" src="./heritagePageImages/IkshaaMaster.jpg" alt=""
+                        loading="lazy" decoding="async">
+                    <img class="figureLayer" alt="" decoding="async">
+                </div>
+            </figure>
+
+            <p>Heritage also lives in behaviour. Across Goa, hospitality is expressed through food, conversation and
+                an instinct to make time for others. A meal is rarely only a meal. It is an invitation to stay longer.
+                A verandah is rarely only a passage. It is a place to sit, watch the rain and share the news of the
+                day.</p>
+
+            <p>That generosity guides the experience of staying at Ikshaa. Privacy is important, but so is warmth. We
+                hope guests leave with more than photographs — a particular quality of morning light, the sound of
+                leaves after rain, and the feeling that, for a few days, the house belonged to them.</p>
+
+            <h2>What We Choose to Carry Forward</h2>
+
+            <p>To speak of “our heritage” is not to claim ownership over Goa’s many histories. It is to acknowledge
+                our responsibility towards the place we inhabit. Every generation decides what it will preserve,
+                reinterpret and pass on.</p>
+
+            <p>Ikshaa is our contribution to that continuing conversation: a contemporary villa shaped by older
+                wisdom, a private retreat connected to its village landscape and a home whose identity grows deeper
+                each time it is lived in.</p>
+
+            <p class="articleMark">✦</p>
+
+        </article>
+
+        <!-- Village context, from research rather than the original essay -->
+        <section class="splitSection splitSection--reverse">
+            <div class="splitMedia">
+                <img src="./imagesIkshaa/chorlaghat.jpg" alt="" loading="lazy" decoding="async">
+            </div>
+            <div class="splitBody">
+                <p class="eyebrow">The village</p>
+                <h2 class="sectionTitle">Loutolim</h2>
+                <p class="bodyText">A village on a hillock in Salcete, about ten kilometres from Madgaon station and
+                    twenty minutes from the airport. It is among Goa’s prettiest — narrow winding roads, and some of
+                    the finest surviving Portuguese-era mansions in the state.</p>
+                <p class="bodyText">Casa Araujo Alvares, a 251-year-old family house now open as a heritage museum,
+                    stands a short walk away, beside the open-air museum at Ancestral Goa. Ikshaa sits in that same
+                    company of houses.</p>
+                <a class="sectionLink" href="findingUs.html">Finding us</a>
+            </div>
+        </section>
+
+        <section class="contentSection">
+            <p class="eyebrow">Details</p>
+            <h2 class="sectionTitle">The House Today</h2>
+
+            <dl class="infoList">
+                <div class="infoRow">
+                    <dt>The house</dt>
+                    <dd>Three bedrooms, sleeping six</dd>
+                </div>
+                <div class="infoRow">
+                    <dt>Let</dt>
+                    <dd>On an exclusive basis — the whole villa, even if one room is booked</dd>
+                </div>
+                <div class="infoRow">
+                    <dt>To confirm</dt>
+                    <dd>A 50% deposit, non-refundable</dd>
+                </div>
+                <div class="infoRow">
+                    <dt>Where</dt>
+                    <dd><a class="sectionLink" href="findingUs.html">Loutolim, South Goa</a></dd>
+                </div>
+            </dl>
+
+            <p><a class="ctaButton" href="stayWithUs.html">Check availability</a></p>
+        </section>
+
+        <div class="squareWhiteRoundCard" id="subscribe">
+            <h2 class="sectionTitle">Subscribe to Newsletter</h2>
+            <p class="bodyText">Stories about architecture, food, landscape and slow living in South Goa — the Ikshaa
+                Journal, a few times a year.</p>
+            <!-- TODO: action="#" does nothing. Point it at a form handler
+                 before this goes live, or the field silently discards.
+                 The id differs from the home page's so the two forms stay
+                 distinct if they ever end up on one page together. -->
+            <form class="subscribeForm" action="#" method="post">
+                <label class="visually-hidden" for="heritageSubscribeEmail">Email address</label>
+                <input type="email" id="heritageSubscribeEmail" name="email" placeholder="you@example.com" required>
+                <button type="submit" class="ctaButton">Subscribe</button>
+            </form>
+        </div>
+
+        <footer class="footer">
+            <div class="footerGrid">
+                <div class="footerCol footerBrand">
+                    <h2 class="sectionTitle">Ikshaa</h2>
+                    <p>A 3 bedroom luxury villa with private pool in Loutolim, South Goa.</p>
+                </div>
+
+                <div class="footerCol">
+                    <p class="eyebrow">Contact</p>
+                    <p><a href="mailto:nyaragoa@gmail.com">nyaragoa@gmail.com</a></p>
+                </div>
+
+                <div class="footerCol">
+                    <p class="eyebrow">Finding us</p>
+                    <ul>
+                        <li>Loutolim, South Goa</li>
+                        <li>20 minutes from Goa airport</li>
+                        <li>10 minutes from Margao station</li>
+                        <li>15 minutes from the beaches</li>
+                    </ul>
+                </div>
+
+                <div class="footerCol">
+                    <p class="eyebrow">Discover</p>
+                    <ul>
+                        <li><a href="ourHeritage.html">Our heritage</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                        <li><a href="guestBook.html">Guest book</a></li>
+                        <li><a href="index.html#outdoor">Outdoor</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="platformRow">
+                <p class="eyebrow">Also book us on</p>
+                <ul class="platformList">
+                    <li><a href="https://www.airbnb.co.in/rooms/17852391" target="_blank"
+                            rel="noopener noreferrer">Airbnb</a></li>
+                </ul>
+            </div>
+
+            <div class="footerLegal">
+                <p class="footerBase" style="margin:0">&copy; 2026 Ikshaa. All rights reserved.</p>
+                <ul>
+                    <li><a href="#">Privacy</a></li>
+                    <li><a href="#">Terms</a></li>
+                </ul>
+            </div>
+        </footer>
+    </main>
+
+    <script src="script.js"></script>
+
+    <!-- Chat widget. Deferred and last: it builds its own DOM, so nothing
+         above depends on it, and none of it blocks the page. Load order
+         matters — bot.js reads NLU and KNOWLEDGE off window. -->
+    <script src="chat/nlu.js" defer></script>
+    <script src="chat/knowledge.js" defer></script>
+    <script src="chat/bot.js" defer></script>
+    <script src="chat/chat.js" defer></script>
+</body>
+
+</html>

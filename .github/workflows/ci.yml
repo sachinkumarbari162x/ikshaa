@@ -1,0 +1,40 @@
+# Runs on every push and pull request.
+#
+# The point of this file is the ordering: the build runs BEFORE the tests,
+# because tests/build.test.js inspects dist/ and walks it the way a browser
+# would. That is the check that catches a page referencing a file the build
+# forgot to copy — which has already happened once, and shipped a villa tour
+# with no audio.
+#
+# Netlify builds independently of this. Turn on "Deploy only after CI passes"
+# in the Netlify UI if you want a red build to block a deploy.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # `ci` not `install`: installs exactly what package-lock pins, and
+      # fails if the lockfile and package.json disagree.
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test

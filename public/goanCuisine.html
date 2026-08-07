@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goan Cuisine — Ikshaa</title>
+    <!-- Cormorant Garamond for display, Jost for text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Jost:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="chat/chat.css">
+    <link rel="preload" as="image" href="./imagesIkshaa/dining.jpg" fetchpriority="high">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false"
+            aria-controls="navPanel">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="villaName"><a href="index.html">Ikshaa</a></div>
+
+        <a class="navBook" href="stayWithUs.html">Book Now</a>
+
+        <div class="nav-panel" id="navPanel">
+            <ul class="nav-links" id="navLinks">
+                <li><a href="ourHeritage.html" data-preview="ourHeritage">Our Heritage</a></li>
+                <li><a href="gallery.html" data-preview="gallery">Gallery</a></li>
+                <li><a href="exploreIkshaa.html" data-preview="villaTour">Villa Tour</a></li>
+                <li><a href="exploreGoa.html" data-preview="exploreGoa">Explore Goa</a></li>
+                <li><a href="goanCuisine.html" data-preview="goanCuisine">Goan Cuisine</a></li>
+                <li><a href="index.html#outdoor" data-preview="outdoor">Outdoor</a></li>
+                <li><a href="index.html#local-eateries" data-preview="localEateries">Local Eateries</a></li>
+                <li><a href="index.html#life-in-goa" data-preview="lifeInGoa">Life in Goa</a></li>
+                <li><a href="index.html#goa-fit" data-preview="goaFit">Goa Fit</a></li>
+                <li><a href="guestBook.html" data-preview="guestBook">Guest Book</a></li>
+                <li><a href="findingUs.html" data-preview="findingUs">Finding Us</a></li>
+                <li><a href="stayWithUs.html" data-preview="stayWithUs">Stay With Us</a></li>
+            </ul>
+
+            <div class="nav-preview" id="navPreview">
+                <img class="previewImage isVisible" data-preview="ourHeritage"
+                    data-src="./hamBurgerDropImages/OurHeritage/IkshaaDoor.jpg" alt="">
+                <img class="previewImage" data-preview="gallery"
+                    data-src="./hamBurgerDropImages/Gallery/IkshaaPool.jpg" alt="">
+                <img class="previewImage" data-preview="villaTour"
+                    data-src="./hamBurgerDropImages/VillaTour/mainGateOfIkshaa.avif" alt="">
+                <img class="previewImage" data-preview="exploreGoa"
+                    data-src="./hamBurgerDropImages/ExploreGoa/goaRoads.jpg" alt="">
+                <img class="previewImage" data-preview="goanCuisine"
+                    data-src="./hamBurgerDropImages/GoanCuisine/dining.jpg" alt="">
+                <img class="previewImage" data-preview="outdoor"
+                    data-src="./hamBurgerDropImages/Outdoor/paragliding.jpg" alt="">
+                <img class="previewImage" data-preview="localEateries"
+                    data-src="./hamBurgerDropImages/localEatery/eclairs.jpg" alt="">
+                <img class="previewImage" data-preview="lifeInGoa"
+                    data-src="./hamBurgerDropImages/lifeInGoa/boatingGoa.jpg" alt="">
+                <img class="previewImage" data-preview="goaFit"
+                    data-src="./hamBurgerDropImages/GoAfiT/ParraRoadGoa.jpg" alt="">
+                <img class="previewImage" data-preview="guestBook"
+                    data-src="./hamBurgerDropImages/GuestBook/toasting.jpg" alt="">
+                <img class="previewImage" data-preview="findingUs"
+                    data-src="./hamBurgerDropImages/FindingUs/chorlaghat.jpg" alt="">
+                <img class="previewImage" data-preview="stayWithUs"
+                    data-src="./hamBurgerDropImages/StayWithUs/Courtyard.jpg" alt="">
+            </div>
+        </div>
+    </nav>
+
+    <header class="pageHero" data-nav-dark>
+        <img class="pageHeroImage" src="./imagesIkshaa/dining.jpg" alt="" fetchpriority="high" decoding="async">
+        <div class="pageHeroScrim"></div>
+        <h1 class="pageHeroTitle">Goan Cuisine</h1>
+        <p class="scrollCue">Scroll</p>
+    </header>
+
+    <main class="siteContent">
+
+        <section class="welcomeIntro">
+            <h2 class="welcomeIntroTitle">A meal is rarely only a meal</h2>
+            <p class="welcomeIntroLede">It is an invitation to stay longer. Across Goa, hospitality is expressed
+                through food, conversation and an instinct to make time for others — and that is where a stay here
+                begins.</p>
+        </section>
+
+        <!-- White card: serif headline, carousel left, copy right -->
+        <section class="cuisinePanel" id="at-the-house">
+            <h2 class="cuisineTitle">At the house, from morning to late</h2>
+
+            <div class="cuisineLayout">
+                <div class="cuisineCarousel">
+                    <div class="cuisineTrack" id="cuisineTrack">
+                        <figure class="cuisineSlide">
+                            <img src="./media/images/goanCuisnes/fishHooman.webp" alt="Fish hooman, the everyday Goan curry" loading="lazy" decoding="async">
+                        </figure>
+                        <figure class="cuisineSlide">
+                            <img src="./media/images/goanCuisnes/chickenCafreal.webp" alt="Chicken cafreal" loading="lazy" decoding="async">
+                        </figure>
+                        <figure class="cuisineSlide">
+                            <img src="./media/images/goanCuisnes/porkVindaloo.webp" alt="Pork vindaloo" loading="lazy" decoding="async">
+                        </figure>
+                        <figure class="cuisineSlide">
+                            <img src="./media/images/goanCuisnes/vegShagoti.webp" alt="Vegetable xacuti" loading="lazy" decoding="async">
+                        </figure>
+                        <figure class="cuisineSlide">
+                            <img src="./media/images/goanCuisnes/khatkhatem.webp" alt="Khatkhatem" loading="lazy" decoding="async">
+                        </figure>
+                        <figure class="cuisineSlide">
+                            <img src="./media/images/goanCuisnes/moongachoGathi.webp" alt="Moongacho gathi" loading="lazy" decoding="async">
+                        </figure>
+                        <figure class="cuisineSlide">
+                            <img src="./media/images/goanCuisnes/bebinca.webp" alt="Bebinca" loading="lazy" decoding="async">
+                        </figure>
+                        <figure class="cuisineSlide">
+                            <img src="./media/images/goanCuisnes/alleBelle.webp" alt="Alle belle" loading="lazy" decoding="async">
+                        </figure>
+                    </div>
+
+                    <button class="cuisineArrow cuisineArrow--prev" type="button" id="cuisinePrev"
+                        aria-label="Previous photo">&#8249;</button>
+                    <button class="cuisineArrow cuisineArrow--next" type="button" id="cuisineNext"
+                        aria-label="Next photo">&#8250;</button>
+
+                    <!-- dots are generated by script.js from the slide count -->
+                    <div class="cuisineDots" id="cuisineDots"></div>
+                </div>
+
+                <div class="cuisineAside">
+                    <p class="bodyText">A complimentary English breakfast each morning, and unlimited tea, coffee and
+                        juices through the day. Dinner is provided on request, and there is a barbeque in the gazebo
+                        for the evenings you would rather cook outside.</p>
+                    <p class="bodyText">Tell us before you arrive if you would like a cook for part of your stay, or
+                        if anyone in your party eats differently.</p>
+                    <a class="ctaButton" href="stayWithUs.html">Arrange it when booking</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="contentSection" id="dishes">
+            <p class="eyebrow">What to eat</p>
+            <h2 class="sectionTitle">The Goan Table</h2>
+            <p class="bodyText">Goan cooking is coastal food built on coconut, kokum, tamarind and a long Portuguese
+                inheritance. These are the ones worth ordering by name.</p>
+
+            <div class="experienceGrid">
+                <article class="experienceCard">
+                    <img src="./media/images/goanCuisnes/fishHooman.webp" alt="Fish Hooman" loading="lazy" decoding="async">
+                    <p class="experienceTag">Every day</p>
+                    <h3>Fish Hooman</h3>
+                    <p>The everyday meal of Goa rather than a special one — the day’s catch in coconut and kokum, with rice. Judge a kitchen on this.</p>
+                </article>
+                <article class="experienceCard">
+                    <img src="./media/images/goanCuisnes/chickenCafreal.webp" alt="Chicken Cafreal" loading="lazy" decoding="async">
+                    <p class="experienceTag">Green</p>
+                    <h3>Chicken Cafreal</h3>
+                    <p>Coriander, mint, green chilli and lime, ground to a paste. Carried to Goa from Mozambique by Portuguese soldiers.</p>
+                </article>
+                <article class="experienceCard">
+                    <img src="./media/images/goanCuisnes/porkVindaloo.webp" alt="Pork Vindaloo" loading="lazy" decoding="async">
+                    <p class="experienceTag">Vinegar and garlic</p>
+                    <h3>Pork Vindaloo</h3>
+                    <p>From <em>carne de vinha d’alhos</em> — meat in wine and garlic. Goa swapped in palm vinegar and Kashmiri chilli. Sour before it is hot.</p>
+                </article>
+                <article class="experienceCard">
+                    <img src="./media/images/goanCuisnes/vegShagoti.webp" alt="Vegetable Xacuti" loading="lazy" decoding="async">
+                    <p class="experienceTag">Roasted</p>
+                    <h3>Vegetable Xacuti</h3>
+                    <p>Dark with roasted coconut and a long list of spices. Usually chicken; this is the one to ask for without.</p>
+                </article>
+                <article class="experienceCard">
+                    <img src="./media/images/goanCuisnes/khatkhatem.webp" alt="Khatkhatem" loading="lazy" decoding="async">
+                    <p class="experienceTag">Festival</p>
+                    <h3>Khatkhatem</h3>
+                    <p>Mixed vegetables and beans in coconut, sharpened with <em>teppal</em>. A temple dish, so no onion and no garlic.</p>
+                </article>
+                <article class="experienceCard">
+                    <img src="./media/images/goanCuisnes/moongachoGathi.webp" alt="Moongacho Gathi" loading="lazy" decoding="async">
+                    <p class="experienceTag">Morning</p>
+                    <h3>Moongacho Gathi</h3>
+                    <p>Sprouted green gram in a thin coconut gravy. Breakfast, more often than not, with bread from the poder.</p>
+                </article>
+                <article class="experienceCard">
+                    <img src="./media/images/goanCuisnes/bebinca.webp" alt="Bebinca" loading="lazy" decoding="async">
+                    <p class="experienceTag">To finish</p>
+                    <h3>Bebinca</h3>
+                    <p>Layered coconut and egg-yolk cake, baked one layer at a time. Traditionally Christmas, in practice year-round.</p>
+                </article>
+                <article class="experienceCard">
+                    <img src="./media/images/goanCuisnes/alleBelle.webp" alt="Alle Belle" loading="lazy" decoding="async">
+                    <p class="experienceTag">Teatime</p>
+                    <h3>Alle Belle</h3>
+                    <p>A thin pancake rolled around coconut and jaggery. The simplest thing on this page, and the one guests ask for again.</p>
+                </article>
+            </div>
+        </section>
+
+        <div class="tileRule" role="presentation"></div>
+
+        <section class="splitSection" id="bread">
+            <div class="splitMedia">
+                <img src="./imagesIkshaa/kitchen.jpg" alt="" loading="lazy" decoding="async">
+            </div>
+            <div class="splitBody">
+                <p class="eyebrow">Every morning</p>
+                <h2 class="sectionTitle">The Poder’s Round</h2>
+                <p class="bodyText">The village baker still comes by on a bicycle, twice a day, sounding a horn.
+                    <em>Poi</em>, <em>undo</em>, <em>kankonn</em> — the breads are a Portuguese inheritance that
+                    stayed, and they are best eaten within the hour.</p>
+                <p class="bodyText">It is one of the few daily rituals in Goa that has not changed at all, and it
+                    reaches this house as it reaches every other in Loutolim.</p>
+            </div>
+        </section>
+
+        <section class="splitSection splitSection--reverse" id="eating-out">
+            <div class="splitMedia">
+                <img src="./hamBurgerDropImages/Outdoor/dinnerBeachside.jpg" alt="" loading="lazy" decoding="async">
+            </div>
+            <div class="splitBody">
+                <p class="eyebrow">Nearby</p>
+                <h2 class="sectionTitle">Eating Out</h2>
+                <p class="bodyText">The beach shacks at Betalbatim, Colva and Benaulim cook the day's catch fifteen
+                    minutes from the gate, and Margao's market is ten minutes the other way.</p>
+                <!-- TODO: the specific restaurants you send guests to. Nothing
+                     on ikshaa.com or in the saved listings names any, so these
+                     have to come from you. -->
+                <p class="bodyText">Ask us when you arrive — the places worth the drive change with the season, and
+                    we would rather tell you in person than print a list that dates.</p>
+            </div>
+        </section>
+
+        <div class="squareWhiteRoundCard" id="subscribe">
+            <h2 class="sectionTitle">Subscribe to Newsletter</h2>
+            <p class="bodyText">Stories about architecture, food, landscape and slow living in South Goa — the Ikshaa
+                Journal, a few times a year.</p>
+            <!-- TODO: action="#" does nothing. Point it at a form handler
+                 before this goes live, or the field silently discards. -->
+            <form class="subscribeForm" action="#" method="post">
+                <label class="visually-hidden" for="cuisineSubscribeEmail">Email address</label>
+                <input type="email" id="cuisineSubscribeEmail" name="email" placeholder="you@example.com" required>
+                <button type="submit" class="ctaButton">Subscribe</button>
+            </form>
+        </div>
+
+        <footer class="footer">
+            <div class="footerGrid">
+                <div class="footerCol footerBrand">
+                    <h2 class="sectionTitle">Ikshaa</h2>
+                    <p>A 3 bedroom luxury villa with private pool in Loutolim, South Goa.</p>
+                </div>
+
+                <div class="footerCol">
+                    <p class="eyebrow">Contact</p>
+                    <p><a href="mailto:nyaragoa@gmail.com">nyaragoa@gmail.com</a></p>
+                </div>
+
+                <div class="footerCol">
+                    <p class="eyebrow">Finding us</p>
+                    <ul>
+                        <li>Loutolim, South Goa</li>
+                        <li>20 minutes from Goa airport</li>
+                        <li>10 minutes from Margao station</li>
+                        <li>15 minutes from the beaches</li>
+                    </ul>
+                </div>
+
+                <div class="footerCol">
+                    <p class="eyebrow">Discover</p>
+                    <ul>
+                        <li><a href="ourHeritage.html">Our heritage</a></li>
+                        <li><a href="exploreGoa.html">Explore Goa</a></li>
+                        <li><a href="goanCuisine.html">Goan cuisine</a></li>
+                        <li><a href="guestBook.html">Guest book</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="platformRow">
+                <p class="eyebrow">Also book us on</p>
+                <ul class="platformList">
+                    <li><a href="https://www.airbnb.co.in/rooms/17852391" target="_blank"
+                            rel="noopener noreferrer">Airbnb</a></li>
+                </ul>
+            </div>
+
+            <div class="footerLegal">
+                <p class="footerBase" style="margin:0">&copy; 2026 Ikshaa. All rights reserved.</p>
+                <ul>
+                    <li><a href="#">Privacy</a></li>
+                    <li><a href="#">Terms</a></li>
+                </ul>
+            </div>
+        </footer>
+    </main>
+
+    <script src="script.js"></script>
+
+    <!-- Chat widget. Deferred and last: it builds its own DOM, so nothing
+         above depends on it, and none of it blocks the page. Load order
+         matters — bot.js reads NLU and KNOWLEDGE off window. -->
+    <script src="chat/nlu.js" defer></script>
+    <script src="chat/knowledge.js" defer></script>
+    <script src="chat/bot.js" defer></script>
+    <script src="chat/chat.js" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,620 @@
+/* =====================================================================
+ * chat.css — the overlay. Sits above the slideshow, borrows none of its
+ * layout: everything here is fixed-position and self-contained.
+ * ===================================================================== */
+
+.chat {
+    --ink: #f6f1e8;
+    --ink-dim: rgba(246, 241, 232, 0.62);
+    --glass: rgba(22, 18, 16, 0.72);
+    --glass-edge: rgba(255, 255, 255, 0.14);
+    --sand: #d8a355;
+    --bubble-bot: rgba(255, 255, 255, 0.10);
+    --bubble-me: rgba(216, 163, 85, 0.92);
+    --radius: 18px;
+
+    /* ---- sizing, one place ----
+       Every breakpoint below overrides these variables rather than restating
+       rules, so there is a single description of the widget at each size. */
+    --launcher: 84px;    /* the circular gif button */
+    --panel-w: 430px;    /* desired panel width; clamped to the viewport */
+    --panel-h: 640px;
+    --gutter: 20px;      /* distance from the screen edge */
+    --msg-font: 14.5px;
+    --pad: 16px;
+
+    font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------- launcher ---------------- */
+
+/* The launcher clips its gif with overflow:hidden, so the rings cannot live
+   inside it — this wrapper gives them room to draw outside the circle. */
+.chat__beacon {
+    position: fixed;
+    /* env() keeps clear of the iPhone home indicator and rounded corners. */
+    right: max(var(--gutter), env(safe-area-inset-right));
+    bottom: max(var(--gutter), env(safe-area-inset-bottom));
+    z-index: 40;
+
+    width: var(--launcher);
+    height: var(--launcher);
+    display: grid;
+    place-items: center;
+}
+
+.chat__beacon[hidden] {
+    display: none;
+}
+
+@keyframes chatTrace {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes chatTraceBack {
+    to { transform: rotate(-360deg); }
+}
+
+.chat__launcher {
+    position: relative;
+    z-index: 1;
+
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+
+    color: var(--ink);
+    font: inherit;
+
+    background: var(--glass);
+    backdrop-filter: blur(16px) saturate(1.3);
+    -webkit-backdrop-filter: blur(16px) saturate(1.3);
+    border: 1px solid var(--glass-edge);
+    border-radius: 50%;
+    overflow: hidden;              /* clips the gif to the circle */
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+
+    transition: transform .35s cubic-bezier(.25, 1, .5, 1), box-shadow .3s ease, opacity .25s ease;
+}
+
+.chat__launcher:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
+}
+
+.chat__launcher:focus-visible {
+    outline: 2px solid var(--sand);
+    outline-offset: 3px;
+}
+
+.chat__launcher img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Only shown if the gif fails to load — see the onerror in chat.js. */
+.chat__launcher svg {
+    width: 30px;
+    height: 30px;
+    stroke: var(--sand);
+}
+
+.chat__launcher[hidden] {
+    display: none;
+}
+
+.chat__scrim[aria-hidden="true"] {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.chat__panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 41;
+
+    display: flex;
+    flex-direction: column;
+    width: min(var(--panel-w), calc(100vw - var(--gutter) * 2));
+    /* dvh so a phone's collapsing address bar does not clip the composer. */
+    height: min(var(--panel-h), calc(100vh - var(--gutter) * 2));
+    height: min(var(--panel-h), calc(100dvh - var(--gutter) * 2));
+
+    transform: translate(-50%, -50%);
+
+    color: var(--ink);
+    background: var(--glass);
+    backdrop-filter: blur(26px) saturate(1.4);
+    -webkit-backdrop-filter: blur(26px) saturate(1.4);
+    border: 1px solid var(--glass-edge);
+    border-radius: var(--radius);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+    overflow: hidden;
+
+    transform-origin: center;
+    transition: opacity .28s ease, transform .32s cubic-bezier(.25, 1, .5, 1), visibility .32s;
+}
+
+/* Keep the centring translate in the hidden state too, or it flies off-centre. */
+.chat__panel[aria-hidden="true"] {
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, -46%) scale(.96);
+    pointer-events: none;
+}
+
+/* ---------------- header ---------------- */
+
+.chat__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 14px 14px 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+    flex: none;
+}
+
+.chat__title {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: .01em;
+}
+
+.chat__status {
+    display: block;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--ink-dim);
+    margin-top: 2px;
+}
+
+.chat__dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #6ddc8b;
+    margin-right: 6px;
+    vertical-align: 1px;
+}
+
+.chat__spacer { flex: 1; }
+
+.chat__close {
+    flex: none;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    color: var(--ink-dim);
+    background: transparent;
+    border: 0;
+    border-radius: 8px;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background .2s ease, color .2s ease;
+}
+
+.chat__close:hover { background: rgba(255, 255, 255, .09); color: var(--ink); }
+.chat__close:focus-visible { outline: 2px solid var(--sand); outline-offset: 2px; }
+
+/* ---------------- transcript ---------------- */
+
+.chat__log {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding: calc(var(--pad) + 2px) var(--pad) 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, .2) transparent;
+}
+
+.chat__log::-webkit-scrollbar { width: 8px; }
+.chat__log::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, .18);
+    border-radius: 4px;
+}
+
+.chat__msg {
+    max-width: 84%;
+    padding: 11px 14px;
+    border-radius: 16px;
+    font-size: var(--msg-font);
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    animation: chatIn .3s cubic-bezier(.25, 1, .5, 1) both;
+}
+
+@keyframes chatIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+}
+
+.chat__msg--bot {
+    align-self: flex-start;
+    background: var(--bubble-bot);
+    border: 1px solid rgba(255, 255, 255, .07);
+    border-bottom-left-radius: 5px;
+}
+
+.chat__msg--me {
+    align-self: flex-end;
+    background: var(--bubble-me);
+    color: #241a0d;
+    font-weight: 500;
+    border-bottom-right-radius: 5px;
+}
+
+.chat__msg p { margin: 0; }
+.chat__msg p + p { margin-top: 9px; }
+
+/* typing indicator */
+.chat__typing {
+    align-self: flex-start;
+    display: flex;
+    gap: 4px;
+    padding: 14px;
+    background: var(--bubble-bot);
+    border-radius: 16px;
+    border-bottom-left-radius: 5px;
+}
+
+.chat__typing span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--ink-dim);
+    animation: chatBounce 1.2s infinite ease-in-out;
+}
+
+.chat__typing span:nth-child(2) { animation-delay: .15s; }
+.chat__typing span:nth-child(3) { animation-delay: .3s; }
+
+@keyframes chatBounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: .45; }
+    30% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* ---------------- quick replies ---------------- */
+
+.chat__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    padding: 10px var(--pad) 4px;
+    flex: none;
+}
+
+.chat__chips:empty { display: none; }
+
+.chat__chip {
+    padding: 7px 13px;
+    font: inherit;
+    font-size: 12.5px;
+    color: var(--ink);
+    background: rgba(255, 255, 255, .07);
+    border: 1px solid rgba(255, 255, 255, .16);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background .2s ease, border-color .2s ease, transform .2s ease;
+}
+
+.chat__chip:hover {
+    background: rgba(216, 163, 85, .22);
+    border-color: var(--sand);
+    transform: translateY(-1px);
+}
+
+.chat__chip:focus-visible { outline: 2px solid var(--sand); outline-offset: 2px; }
+
+/* ---------------- composer ---------------- */
+
+.chat__form {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    padding: 12px var(--pad) max(14px, env(safe-area-inset-bottom));
+    border-top: 1px solid rgba(255, 255, 255, .09);
+    flex: none;
+}
+
+.chat__input {
+    flex: 1;
+    resize: none;
+    max-height: 110px;
+    padding: 11px 14px;
+    font: inherit;
+    /* Never below 16px on iOS: smaller text makes Safari zoom the whole page
+       the moment the field takes focus. */
+    font-size: max(16px, var(--msg-font));
+    line-height: 1.45;
+    color: var(--ink);
+    background: rgba(255, 255, 255, .07);
+    border: 1px solid rgba(255, 255, 255, .14);
+    border-radius: 14px;
+    transition: border-color .2s ease, background .2s ease;
+}
+
+.chat__input::placeholder { color: rgba(246, 241, 232, .42); }
+
+.chat__input:focus {
+    outline: none;
+    border-color: var(--sand);
+    background: rgba(255, 255, 255, .1);
+}
+
+.chat__send {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    color: #241a0d;
+    background: var(--sand);
+    border: 0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform .2s ease, opacity .2s ease;
+}
+
+.chat__send:hover { transform: scale(1.06); }
+.chat__send:disabled { opacity: .35; cursor: default; transform: none; }
+.chat__send:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.chat__send svg { width: 18px; height: 18px; }
+
+/* ---------------- small screens ---------------- */
+
+/* =====================================================================
+ * Device ladder. Each block only re-declares the sizing variables.
+ * ===================================================================== */
+
+/* --- small phones: iPhone SE / mini, 320-389px --- */
+@media (max-width: 389px) {
+    .chat {
+        --launcher: 62px;
+        --gutter: 12px;
+        --panel-w: 100vw;
+        --panel-h: 100vh;
+        --msg-font: 14px;
+        --pad: 12px;
+    }
+    .chat__msg { max-width: 92%; }
+    .chat__title { font-size: 14px; }
+    .chat__status { font-size: 11px; }
+}
+
+/* --- phones: iPhone 12-16, Pixel, 390-600px --- */
+@media (min-width: 390px) and (max-width: 600px) {
+    .chat {
+        --launcher: 70px;
+        --gutter: 14px;
+        --panel-w: 100vw;
+        --panel-h: 100vh;
+        --msg-font: 15px;
+    }
+    .chat__msg { max-width: 90%; }
+}
+
+/* --- tablets: iPad mini / Air portrait, 601-900px --- */
+@media (min-width: 601px) and (max-width: 900px) {
+    .chat {
+        --launcher: 82px;
+        --gutter: 22px;
+        --panel-w: 460px;
+        --panel-h: 660px;
+        --msg-font: 15.5px;
+    }
+}
+
+/* --- iPad Pro and small laptops, 901-1439px --- */
+@media (min-width: 901px) and (max-width: 1439px) {
+    .chat {
+        --launcher: 84px;
+        --panel-w: 440px;
+        --panel-h: 660px;
+    }
+}
+
+/* --- large desktop monitors, 1440px+ --- */
+@media (min-width: 1440px) {
+    .chat {
+        --launcher: 92px;
+        --gutter: 28px;
+        --panel-w: 480px;
+        --panel-h: 720px;
+        --msg-font: 15.5px;
+        --pad: 18px;
+    }
+}
+
+/* --- 4K / very large displays: scale up or it reads as a postage stamp --- */
+@media (min-width: 2200px) {
+    .chat {
+        --launcher: 112px;
+        --gutter: 40px;
+        --panel-w: 560px;
+        --panel-h: 820px;
+        --msg-font: 17px;
+        --pad: 22px;
+        --radius: 22px;
+    }
+    .chat__title { font-size: 17px; }
+    .chat__status { font-size: 13.5px; }
+    .chat__chip { font-size: 14px; }
+}
+
+/* --- Short viewports last, so they beat the width blocks above.
+       A landscape iPhone is 852px WIDE and would otherwise be styled as a
+       tablet despite having under 400px of height to work with. --- */
+@media (max-height: 460px) and (orientation: landscape) {
+    .chat {
+        --launcher: 54px;
+        --gutter: 10px;
+        --panel-w: 420px;
+        --panel-h: 100vh;
+        --pad: 10px;
+    }
+    .chat__header { padding: 9px 10px 8px 14px; }
+    .chat__status { display: none; }   /* buy back a line of height */
+    .chat__msg { max-width: 88%; }
+}
+
+/* Coarse pointers need a real target regardless of screen size — 44px is the
+   documented minimum on both iOS and Android. */
+@media (pointer: coarse) {
+    .chat__close { width: 44px; height: 44px; }
+    .chat__send { width: 46px; height: 46px; }
+    .chat__chip { padding: 10px 15px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .chat__launcher,
+    .chat__scrim,
+    .chat__panel,
+    .chat__msg,
+    .chat__chip,
+    .chat__send {
+        transition: none;
+        animation: none;
+    }
+    .chat__typing span { animation-duration: 0.01ms; }
+
+    /* The prompt is shown without cycling under this preference — the JS
+       skips the timer entirely, so there is nothing here to disable. */
+    .chat__nudge {
+        transition: none;
+    }
+}
+
+
+/* ---------------- guiding prompt ----------------
+   Replaces the animated rings. A ring said "look at me"; a question says
+   what the button is FOR, which is what a first-time visitor needs.
+
+   A container with two controls: the question, and a dismiss that closes
+   the prompts WITHOUT touching the launcher. Sits to the left so it never
+   covers the button it is pointing at. */
+.chat__nudge {
+    position: absolute;
+    right: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%) translateX(10px);
+
+    display: flex;
+    align-items: flex-start;
+    gap: 2px;
+
+    max-width: min(16rem, 56vw);
+    padding: 0.65em 0.5em 0.65em 1.05em;
+    border-radius: 16px 16px 4px 16px;
+
+    background: #fff;
+    box-shadow: 0 6px 24px rgba(20, 17, 14, 0.22);
+
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.chat__nudge.is-in {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+    pointer-events: auto;
+}
+
+/* The question itself */
+.chat__nudge-ask {
+    flex: 1;
+    padding: 0;
+    border: none;
+    background: none;
+    color: #2e2a24;
+    font-family: inherit;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    text-align: left;
+    cursor: pointer;
+}
+
+.chat__nudge-ask:hover {
+    color: #8c6a45;
+}
+
+/* Dismiss. Quiet until approached — it is the secondary action here, and
+   making it prominent would invite closing over asking. */
+.chat__nudge-close {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: none;
+    border-radius: 999px;
+    background: none;
+    color: #2e2a24;
+    font-family: inherit;
+    font-size: 1.05rem;
+    line-height: 1;
+    opacity: 0.34;
+    cursor: pointer;
+    transition: opacity 0.25s ease, background-color 0.25s ease;
+}
+
+.chat__nudge-close:hover {
+    opacity: 1;
+    background: rgba(46, 42, 36, 0.09);
+}
+
+.chat__nudge-ask:focus-visible,
+.chat__nudge-close:focus-visible {
+    outline: 2px solid #8c6a45;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* The tail, pointing at the launcher */
+.chat__nudge::after {
+    content: "";
+    position: absolute;
+    right: -5px;
+    bottom: 10px;
+    width: 12px;
+    height: 12px;
+    background: #fff;
+    transform: rotate(45deg);
+    border-radius: 2px;
+}
+
+@media (max-width: 560px) {
+    .chat__nudge {
+        right: 0;
+        top: auto;
+        bottom: calc(100% + 12px);
+        transform: translateY(8px);
+        border-radius: 16px 16px 16px 4px;
+        max-width: 68vw;
+    }
+
+    .chat__nudge.is-in {
+        transform: translateY(0);
+    }
+
+    .chat__nudge::after {
+        right: 22px;
+        bottom: -5px;
+    }
+}

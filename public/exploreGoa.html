@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Goa — Ikshaa</title>
+    <!-- Cormorant Garamond for display, Jost for text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Jost:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="chat/chat.css">
+    <link rel="preload" as="image" href="./hamBurgerDropImages/lifeInGoa/goaRoads.jpg" fetchpriority="high">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false"
+            aria-controls="navPanel">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="villaName"><a href="index.html">Ikshaa</a></div>
+
+        <a class="navBook" href="stayWithUs.html">Book Now</a>
+
+        <div class="nav-panel" id="navPanel">
+            <ul class="nav-links" id="navLinks">
+                <li><a href="ourHeritage.html" data-preview="ourHeritage">Our Heritage</a></li>
+                <li><a href="gallery.html" data-preview="gallery">Gallery</a></li>
+                <li><a href="exploreIkshaa.html" data-preview="villaTour">Villa Tour</a></li>
+                <li><a href="exploreGoa.html" data-preview="exploreGoa">Explore Goa</a></li>
+                <li><a href="goanCuisine.html" data-preview="goanCuisine">Goan Cuisine</a></li>
+                <li><a href="index.html#outdoor" data-preview="outdoor">Outdoor</a></li>
+                <li><a href="index.html#local-eateries" data-preview="localEateries">Local Eateries</a></li>
+                <li><a href="index.html#life-in-goa" data-preview="lifeInGoa">Life in Goa</a></li>
+                <li><a href="index.html#goa-fit" data-preview="goaFit">Goa Fit</a></li>
+                <li><a href="guestBook.html" data-preview="guestBook">Guest Book</a></li>
+                <li><a href="findingUs.html" data-preview="findingUs">Finding Us</a></li>
+                <li><a href="stayWithUs.html" data-preview="stayWithUs">Stay With Us</a></li>
+            </ul>
+
+            <div class="nav-preview" id="navPreview">
+                <img class="previewImage isVisible" data-preview="ourHeritage"
+                    data-src="./hamBurgerDropImages/OurHeritage/IkshaaDoor.jpg" alt="">
+                <img class="previewImage" data-preview="gallery"
+                    data-src="./hamBurgerDropImages/Gallery/IkshaaPool.jpg" alt="">
+                <img class="previewImage" data-preview="villaTour"
+                    data-src="./hamBurgerDropImages/VillaTour/mainGateOfIkshaa.avif" alt="">
+                <img class="previewImage" data-preview="exploreGoa"
+                    data-src="./hamBurgerDropImages/ExploreGoa/goaRoads.jpg" alt="">
+                <img class="previewImage" data-preview="goanCuisine"
+                    data-src="./hamBurgerDropImages/GoanCuisine/dining.jpg" alt="">
+                <img class="previewImage" data-preview="outdoor"
+                    data-src="./hamBurgerDropImages/Outdoor/paragliding.jpg" alt="">
+                <img class="previewImage" data-preview="localEateries"
+                    data-src="./hamBurgerDropImages/localEatery/eclairs.jpg" alt="">
+                <img class="previewImage" data-preview="lifeInGoa"
+                    data-src="./hamBurgerDropImages/lifeInGoa/boatingGoa.jpg" alt="">
+                <img class="previewImage" data-preview="goaFit"
+                    data-src="./hamBurgerDropImages/GoAfiT/ParraRoadGoa.jpg" alt="">
+                <img class="previewImage" data-preview="guestBook"
+                    data-src="./hamBurgerDropImages/GuestBook/toasting.jpg" alt="">
+                <img class="previewImage" data-preview="findingUs"
+                    data-src="./hamBurgerDropImages/FindingUs/chorlaghat.jpg" alt="">
+                <img class="previewImage" data-preview="stayWithUs"
+                    data-src="./hamBurgerDropImages/StayWithUs/Courtyard.jpg" alt="">
+            </div>
+        </div>
+    </nav>
+
+    <header class="pageHero" data-nav-dark>
+        <img class="pageHeroImage" src="./hamBurgerDropImages/lifeInGoa/goaRoads.jpg" alt="" fetchpriority="high"
+            decoding="async">
+        <div class="pageHeroScrim"></div>
+        <h1 class="pageHeroTitle">Explore Goa</h1>
+        <p class="scrollCue">Scroll</p>
+    </header>
+
+    <main class="siteContent">
+
+        <section class="welcomeIntro">
+            <h2 class="welcomeIntroTitle">Goa reveals itself slowly</h2>
+            <p class="welcomeIntroLede">Beyond the beaches are villages shaped by red earth, coconut groves, old
+                houses, chapels, temples, orchards and winding roads. From Loutolim, most of it is inside an
+                afternoon.</p>
+        </section>
+
+        <section class="squareRoundCard" data-nav-dark>
+            <div class="image-container">
+                <img src="./imagesIkshaa/chorlaghat.jpg" alt="" loading="lazy" decoding="async">
+            </div>
+            <div class="card-content">
+                <p class="eyebrow eyebrow--light">Where you are</p>
+                <h2 class="sectionTitle">A village that keeps its own time</h2>
+                <p class="bodyText">Loutolim sits on a hillock in Salcete, ten kilometres from Madgaon station and
+                    twenty minutes from the airport — lush paddy fields, tranquil village roads, and some of the
+                    finest Goan-Portuguese architecture left in the state.</p>
+                <a class="ctaButton ctaButton--onImage" href="findingUs.html">Finding us</a>
+            </div>
+        </section>
+
+        <section class="contentSection" id="beaches">
+            <p class="eyebrow">Fifteen minutes away</p>
+            <h2 class="sectionTitle">The Coast</h2>
+            <p class="bodyText">Salcete's western edge is a near-continuous run of sand. The three closest to the
+                house each have a different temperament.</p>
+
+            <div class="experienceGrid">
+                <article class="experienceCard">
+                    <img src="./imagesIkshaa/beach.jpg" alt="" loading="lazy" decoding="async">
+                    <p class="experienceTag">Quiet</p>
+                    <h3>Betalbatim</h3>
+                    <p>The calm one: clean smooth sand and a long unbroken view, best at sunset. On some nights the
+                        water is bioluminescent.</p>
+                </article>
+                <article class="experienceCard">
+                    <img src="./imagesIkshaa/beach2.jpeg" alt="" loading="lazy" decoding="async">
+                    <p class="experienceTag">Lively</p>
+                    <h3>Colva</h3>
+                    <p>The busiest beach in South Goa, and the one with everything on it — white sand, water sports,
+                        dolphin trips and full-moon nights.</p>
+                </article>
+                <article class="experienceCard">
+                    <img src="./imagesIkshaa/waves2.jpg" alt="" loading="lazy" decoding="async">
+                    <p class="experienceTag">Easy</p>
+                    <h3>Benaulim</h3>
+                    <p>Calm water for swimming and a line of shacks doing the day's catch. The one to walk in the
+                        late afternoon.</p>
+                </article>
+            </div>
+        </section>
+
+        <div class="tileRule" role="presentation"></div>
+
+        <section class="splitSection" id="heritage-houses">
+            <div class="splitMedia">
+                <img src="./imagesIkshaa/IkshaaDoor.jpg" alt="" loading="lazy" decoding="async">
+            </div>
+            <div class="splitBody">
+                <p class="eyebrow">On your doorstep</p>
+                <h2 class="sectionTitle">The Great Houses</h2>
+                <p class="bodyText">Casa Araujo Alvares, a 251-year-old family mansion, is now a heritage museum with
+                    a sound-and-light tour through its office, dining hall, bedrooms and kitchen. Beside it, Ancestral
+                    Goa recreates village life under Portuguese rule as an open-air museum.</p>
+                <p class="bodyText">Fifteen minutes on, Chandor holds the Menezes Braganza house — over 350 years old
+                    and still lived in by the family.</p>
+                <a class="sectionLink" href="ourHeritage.html">Our own heritage</a>
+            </div>
+        </section>
+
+        <section class="splitSection splitSection--reverse" id="inland">
+            <div class="splitMedia">
+                <img src="./imagesIkshaa/stream.jpg" alt="" loading="lazy" decoding="async">
+            </div>
+            <div class="splitBody">
+                <p class="eyebrow">Inland</p>
+                <h2 class="sectionTitle">Spice, Rivers and Ghats</h2>
+                <p class="bodyText">The spice plantations around Ponda grow pepper, cardamom and cinnamon, and most
+                    will walk you through the crop and feed you afterwards. Further east the land climbs into the
+                    ghats — red earth, winding roads, and streams that run hardest through the monsoon.</p>
+                <p class="bodyText">Goa Chitra, the state's first ethnographic museum, keeps the other half of the
+                    story: pottery, farming tools, palanquins and carts from the working countryside.</p>
+            </div>
+        </section>
+
+        <section class="contentSection" id="seasons">
+            <p class="eyebrow">When to come</p>
+            <h2 class="sectionTitle">The Three Goas</h2>
+
+            <dl class="infoList">
+                <div class="infoRow">
+                    <dt>Summer</dt>
+                    <dd>Asks for shade. The house is built for it — deep verandahs, thick walls, the courtyard</dd>
+                </div>
+                <div class="infoRow">
+                    <dt>Monsoon</dt>
+                    <dd>Changes the colour and sound of everything. Green, quiet, and the villa at its most private
+                    </dd>
+                </div>
+                <div class="infoRow">
+                    <dt>Winter</dt>
+                    <dd>Opens the house to long, unhurried evenings. Book a long way ahead for December</dd>
+                </div>
+            </dl>
+
+            <p><a class="ctaButton" href="stayWithUs.html">Check availability</a></p>
+        </section>
+
+        <div class="squareWhiteRoundCard" id="subscribe">
+            <h2 class="sectionTitle">Subscribe to Newsletter</h2>
+            <p class="bodyText">Stories about architecture, food, landscape and slow living in South Goa — the Ikshaa
+                Journal, a few times a year.</p>
+            <!-- TODO: action="#" does nothing. Point it at a form handler
+                 before this goes live, or the field silently discards. -->
+            <form class="subscribeForm" action="#" method="post">
+                <label class="visually-hidden" for="exploreSubscribeEmail">Email address</label>
+                <input type="email" id="exploreSubscribeEmail" name="email" placeholder="you@example.com" required>
+                <button type="submit" class="ctaButton">Subscribe</button>
+            </form>
+        </div>
+
+        <footer class="footer">
+            <div class="footerGrid">
+                <div class="footerCol footerBrand">
+                    <h2 class="sectionTitle">Ikshaa</h2>
+                    <p>A 3 bedroom luxury villa with private pool in Loutolim, South Goa.</p>
+                </div>
+
+                <div class="footerCol">
+                    <p class="eyebrow">Contact</p>
+                    <p><a href="mailto:nyaragoa@gmail.com">nyaragoa@gmail.com</a></p>
+                </div>
+
+                <div class="footerCol">
+                    <p class="eyebrow">Finding us</p>
+                    <ul>
+                        <li>Loutolim, South Goa</li>
+                        <li>20 minutes from Goa airport</li>
+                        <li>10 minutes from Margao station</li>
+                        <li>15 minutes from the beaches</li>
+                    </ul>
+                </div>
+
+                <div class="footerCol">
+                    <p class="eyebrow">Discover</p>
+                    <ul>
+                        <li><a href="ourHeritage.html">Our heritage</a></li>
+                        <li><a href="exploreGoa.html">Explore Goa</a></li>
+                        <li><a href="goanCuisine.html">Goan cuisine</a></li>
+                        <li><a href="guestBook.html">Guest book</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="platformRow">
+                <p class="eyebrow">Also book us on</p>
+                <ul class="platformList">
+                    <li><a href="https://www.airbnb.co.in/rooms/17852391" target="_blank"
+                            rel="noopener noreferrer">Airbnb</a></li>
+                </ul>
+            </div>
+
+            <div class="footerLegal">
+                <p class="footerBase" style="margin:0">&copy; 2026 Ikshaa. All rights reserved.</p>
+                <ul>
+                    <li><a href="#">Privacy</a></li>
+                    <li><a href="#">Terms</a></li>
+                </ul>
+            </div>
+        </footer>
+    </main>
+
+    <script src="script.js"></script>
+
+    <!-- Chat widget. Deferred and last: it builds its own DOM, so nothing
+         above depends on it, and none of it blocks the page. Load order
+         matters — bot.js reads NLU and KNOWLEDGE off window. -->
+    <script src="chat/nlu.js" defer></script>
+    <script src="chat/knowledge.js" defer></script>
+    <script src="chat/bot.js" defer></script>
+    <script src="chat/chat.js" defer></script>
+</body>
+
+</html>

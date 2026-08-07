@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery — Ikshaa</title>
+    <!-- Cormorant Garamond for display, Jost for text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Jost:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="chat/chat.css">
+    <!-- The hero still, fetched in parallel with the CSS so it can paint as
+         early as possible. Must stay in step with .pageHeroImage below. -->
+    <link rel="preload" as="image" href="./galleryImages/poolArea/IkshaaPool.jpg" fetchpriority="high">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false"
+            aria-controls="navPanel">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <!-- A div, not an h1: on this page the <h1> belongs to the page title -->
+        <div class="villaName"><a href="index.html">Ikshaa</a></div>
+
+        <a class="navBook" href="stayWithUs.html">Book Now</a>
+
+        <div class="nav-panel" id="navPanel">
+            <ul class="nav-links" id="navLinks">
+                <li><a href="ourHeritage.html" data-preview="ourHeritage">Our Heritage</a></li>
+                <li><a href="gallery.html" data-preview="gallery">Gallery</a></li>
+                <li><a href="exploreIkshaa.html" data-preview="villaTour">Villa Tour</a></li>
+                <li><a href="exploreGoa.html" data-preview="exploreGoa">Explore Goa</a></li>
+                <li><a href="goanCuisine.html" data-preview="goanCuisine">Goan Cuisine</a></li>
+                <li><a href="index.html#outdoor" data-preview="outdoor">Outdoor</a></li>
+                <li><a href="index.html#local-eateries" data-preview="localEateries">Local Eateries</a></li>
+                <li><a href="index.html#life-in-goa" data-preview="lifeInGoa">Life in Goa</a></li>
+                <li><a href="index.html#goa-fit" data-preview="goaFit">Goa Fit</a></li>
+                <li><a href="guestBook.html" data-preview="guestBook">Guest Book</a></li>
+                <li><a href="findingUs.html" data-preview="findingUs">Finding Us</a></li>
+                <li><a href="stayWithUs.html" data-preview="stayWithUs">Stay With Us</a></li>
+            </ul>
+
+            <div class="nav-preview" id="navPreview">
+                <img class="previewImage isVisible" data-preview="ourHeritage"
+                    data-src="./hamBurgerDropImages/OurHeritage/IkshaaDoor.jpg" alt="">
+                <img class="previewImage" data-preview="gallery"
+                    data-src="./hamBurgerDropImages/Gallery/IkshaaPool.jpg" alt="">
+                <img class="previewImage" data-preview="villaTour"
+                    data-src="./hamBurgerDropImages/VillaTour/mainGateOfIkshaa.avif" alt="">
+                <img class="previewImage" data-preview="exploreGoa"
+                    data-src="./hamBurgerDropImages/ExploreGoa/goaRoads.jpg" alt="">
+                <img class="previewImage" data-preview="goanCuisine"
+                    data-src="./hamBurgerDropImages/GoanCuisine/dining.jpg" alt="">
+                <img class="previewImage" data-preview="outdoor"
+                    data-src="./hamBurgerDropImages/Outdoor/paragliding.jpg" alt="">
+                <img class="previewImage" data-preview="localEateries"
+                    data-src="./hamBurgerDropImages/localEatery/eclairs.jpg" alt="">
+                <img class="previewImage" data-preview="lifeInGoa"
+                    data-src="./hamBurgerDropImages/lifeInGoa/boatingGoa.jpg" alt="">
+                <img class="previewImage" data-preview="goaFit"
+                    data-src="./hamBurgerDropImages/GoAfiT/ParraRoadGoa.jpg" alt="">
+                <img class="previewImage" data-preview="guestBook"
+                    data-src="./hamBurgerDropImages/GuestBook/toasting.jpg" alt="">
+                <img class="previewImage" data-preview="findingUs"
+                    data-src="./hamBurgerDropImages/FindingUs/chorlaghat.jpg" alt="">
+                <img class="previewImage" data-preview="stayWithUs"
+                    data-src="./hamBurgerDropImages/StayWithUs/Courtyard.jpg" alt="">
+            </div>
+        </div>
+    </nav>
+
+    <header class="pageHero" data-nav-dark>
+        <img class="pageHeroImage" src="./galleryImages/poolArea/IkshaaPool.jpg" alt="" fetchpriority="high" decoding="async">
+        <div class="pageHeroScrim"></div>
+        <h1 class="pageHeroTitle">Gallery</h1>
+        <p class="scrollCue">Scroll</p>
+    </header>
+
+    <main class="siteContent">
+        <div class="galleryGrid">
+
+            <!-- Each tile stacks its group's photos in one box and crossfades
+                 between them in random order. The rotation only runs while the
+                 tile is on screen — script.js starts it on intersection. The
+                 first image of each stack is the fixed opening frame. -->
+            <section class="galleryTile">
+                <div class="galleryStack">
+                    <img class="galleryLayer isVisible" src="./galleryImages/mainBedroom/IkshaaMaster.jpg" alt="Main bedroom"
+                        loading="lazy" decoding="async">
+                    <img class="galleryLayer" src="./galleryImages/mainBedroom/IkshaaBedroom.jpg" alt="" loading="lazy"
+                        decoding="async">
+                    <img class="galleryLayer" src="./galleryImages/mainBedroom/bed3.jpg" alt="" loading="lazy" decoding="async">
+                </div>
+                <h2 class="galleryTileTitle">Main Bedroom</h2>
+                <button class="galleryTrigger" type="button" aria-label="View Main Bedroom photos"></button>
+            </section>
+            <section class="galleryTile">
+                <div class="galleryStack">
+                    <img class="galleryLayer isVisible" src="./galleryImages/secondBedroom/IkshaaBedroom2.jpg" alt="Second bedroom"
+                        loading="lazy" decoding="async">
+                    <img class="galleryLayer" src="./galleryImages/secondBedroom/IkshaaTwinBed.jpg" alt="" loading="lazy"
+                        decoding="async">
+                    <img class="galleryLayer" src="./galleryImages/secondBedroom/IkshaaWindow.jpg" alt="" loading="lazy"
+                        decoding="async">
+                </div>
+                <h2 class="galleryTileTitle">Second Bedroom</h2>
+                <button class="galleryTrigger" type="button" aria-label="View Second Bedroom photos"></button>
+            </section>
+
+            <!-- NB: copies of livingroom2/3 also sit in galleryImages/kitchen/
+                 where they look misfiled. These use the livingRoom copies. -->
+            <section class="galleryTile">
+                <div class="galleryStack">
+                    <img class="galleryLayer isVisible" src="./galleryImages/livingRoom/livingroom3.jpg" alt="Living room"
+                        loading="lazy" decoding="async">
+                    <img class="galleryLayer" src="./galleryImages/livingRoom/livingroom2.jpg" alt="" loading="lazy"
+                        decoding="async">
+                    <img class="galleryLayer" src="./galleryImages/livingRoom/IkshaaSitting2.jpg" alt="" loading="lazy"
+                        decoding="async">
+                </div>
+                <h2 class="galleryTileTitle">Living Room</h2>
+                <button class="galleryTrigger" type="button" aria-label="View Living Room photos"></button>
+            </section>
+            <section class="galleryTile">
+                <div class="galleryStack">
+                    <img class="galleryLayer isVisible" src="./galleryImages/dinning/dining.jpg" alt="Dining area"
+                        loading="lazy" decoding="async">
+                    <img class="galleryLayer" src="./galleryImages/dinning/toasting.jpg" alt="" loading="lazy" decoding="async">
+                    <img class="galleryLayer" src="./galleryImages/dinning/juice.jpg" alt="" loading="lazy" decoding="async">
+                </div>
+                <h2 class="galleryTileTitle">Dining</h2>
+                <button class="galleryTrigger" type="button" aria-label="View Dining photos"></button>
+            </section>
+
+            <!-- TODO: only one true kitchen photo so far; second is a stand-in -->
+            <section class="galleryTile">
+                <div class="galleryStack">
+                    <img class="galleryLayer isVisible" src="./galleryImages/kitchen/kitchen.jpg" alt="Kitchen"
+                        loading="lazy" decoding="async">
+                    <img class="galleryLayer" src="./galleryImages/kitchen/IkshaaCandles.jpg" alt="" loading="lazy"
+                        decoding="async">
+                </div>
+                <h2 class="galleryTileTitle">Kitchen</h2>
+                <button class="galleryTrigger" type="button" aria-label="View Kitchen photos"></button>
+            </section>
+            <section class="galleryTile">
+                <div class="galleryStack">
+                    <img class="galleryLayer isVisible" src="./galleryImages/poolArea/IkshaaPool2.jpg" alt="Pool area"
+                        loading="lazy" decoding="async">
+                    <img class="galleryLayer" src="./galleryImages/poolArea/Courtyard.jpg" alt="" loading="lazy"
+                        decoding="async">
+                    <img class="galleryLayer" src="./galleryImages/poolArea/CourtyardNight.jpg" alt="" loading="lazy"
+                        decoding="async">
+                </div>
+                <h2 class="galleryTileTitle">Pool Area</h2>
+                <button class="galleryTrigger" type="button" aria-label="View Pool Area photos"></button>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Enlarged viewer. Opens on the photo the tile was showing, then the
+         arrows step through that group manually. -->
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
+        <button class="lightboxClose" id="lightboxClose" type="button" aria-label="Close viewer">&times;</button>
+
+        <button class="lightboxNav lightboxPrev" id="lightboxPrev" type="button" aria-label="Previous photo">
+            &#8249;</button>
+
+        <!-- Fixed-size stage. The photo is centred inside it, so a small or
+             differently-shaped image never changes the frame's footprint. -->
+        <div class="lightboxStage">
+            <img class="lightboxImage" id="lightboxImage" src="" alt="">
+        </div>
+
+        <button class="lightboxNav lightboxNext" id="lightboxNext" type="button" aria-label="Next photo">
+            &#8250;</button>
+
+        <p class="lightboxCaption" id="lightboxCaption"></p>
+    </div>
+
+    <script src="script.js"></script>
+
+    <!-- Chat widget. Deferred and last: it builds its own DOM, so nothing
+         above depends on it, and none of it blocks the page. Load order
+         matters — bot.js reads NLU and KNOWLEDGE off window. -->
+    <script src="chat/nlu.js" defer></script>
+    <script src="chat/knowledge.js" defer></script>
+    <script src="chat/bot.js" defer></script>
+    <script src="chat/chat.js" defer></script>
+</body>
+
+</html>

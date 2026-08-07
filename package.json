@@ -1,0 +1,26 @@
+{
+  "name": "ikshaa",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ikshaa — a luxury heritage villa in Loutolim, South Goa. Static site, zero-dependency delivery server, and an offline chat assistant.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "node build.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "eval": "node eval/run.js"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ]
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

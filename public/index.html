@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ikshaa — A Luxury Heritage Villa in South Goa</title>
+    <!-- Cormorant Garamond for display, Jost for text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Jost:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="chat/chat.css">
+    <link rel="preload" as="image" href="./imagesIkshaa/IkshaaBedroom.jpg" fetchpriority="high">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false"
+            aria-controls="navPanel">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <h1 class="villaName"><a href="index.html">Ikshaa</a></h1>
+
+        <!-- Always reachable, at every scroll position -->
+        <a class="navBook" href="stayWithUs.html">Book Now</a>
+
+        <div class="nav-panel" id="navPanel">
+            <ul class="nav-links" id="navLinks">
+                <li><a href="ourHeritage.html" data-preview="ourHeritage">Our Heritage</a></li>
+                <li><a href="gallery.html" data-preview="gallery">Gallery</a></li>
+                <li><a href="exploreIkshaa.html" data-preview="villaTour">Villa Tour</a></li>
+                <li><a href="exploreGoa.html" data-preview="exploreGoa">Explore Goa</a></li>
+                <li><a href="goanCuisine.html" data-preview="goanCuisine">Goan Cuisine</a></li>
+                <li><a href="#outdoor" data-preview="outdoor">Outdoor</a></li>
+                <li><a href="#local-eateries" data-preview="localEateries">Local Eateries</a></li>
+                <li><a href="#life-in-goa" data-preview="lifeInGoa">Life in Goa</a></li>
+                <li><a href="#goa-fit" data-preview="goaFit">Goa Fit</a></li>
+                <li><a href="guestBook.html" data-preview="guestBook">Guest Book</a></li>
+                <li><a href="findingUs.html" data-preview="findingUs">Finding Us</a></li>
+                <li><a href="stayWithUs.html" data-preview="stayWithUs">Stay With Us</a></li>
+            </ul>
+
+            <div class="nav-preview" id="navPreview">
+                <img class="previewImage isVisible" data-preview="ourHeritage"
+                    data-src="./hamBurgerDropImages/OurHeritage/IkshaaDoor.jpg" alt="">
+                <img class="previewImage" data-preview="gallery"
+                    data-src="./hamBurgerDropImages/Gallery/IkshaaPool.jpg" alt="">
+                <img class="previewImage" data-preview="villaTour"
+                    data-src="./hamBurgerDropImages/VillaTour/mainGateOfIkshaa.avif" alt="">
+                <img class="previewImage" data-preview="exploreGoa"
+                    data-src="./hamBurgerDropImages/ExploreGoa/goaRoads.jpg" alt="">
+                <img class="previewImage" data-preview="goanCuisine"
+                    data-src="./hamBurgerDropImages/GoanCuisine/dining.jpg" alt="">
+                <img class="previewImage" data-preview="outdoor"
+                    data-src="./hamBurgerDropImages/Outdoor/paragliding.jpg" alt="">
+                <img class="previewImage" data-preview="localEateries"
+                    data-src="./hamBurgerDropImages/localEatery/eclairs.jpg" alt="">
+                <img class="previewImage" data-preview="lifeInGoa"
+                    data-src="./hamBurgerDropImages/lifeInGoa/boatingGoa.jpg" alt="">
+                <img class="previewImage" data-preview="goaFit"
+                    data-src="./hamBurgerDropImages/GoAfiT/ParraRoadGoa.jpg" alt="">
+                <img class="previewImage" data-preview="guestBook"
+                    data-src="./hamBurgerDropImages/GuestBook/toasting.jpg" alt="">
+                <img class="previewImage" data-preview="findingUs"
+                    data-src="./hamBurgerDropImages/FindingUs/chorlaghat.jpg" alt="">
+                <img class="previewImage" data-preview="stayWithUs"
+                    data-src="./hamBurgerDropImages/StayWithUs/Courtyard.jpg" alt="">
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero as on index.html: 13 slides, 13 captions paired by position,
+         driven by script.js. -->
+    <div class="baseContainer" id="baseContainer" data-nav-dark>
+        <img class="slide" src="./imagesIkshaa/IkshaaBedroom.jpg" alt="Bedroom" fetchpriority="high"
+            decoding="async">
+        <img class="slide" data-src="./imagesIkshaa/IkshaaMaster.jpg" alt="Master bedroom" decoding="async">
+        <img class="slide" data-src="./imagesIkshaa/juice.jpg" alt="Fresh juice on the table" decoding="async">
+        <img class="slide" data-src="./imagesIkshaa/rain.jpg" alt="Rain over the villa" decoding="async">
+        <img class="slide" data-src="./imagesIkshaa/stream.jpg" alt="Stream near the villa" decoding="async">
+        <img class="slide" data-src="./imagesIkshaa/livingroom3.jpg" alt="Living room" decoding="async">
+        <img class="slide" data-src="./imagesIkshaa/bath1.jpg" alt="Bathroom" decoding="async">
+        <img class="slide" data-src="./imagesIkshaa/beach.jpg" alt="Beach" decoding="async">
+        <img class="slide" data-src="./imagesIkshaa/beach2.jpeg" alt="Beach at sunset" decoding="async">
+        <img class="slide" data-src="./imagesIkshaa/chorlaghat.jpg" alt="Chorla Ghat" decoding="async">
+        <img class="slide" data-src="./imagesIkshaa/CourtyardNight.jpg" alt="Courtyard at night" decoding="async">
+        <img class="slide" data-src="./imagesIkshaa/dining.jpg" alt="Dining area" decoding="async">
+        <img class="slide" data-src="./imagesIkshaa/IkshaaBedroom2.jpg" alt="Second bedroom" decoding="async">
+
+        <div class="heroScrim"></div>
+
+        <div class="heroOverlay">
+            <p class="heroEyebrow">Loutulim &middot; South Goa</p>
+
+            <div class="heroCaptions">
+                <div class="heroCaption isVisible">
+                    <h2 class="heroHeadline">Rooms that keep<br>the afternoon</h2>
+                    <p class="heroLede">Deep shade, and light that moves slowly across the floor.</p>
+                </div>
+                <div class="heroCaption">
+                    <h2 class="heroHeadline">A quiet<br>inheritance</h2>
+                    <p class="heroLede">Older proportions, made for the way we live now.</p>
+                </div>
+                <div class="heroCaption">
+                    <h2 class="heroHeadline">Mornings without<br>a schedule</h2>
+                    <p class="heroLede">Breakfast whenever the day asks for it.</p>
+                </div>
+                <div class="heroCaption">
+                    <h2 class="heroHeadline">The monsoon<br>changes everything</h2>
+                    <p class="heroLede">Colour, sound, and the pace of an entire afternoon.</p>
+                </div>
+                <div class="heroCaption">
+                    <h2 class="heroHeadline">The village keeps<br>its own time</h2>
+                    <p class="heroLede">Water close by, and no particular hurry to reach it.</p>
+                </div>
+                <div class="heroCaption">
+                    <h2 class="heroHeadline">Room<br>to gather</h2>
+                    <p class="heroLede">Where the life of the house quietly settles.</p>
+                </div>
+                <div class="heroCaption">
+                    <h2 class="heroHeadline">An unhurried<br>hour</h2>
+                    <p class="heroLede">Cool stone underfoot, and nowhere else to be.</p>
+                </div>
+                <div class="heroCaption">
+                    <h2 class="heroHeadline">Fifteen minutes<br>to the sand</h2>
+                    <p class="heroLede">The virgin beaches of South Goa, and back by lunch.</p>
+                </div>
+                <div class="heroCaption">
+                    <h2 class="heroHeadline">Evenings the<br>colour of salt</h2>
+                    <p class="heroLede">The coast at the far end of the day.</p>
+                </div>
+                <div class="heroCaption">
+                    <h2 class="heroHeadline">Beyond<br>the beaches</h2>
+                    <p class="heroLede">Red earth, coconut groves and winding roads.</p>
+                </div>
+                <div class="heroCaption">
+                    <h2 class="heroHeadline">The courtyard<br>after dark</h2>
+                    <p class="heroLede">Candlelight, and the sky at the centre of the house.</p>
+                </div>
+                <div class="heroCaption">
+                    <h2 class="heroHeadline">A meal is rarely<br>only a meal</h2>
+                    <p class="heroLede">It is an invitation to stay a little longer.</p>
+                </div>
+                <div class="heroCaption">
+                    <h2 class="heroHeadline">Space<br>for everyone</h2>
+                    <p class="heroLede">Three bedrooms, and a house built to hold six.</p>
+                </div>
+            </div>
+
+            <ul class="heroMarks">
+                <li>Heritage</li>
+                <li>Luxury</li>
+                <li>Peace</li>
+            </ul>
+
+       </div>
+
+        <p class="scrollCue">Scroll</p>
+    </div>
+
+    <main class="siteContent">
+
+        <!-- Quiet centred opener on bare cream, then the photograph. -->
+        <section class="welcomeIntro">
+            <h2 class="welcomeIntroTitle">This is where Ikshaa begins</h2>
+            <p class="welcomeIntroLede">A heritage villa with a private pool, set in a South Goan village that has
+                kept its own pace — twenty minutes from the airport, and a world away from it.</p>
+        </section>
+
+        <!-- Welcome: the About paragraph from ikshaa.com, in its own words -->
+        <section class="squareRoundCard" id="welcome" data-nav-dark>
+            <!-- The visitor presses play; nothing starts on its own. That
+                 click is also what permits sound at all, so the mute
+                 control below depends on it. Until then the poster stands
+                 in and none of the 2.7MB is fetched.
+                 The .mov you supplied is kept as the master; this is a
+                 faststart H.264/AAC encode made from it. -->
+            <div class="image-container image-container--film">
+                <video class="cardVideo" id="welcomeVideo" muted loop playsinline preload="none"
+                    poster="./media/videos/mainPageVideoPoster.jpg"
+                    aria-label="The villa, in motion">
+                    <source src="./media/videos/mainPageVideoWeb.mp4" type="video/mp4">
+                </video>
+
+                <!-- Two glyphs per button, one shown at a time from
+                     aria-pressed, so the state lives in the attribute
+                     assistive tech already reads. -->
+                <div class="videoControls">
+                    <button class="mediaBtn" id="welcomePlay" type="button" aria-pressed="false"
+                        aria-label="Play the film">
+                        <svg class="ico ico--play" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path d="M8 5.5v13l10-6.5-10-6.5z" fill="currentColor" />
+                        </svg>
+                        <svg class="ico ico--pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path d="M9 5.5h2.6v13H9zM12.4 5.5H15v13h-2.6z" fill="currentColor" />
+                        </svg>
+                    </button>
+
+                    <button class="mediaBtn" id="welcomeMute" type="button" aria-pressed="true"
+                        aria-label="Unmute the film">
+                        <svg class="ico ico--muted" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" />
+                            <path d="M17 9.5l4 5M21 9.5l-4 5" stroke="currentColor" stroke-width="1.8"
+                                stroke-linecap="round" fill="none" />
+                        </svg>
+                        <svg class="ico ico--heard" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" />
+                            <path d="M16.5 9a4.5 4.5 0 010 6M19 6.5a8 8 0 010 11" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" fill="none" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="card-content">
+                <p class="eyebrow eyebrow--light">Welcome to Ikshaa</p>
+                <h2 class="sectionTitle">A hidalgo’s villa? A mansion? A temple?</h2>
+                <p class="bodyText">Ikshaa in pristine Loutolim is a harmonious blend of all of these — the ultimate
+                    heritage luxury villa in Goa for people seeking refuge from big-city stress. It has the comforts
+                    of modern living, but all the earthy charm of the Goa of yesteryears, down to the little recesses
+                    in the walls for the old <em>ponttios</em>, or paraffin lamps.</p>
+                <a class="ctaButton ctaButton--onImage" href="ourHeritage.html">Our heritage</a>
+            </div>
+        </section>
+
+        <!-- data-parallax tells script.js which way each PICTURE travels
+             inside its frame. The frames themselves never move. -->
+        <section class="twoImagesContainer" id="rooms" data-nav-dark>
+            <article class="imageCard">
+                <img src="./imagesIkshaa/IkshaaBedroom.jpg" alt="" class="twoImages" data-parallax="up" loading="lazy"
+                    decoding="async">
+                <div class="pair-overlay">
+                    <h3>The Bedrooms</h3>
+                    <p>Three bedrooms sleeping six, air-conditioned, and fitted with Goa’s biggest rainshower heads.
+                    </p>
+                    <a class="ctaButton ctaButton--onImage" href="gallery.html">View rooms</a>
+                </div>
+            </article>
+            <article class="imageCard">
+                <img src="./imagesIkshaa/livingroom2.jpg" alt="" class="twoImages" data-parallax="down" loading="lazy"
+                    decoding="async">
+                <div class="pair-overlay">
+                    <h3>The Living Room</h3>
+                    <p>Air-conditioned and open to the courtyard, with satellite TV, DVD and unlimited tea and
+                        coffee.</p>
+                    <a class="ctaButton ctaButton--onImage" href="gallery.html">Take a look</a>
+                </div>
+            </article>
+        </section>
+
+        <div class="tileRule" role="presentation"></div>
+
+        <!-- White card: serif headline, carousel left, copy right -->
+        <section class="cuisinePanel" id="cuisine">
+            <h2 class="cuisineTitle">Our cuisine, between the house and the village</h2>
+
+            <div class="cuisineLayout">
+                <div class="cuisineCarousel">
+                    <div class="cuisineTrack" id="cuisineTrack">
+                        <figure class="cuisineSlide">
+                            <img src="./media/images/goanCuisnes/fishHooman.webp" alt="Fish hooman, the everyday Goan curry" loading="lazy" decoding="async">
+                        </figure>
+                        <figure class="cuisineSlide">
+                            <img src="./media/images/goanCuisnes/chickenCafreal.webp" alt="Chicken cafreal" loading="lazy" decoding="async">
+                        </figure>
+                        <figure class="cuisineSlide">
+                            <img src="./media/images/goanCuisnes/porkVindaloo.webp" alt="Pork vindaloo" loading="lazy" decoding="async">
+                        </figure>
+                        <figure class="cuisineSlide">
+                            <img src="./media/images/goanCuisnes/vegShagoti.webp" alt="Vegetable xacuti" loading="lazy" decoding="async">
+                        </figure>
+                        <figure class="cuisineSlide">
+                            <img src="./media/images/goanCuisnes/khatkhatem.webp" alt="Khatkhatem" loading="lazy" decoding="async">
+                        </figure>
+                        <figure class="cuisineSlide">
+                            <img src="./media/images/goanCuisnes/moongachoGathi.webp" alt="Moongacho gathi" loading="lazy" decoding="async">
+                        </figure>
+                        <figure class="cuisineSlide">
+                            <img src="./media/images/goanCuisnes/bebinca.webp" alt="Bebinca" loading="lazy" decoding="async">
+                        </figure>
+                        <figure class="cuisineSlide">
+                            <img src="./media/images/goanCuisnes/alleBelle.webp" alt="Alle belle" loading="lazy" decoding="async">
+                        </figure>
+                    </div>
+
+                    <button class="cuisineArrow cuisineArrow--prev" type="button" id="cuisinePrev"
+                        aria-label="Previous photo">&#8249;</button>
+                    <button class="cuisineArrow cuisineArrow--next" type="button" id="cuisineNext"
+                        aria-label="Next photo">&#8250;</button>
+
+                    <!-- dots are generated by script.js from the slide count -->
+                    <div class="cuisineDots" id="cuisineDots"></div>
+                </div>
+
+                <div class="cuisineAside">
+                    <p class="bodyText">A complimentary English breakfast each morning, and unlimited tea, coffee and
+                        juices through the day. Dinner is provided on request, and there is a barbeque in the gazebo
+                        for the evenings you would rather cook outside.</p>
+                    <a class="ctaButton" href="gallery.html">Discover more</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Keeps the #life-in-goa anchor the other pages link to -->
+        <section class="findPeaceGoaSection" id="life-in-goa" data-nav-dark>
+            <img src="./imagesIkshaa/chorlaghat.jpg" alt="" loading="lazy" decoding="async">
+            <div class="findPeaceContent">
+                <p class="eyebrow eyebrow--light">Goa</p>
+                <h2 class="sectionTitle">Find Peace in Goa</h2>
+                <p class="bodyText">Loutolim is one of Goa’s prettiest villages, with narrow winding roads and
+                    impressive heritage mansions. Twenty minutes from the airport, ten from Margao station, and
+                    fifteen from the virgin beaches of the south.</p>
+                <a class="ctaButton ctaButton--onImage" href="findingUs.html">Finding us</a>
+            </div>
+        </section>
+
+        <!-- Keeps the #outdoor anchor -->
+        <section class="contentSection" id="outdoor">
+            <p class="eyebrow">Things to do</p>
+            <h2 class="sectionTitle">Outdoor</h2>
+            <p class="bodyText">The coast, the backwaters and the ghats are all within an afternoon of the house.</p>
+
+            <!-- auto-fill grid: more .experienceCard blocks wrap on their own -->
+            <div class="experienceGrid">
+                <article class="experienceCard">
+                    <img src="./imagesIkshaa/beach.jpg" alt="" loading="lazy" decoding="async">
+                    <p class="experienceTag">Coast</p>
+                    <h3>The Beaches</h3>
+                    <p>Fifteen minutes to the virgin beaches of South Goa — close enough to go before breakfast and
+                        be back for it.</p>
+                    <a class="sectionLink" href="findingUs.html">How to get there</a>
+                </article>
+                <article class="experienceCard">
+                    <img src="./imagesIkshaa/stream.jpg" alt="" loading="lazy" decoding="async">
+                    <p class="experienceTag">Inland</p>
+                    <h3>Waterfalls</h3>
+                    <p>The streams and falls of the interior are at their fullest through the monsoon, when the
+                        whole landscape changes colour.</p>
+                    <a class="sectionLink" href="#life-in-goa">Life in Goa</a>
+                </article>
+                <article class="experienceCard">
+                    <img src="./imagesIkshaa/chorlaghat.jpg" alt="" loading="lazy" decoding="async">
+                    <p class="experienceTag">Drives</p>
+                    <h3>The Ghats</h3>
+                    <p>Red earth, coconut groves and winding roads through villages that have kept their own pace.</p>
+                    <a class="sectionLink" href="#life-in-goa">Life in Goa</a>
+                </article>
+                <article class="experienceCard">
+                    <img src="./imagesIkshaa/waves2.jpg" alt="" loading="lazy" decoding="async">
+                    <p class="experienceTag">Water</p>
+                    <h3>Boat Trips</h3>
+                    <p>Out along the backwaters and the coast, arranged from the house with a day's notice.</p>
+                    <a class="sectionLink" href="stayWithUs.html">Ask when booking</a>
+                </article>
+            </div>
+        </section>
+
+        <!-- Keeps the #goa-fit anchor. Content from the facilities page.
+             Split rather than overlaid: the page needs a beat where the
+             picture sits BESIDE the words instead of under them. -->
+        <section class="splitSection" id="goa-fit">
+            <div class="splitMedia">
+                <img src="./imagesIkshaa/IkshaaShells.jpg" alt="" loading="lazy" decoding="async">
+            </div>
+            <div class="splitBody">
+                <p class="eyebrow">Wellness</p>
+                <h2 class="sectionTitle">Goa Fit</h2>
+                <p class="bodyText">Massage services and yoga can be arranged at the house, along with personal
+                    laundry, a daily newspaper and medical service on call. Baby sitting is available with prior
+                    intimation.</p>
+                <a class="sectionLink" href="stayWithUs.html">What's included</a>
+            </div>
+        </section>
+
+        <!-- Reversed, so the two splits alternate down the page.
+             TODO: no restaurant information exists on ikshaa.com or in the
+             saved listings, so this is the one section still unwritten. -->
+        <section class="splitSection splitSection--reverse" id="local-eateries">
+            <div class="splitMedia">
+                <img src="./imagesIkshaa/toasting.jpg" alt="" loading="lazy" decoding="async">
+            </div>
+            <div class="splitBody">
+                <p class="eyebrow">Nearby</p>
+                <h2 class="sectionTitle">Local Eateries</h2>
+                <p class="bodyText">Placeholder — the places you send guests to eat. Nothing on the current site
+                    covers this, so the names and descriptions need to come from you.</p>
+            </div>
+        </section>
+
+        <section class="explore" id="explore">
+            <div class="exploreHead">
+                <h2 class="sectionTitle">Explore the Villa</h2>
+                <!-- aria-label carries the meaning; the arrow glyph is decorative -->
+                <div class="exploreNav">
+                    <button type="button" id="exploreLeft" aria-label="Scroll left">&larr;</button>
+                    <button type="button" id="exploreRight" aria-label="Scroll right">&rarr;</button>
+                </div>
+            </div>
+            <div class="exploreStrip" id="exploreStrip">
+                <figure>
+                    <img src="./imagesIkshaa/IkshaaMaster.jpg" alt="" loading="lazy" decoding="async">
+                    <figcaption>Master suite</figcaption>
+                </figure>
+                <figure>
+                    <img src="./imagesIkshaa/IkshaaTwinBed.jpg" alt="" loading="lazy" decoding="async">
+                    <figcaption>Twin room</figcaption>
+                </figure>
+                <figure>
+                    <img src="./imagesIkshaa/IkshaaMainBath.jpg" alt="" loading="lazy" decoding="async">
+                    <figcaption>Bath</figcaption>
+                </figure>
+                <figure>
+                    <img src="./imagesIkshaa/CourtyardNight.jpg" alt="" loading="lazy" decoding="async">
+                    <figcaption>Courtyard at night</figcaption>
+                </figure>
+                <figure>
+                    <img src="./imagesIkshaa/IkshaaWindow.jpg" alt="" loading="lazy" decoding="async">
+                    <figcaption>Windows</figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <div class="squareWhiteRoundCard" id="subscribe">
+            <h2 class="sectionTitle">Subscribe to Newsletter</h2>
+            <p class="bodyText">Stay updated with the latest news and offers from Ikshaa.</p>
+            <!-- TODO: action="#" does nothing. Point it at a form handler
+                 before this goes live, or the field silently discards. -->
+            <form class="subscribeForm" action="#" method="post">
+                <label class="visually-hidden" for="subscribeEmail">Email address</label>
+                <input type="email" id="subscribeEmail" name="email" placeholder="you@example.com" required>
+                <button type="submit" class="ctaButton">Subscribe</button>
+            </form>
+        </div>
+
+        <footer class="footer">
+            <div class="footerGrid">
+                <div class="footerCol footerBrand">
+                    <h2 class="sectionTitle">Ikshaa</h2>
+                    <p>A 3 bedroom luxury villa with private pool in Loutolim, South Goa.</p>
+                </div>
+
+                <div class="footerCol">
+                    <p class="eyebrow">Contact</p>
+                    <p><a href="mailto:nyaragoa@gmail.com">nyaragoa@gmail.com</a></p>
+                    <!-- ikshaa.com publishes no telephone number. Add one here
+                         if you have it — do not invent one. -->
+                </div>
+
+                <div class="footerCol">
+                    <p class="eyebrow">Finding us</p>
+                    <ul>
+                        <li>Loutolim, South Goa</li>
+                        <li>20 minutes from Goa airport</li>
+                        <li>10 minutes from Margao station</li>
+                        <li>15 minutes from the beaches</li>
+                    </ul>
+                </div>
+
+                <div class="footerCol">
+                    <p class="eyebrow">Discover</p>
+                    <ul>
+                        <li><a href="ourHeritage.html">Our heritage</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                        <li><a href="guestBook.html">Guest book</a></li>
+                        <li><a href="#outdoor">Outdoor</a></li>
+                    </ul>
+                    <p class="eyebrow" style="margin-top:1.6em">Connect</p>
+                    <ul class="footerSocial">
+                        <!-- TODO: no social accounts are linked from ikshaa.com.
+                             Add the real handles or drop this list. -->
+                        <li><a href="#">Instagram</a></li>
+                        <li><a href="#">Facebook</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="platformRow">
+                <p class="eyebrow">Also book us on</p>
+                <ul class="platformList">
+                    <li><a href="https://www.airbnb.co.in/rooms/17852391" target="_blank"
+                            rel="noopener noreferrer">Airbnb</a></li>
+                    <!-- TODO: Agoda was in the skeleton but no listing URL is
+                         known, so it is left out rather than linked to "#". -->
+                </ul>
+            </div>
+
+            <div class="footerLegal">
+                <p class="footerBase" style="margin:0">&copy; 2026 Ikshaa. All rights reserved.</p>
+                <ul>
+                    <!-- TODO: these pages do not exist yet -->
+                    <li><a href="#">Privacy</a></li>
+                    <li><a href="#">Terms</a></li>
+                </ul>
+            </div>
+        </footer>
+    </main>
+
+    <script src="script.js"></script>
+
+    <!-- Chat widget. Deferred and last: it builds its own DOM, so nothing
+         above depends on it, and none of it blocks the page. Load order
+         matters — bot.js reads NLU and KNOWLEDGE off window. -->
+    <script src="chat/nlu.js" defer></script>
+    <script src="chat/knowledge.js" defer></script>
+    <script src="chat/bot.js" defer></script>
+    <script src="chat/chat.js" defer></script>
+</body>
+
+</html>

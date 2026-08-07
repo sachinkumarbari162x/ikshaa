@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finding Us — Ikshaa</title>
+    <!-- Cormorant Garamond for display, Jost for text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Jost:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="chat/chat.css">
+    <link rel="preload" as="image" href="./imagesIkshaa/chorlaghat.jpg" fetchpriority="high">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false"
+            aria-controls="navPanel">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="villaName"><a href="index.html">Ikshaa</a></div>
+
+        <a class="navBook" href="stayWithUs.html">Book Now</a>
+
+        <div class="nav-panel" id="navPanel">
+            <ul class="nav-links" id="navLinks">
+                <li><a href="ourHeritage.html" data-preview="ourHeritage">Our Heritage</a></li>
+                <li><a href="gallery.html" data-preview="gallery">Gallery</a></li>
+                <li><a href="exploreIkshaa.html" data-preview="villaTour">Villa Tour</a></li>
+                <li><a href="exploreGoa.html" data-preview="exploreGoa">Explore Goa</a></li>
+                <li><a href="goanCuisine.html" data-preview="goanCuisine">Goan Cuisine</a></li>
+                <li><a href="index.html#outdoor" data-preview="outdoor">Outdoor</a></li>
+                <li><a href="index.html#local-eateries" data-preview="localEateries">Local Eateries</a></li>
+                <li><a href="index.html#life-in-goa" data-preview="lifeInGoa">Life in Goa</a></li>
+                <li><a href="index.html#goa-fit" data-preview="goaFit">Goa Fit</a></li>
+                <li><a href="guestBook.html" data-preview="guestBook">Guest Book</a></li>
+                <li><a href="findingUs.html" data-preview="findingUs">Finding Us</a></li>
+                <li><a href="stayWithUs.html" data-preview="stayWithUs">Stay With Us</a></li>
+            </ul>
+
+            <div class="nav-preview" id="navPreview">
+                <img class="previewImage isVisible" data-preview="ourHeritage"
+                    data-src="./hamBurgerDropImages/OurHeritage/IkshaaDoor.jpg" alt="">
+                <img class="previewImage" data-preview="gallery"
+                    data-src="./hamBurgerDropImages/Gallery/IkshaaPool.jpg" alt="">
+                <img class="previewImage" data-preview="villaTour"
+                    data-src="./hamBurgerDropImages/VillaTour/mainGateOfIkshaa.avif" alt="">
+                <img class="previewImage" data-preview="exploreGoa"
+                    data-src="./hamBurgerDropImages/ExploreGoa/goaRoads.jpg" alt="">
+                <img class="previewImage" data-preview="goanCuisine"
+                    data-src="./hamBurgerDropImages/GoanCuisine/dining.jpg" alt="">
+                <img class="previewImage" data-preview="outdoor"
+                    data-src="./hamBurgerDropImages/Outdoor/paragliding.jpg" alt="">
+                <img class="previewImage" data-preview="localEateries"
+                    data-src="./hamBurgerDropImages/localEatery/eclairs.jpg" alt="">
+                <img class="previewImage" data-preview="lifeInGoa"
+                    data-src="./hamBurgerDropImages/lifeInGoa/boatingGoa.jpg" alt="">
+                <img class="previewImage" data-preview="goaFit"
+                    data-src="./hamBurgerDropImages/GoAfiT/ParraRoadGoa.jpg" alt="">
+                <img class="previewImage" data-preview="guestBook"
+                    data-src="./hamBurgerDropImages/GuestBook/toasting.jpg" alt="">
+                <img class="previewImage" data-preview="findingUs"
+                    data-src="./hamBurgerDropImages/FindingUs/chorlaghat.jpg" alt="">
+                <img class="previewImage" data-preview="stayWithUs"
+                    data-src="./hamBurgerDropImages/StayWithUs/Courtyard.jpg" alt="">
+            </div>
+        </div>
+    </nav>
+
+    <header class="pageHero" data-nav-dark>
+        <img class="pageHeroImage" src="./imagesIkshaa/chorlaghat.jpg" alt="" fetchpriority="high" decoding="async">
+        <div class="pageHeroScrim"></div>
+        <h1 class="pageHeroTitle">Finding Us</h1>
+        <p class="scrollCue">Scroll</p>
+    </header>
+
+    <main class="siteContent">
+        <article class="article">
+
+            <p class="articleLede">The house sits back from the road, in a village that rewards arriving slowly.</p>
+
+            <p>Ikshaa is in Loutulim, in the Salcete taluka of South Goa — inland from the coast, among red earth,
+                coconut groves and old village houses. It is one of Goa’s prettiest villages, with narrow winding
+                roads and impressive heritage mansions. The turning is quiet and easy to pass; the map below is the
+                surest way to find it.</p>
+
+            <!-- Google's embed endpoint. It takes a plain search query, so no
+                 API key is needed. Swap the q= value for the villa's exact
+                 coordinates to drop the pin precisely. -->
+            <div class="mapFrame">
+                <iframe src="https://www.google.com/maps?q=Loutulim,%20Salcete,%20Goa,%20India&output=embed"
+                    title="Map showing Loutulim, South Goa" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                    allowfullscreen></iframe>
+            </div>
+
+            <p class="mapNote">The pin currently marks the village of Loutulim rather than the gate — see the note
+                below about setting it exactly.</p>
+
+            <h2>Getting Here</h2>
+
+            <!-- Times as published on ikshaa.com/location.html. Mopa opened
+                 after that page was written, so it has no figure yet. -->
+            <dl class="infoList">
+                <div class="infoRow">
+                    <dt>Goa Airport, Dabolim</dt>
+                    <dd>20 minute drive</dd>
+                </div>
+                <div class="infoRow">
+                    <dt>Margao Railway Station</dt>
+                    <dd>10 minute drive</dd>
+                </div>
+                <div class="infoRow">
+                    <dt>Beaches of South Goa</dt>
+                    <dd>15 minute drive</dd>
+                </div>
+                <div class="infoRow">
+                    <dt>Manohar International, Mopa</dt>
+                    <dd>—</dd>
+                </div>
+            </dl>
+
+            <p class="mapNote">Airport transfers are complimentary — tell us your flight and we will arrange the car.
+            </p>
+
+            <h2>Arriving</h2>
+
+            <p>Taxis are straightforward from either airport and from Madgaon, and drivers know Loutulim well. If you
+                are driving yourself, the village roads narrow in places and are best taken gently — particularly
+                during the monsoon, when the verges soften.</p>
+
+            <p>Tell us when you expect to arrive and we will make sure someone is at the house to meet you.</p>
+
+            <p class="articleMark">✦</p>
+
+            <p><a class="ctaButton" href="stayWithUs.html">Check availability</a></p>
+
+        </article>
+    </main>
+
+    <script src="script.js"></script>
+
+    <!-- Chat widget. Deferred and last: it builds its own DOM, so nothing
+         above depends on it, and none of it blocks the page. Load order
+         matters — bot.js reads NLU and KNOWLEDGE off window. -->
+    <script src="chat/nlu.js" defer></script>
+    <script src="chat/knowledge.js" defer></script>
+    <script src="chat/bot.js" defer></script>
+    <script src="chat/chat.js" defer></script>
+</body>
+
+</html>

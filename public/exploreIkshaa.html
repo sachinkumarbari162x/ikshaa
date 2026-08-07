@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ikshaa — A Villa Tour</title>
+    <meta name="description" content="Walk Ikshaa room by room — gate, courtyard, bedrooms, kitchen, pool and garden.">
+
+    <!-- Fonts are deliberately NOT loaded from Google here. On a distant or
+         slow link that is a second host to resolve, connect and negotiate TLS
+         with, all of it blocking text. The stack below falls back to fonts
+         already on the device, so the first paint owes nothing to the
+         network. Add the Google <link> back if the exact faces matter more
+         than the first second. -->
+
+    <!-- One round trip, cached separately from the markup -->
+    <link rel="stylesheet" href="exploreIkshaa.css">
+
+    <!-- The opening photograph, fetched in parallel with the CSS instead of
+         waiting for the script to parse and ask for it. Must stay in step
+         with the first entry of TOUR in exploreIkshaa.js. -->
+    <link rel="preload" as="image" href="./media/images/mainGateOfIkshaa.avif" fetchpriority="high">
+</head>
+
+<body>
+
+    <!-- Everything below the stage is chrome. The rooms themselves are built
+         by exploreIkshaa.js from the TOUR array, so adding a photo means
+         editing one line of data and never this file. -->
+    <div id="stage"></div>
+    <div id="scrim"></div>
+    <!-- Grain and vignette sit over the photographs. Both exist to carry
+         1200px-wide sources at full screen; see exploreIkshaa.css. -->
+    <div id="vignette"></div>
+    <div id="grain"></div>
+
+    <!-- The one piece of site chrome the tour carries. A full navbar would
+         undo the point of a full-screen walk, but with nothing at all this
+         page was a dead end: no way back except the browser button. -->
+    <a class="tourHome" href="index.html">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"
+                stroke-linejoin="round" fill="none" />
+        </svg>
+        <span>Ikshaa</span>
+    </a>
+
+    <div id="caption"></div>
+    <!-- Rail: step back, the dots, step on. The dots are generated into
+         #dots by the script; these two are static so they never depend on
+         the tour data. -->
+    <nav id="rail" aria-label="Rooms">
+        <button id="prevBtn" class="iconBtn railBtn" type="button" aria-label="Previous room">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M17 14l-5-5-5 5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"
+                    stroke-linejoin="round" fill="none" />
+            </svg>
+        </button>
+        <div id="dots"></div>
+        <button id="nextBtn" class="iconBtn railBtn" type="button" aria-label="Next room">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"
+                    stroke-linejoin="round" fill="none" />
+            </svg>
+        </button>
+    </nav>
+    <nav id="ticks" aria-label="Chapters"></nav>
+
+    <div id="bar">
+        <span id="counter">01 / 35</span>
+        <div id="track">
+            <div id="fill"></div>
+        </div>
+        <!-- Two glyphs, one shown at a time from aria-pressed, so the state
+             lives in the attribute assistive tech already reads rather than
+             in a separate class. currentColor lets the JS recolour both by
+             setting one property. -->
+        <button id="soundBtn" class="iconBtn" type="button" aria-pressed="false" aria-label="Turn sound on">
+            <svg class="ico ico--off" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" />
+                <path d="M17 9.5l4 5M21 9.5l-4 5" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" fill="none" />
+            </svg>
+            <svg class="ico ico--on" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" />
+                <path d="M16.5 9a4.5 4.5 0 010 6M19 6.5a8 8 0 010 11" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" fill="none" />
+            </svg>
+        </button>
+        <button id="autoBtn" type="button" aria-pressed="false">Auto tour</button>
+    </div>
+
+    <section id="outro" class="card">
+        <p class="card__kicker">End of the tour</p>
+        <h2 class="card__title">Stay a while</h2>
+        <p class="card__sub">
+            You have walked the whole house — gate to garden, kitchen to
+            courtyard. Scroll back up whenever you want to see a room again.
+        </p>
+        <div class="card__row">
+            <button class="card__btn" id="againBtn" type="button">Walk it again</button>
+            <a class="card__btn card__btn--ghost" href="stayWithUs.html">Check availability</a>
+            <a class="card__btn card__btn--ghost" href="index.html">Back to the villa</a>
+        </div>
+    </section>
+
+    <section id="intro" class="card">
+        <p class="card__kicker">Goa &middot; Private Villa</p>
+        <h1 class="card__title">Ikshaa</h1>
+        <p class="card__sub">
+            Step through the gate and walk the house room by room — the light,
+            the courtyard, the water, and everything just beyond the wall.
+        </p>
+        <button class="card__btn" id="enterBtn" type="button">Enter the villa</button>
+        <p class="card__hint">Scroll &middot; Arrow keys &middot; Swipe</p>
+    </section>
+
+    <!-- defer, not async: the script needs the chrome elements above to
+         exist, and defer guarantees that while still downloading in
+         parallel with the HTML rather than blocking it. -->
+    <!-- No chat widget on this page, deliberately. The tour is a
+         full-screen walk with its own controls at every edge; a floating
+         bubble competes with it. "Back to Ikshaa" is the way out, and the
+         chat is on every other page. -->
+    <script src="exploreIkshaa.js" defer></script>
+
+</body>
+
+</html>

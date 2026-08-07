@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guest Book — Ikshaa</title>
+    <!-- Cormorant Garamond for display, Jost for text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Jost:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="chat/chat.css">
+    <link rel="preload" as="image" href="./imagesIkshaa/IkshaaSitting2.jpg" fetchpriority="high">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false"
+            aria-controls="navPanel">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="villaName"><a href="index.html">Ikshaa</a></div>
+
+        <a class="navBook" href="stayWithUs.html">Book Now</a>
+
+        <div class="nav-panel" id="navPanel">
+            <ul class="nav-links" id="navLinks">
+                <li><a href="ourHeritage.html" data-preview="ourHeritage">Our Heritage</a></li>
+                <li><a href="gallery.html" data-preview="gallery">Gallery</a></li>
+                <li><a href="exploreIkshaa.html" data-preview="villaTour">Villa Tour</a></li>
+                <li><a href="exploreGoa.html" data-preview="exploreGoa">Explore Goa</a></li>
+                <li><a href="goanCuisine.html" data-preview="goanCuisine">Goan Cuisine</a></li>
+                <li><a href="index.html#outdoor" data-preview="outdoor">Outdoor</a></li>
+                <li><a href="index.html#local-eateries" data-preview="localEateries">Local Eateries</a></li>
+                <li><a href="index.html#life-in-goa" data-preview="lifeInGoa">Life in Goa</a></li>
+                <li><a href="index.html#goa-fit" data-preview="goaFit">Goa Fit</a></li>
+                <li><a href="guestBook.html" data-preview="guestBook">Guest Book</a></li>
+                <li><a href="findingUs.html" data-preview="findingUs">Finding Us</a></li>
+                <li><a href="stayWithUs.html" data-preview="stayWithUs">Stay With Us</a></li>
+            </ul>
+
+            <div class="nav-preview" id="navPreview">
+                <img class="previewImage isVisible" data-preview="ourHeritage"
+                    data-src="./hamBurgerDropImages/OurHeritage/IkshaaDoor.jpg" alt="">
+                <img class="previewImage" data-preview="gallery"
+                    data-src="./hamBurgerDropImages/Gallery/IkshaaPool.jpg" alt="">
+                <img class="previewImage" data-preview="villaTour"
+                    data-src="./hamBurgerDropImages/VillaTour/mainGateOfIkshaa.avif" alt="">
+                <img class="previewImage" data-preview="exploreGoa"
+                    data-src="./hamBurgerDropImages/ExploreGoa/goaRoads.jpg" alt="">
+                <img class="previewImage" data-preview="goanCuisine"
+                    data-src="./hamBurgerDropImages/GoanCuisine/dining.jpg" alt="">
+                <img class="previewImage" data-preview="outdoor"
+                    data-src="./hamBurgerDropImages/Outdoor/paragliding.jpg" alt="">
+                <img class="previewImage" data-preview="localEateries"
+                    data-src="./hamBurgerDropImages/localEatery/eclairs.jpg" alt="">
+                <img class="previewImage" data-preview="lifeInGoa"
+                    data-src="./hamBurgerDropImages/lifeInGoa/boatingGoa.jpg" alt="">
+                <img class="previewImage" data-preview="goaFit"
+                    data-src="./hamBurgerDropImages/GoAfiT/ParraRoadGoa.jpg" alt="">
+                <img class="previewImage" data-preview="guestBook"
+                    data-src="./hamBurgerDropImages/GuestBook/toasting.jpg" alt="">
+                <img class="previewImage" data-preview="findingUs"
+                    data-src="./hamBurgerDropImages/FindingUs/chorlaghat.jpg" alt="">
+                <img class="previewImage" data-preview="stayWithUs"
+                    data-src="./hamBurgerDropImages/StayWithUs/Courtyard.jpg" alt="">
+            </div>
+        </div>
+    </nav>
+
+    <header class="pageHero" data-nav-dark>
+        <img class="pageHeroImage" src="./imagesIkshaa/IkshaaSitting2.jpg" alt="" fetchpriority="high"
+            decoding="async">
+        <div class="pageHeroScrim"></div>
+        <h1 class="pageHeroTitle">Guest Book</h1>
+        <p class="scrollCue">Scroll</p>
+    </header>
+
+    <main class="siteContent">
+
+        <div class="guestBookIntro">
+            <p class="articleLede">What guests have written, in their own words.</p>
+        </div>
+
+        <!-- Laid out in CSS columns rather than a grid: the entries vary a lot
+             in length, and columns let each one take only the height it needs
+             instead of padding every row to its tallest member. -->
+        <div class="guestBook">
+
+            <blockquote class="testimonial">
+                <p>Ikshaa is one of the most secluded, romantic and luxurious villa I have been to.</p>
+                <cite><span class="testimonialName">Sonny Walia</span><span class="testimonialFrom">New Delhi,
+                        India</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>You have a gem here, both the property, the peaceful and gorgeous location, plus the most amazing
+                    owner and staff</p>
+                <cite><span class="testimonialName">James Brosnan</span><span class="testimonialFrom">UK</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>Let me sum it up in one word: PARADISE!!!</p>
+                <cite><span class="testimonialName">Susan Brosnan</span><span class="testimonialFrom">UK</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>Ikshaa! Heaven on Earth!! Is that what it means?!</p>
+                <cite><span class="testimonialName">‘Chiyaan’ Vikram &amp; Shaila</span><span
+                        class="testimonialFrom">Chennai, India</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>A little gem hidden in the middle of nowhere. One of the most atmospheric places I have had.</p>
+                <cite><span class="testimonialName">Peter Willer</span><span class="testimonialFrom">Hamburg,
+                        Germany</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>Rustic, earthy, serene. Three cheers to Carmen and her team.</p>
+                <cite><span class="testimonialName">Amit Dhirwani</span><span class="testimonialFrom">Mumbai,
+                        India</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>Pure paradise! Our bedroom was beautifully decorated and extremely comfortable.</p>
+                <cite><span class="testimonialName">Francois Chombart</span><span
+                        class="testimonialFrom">France</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>What a beautiful and most serene paradise Ikshaa is! A home away from home.</p>
+                <cite><span class="testimonialName">Barbara Stiemerling</span><span
+                        class="testimonialFrom">Switzerland</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>What a beautiful oasis! We fell in love with the place and the hospitality.</p>
+                <cite><span class="testimonialName">Jennifer Thomas</span><span class="testimonialFrom">San Diego,
+                        USA</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>Ikshaa is my numero uno recommendation if you are a foodie and a nature lover.</p>
+                <cite><span class="testimonialName">Gina d’Costa</span><span class="testimonialFrom">Mumbai,
+                        India</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>Most of all, it immediately becomes home and that’s what you look for in a truly restful holiday.
+                </p>
+                <cite><span class="testimonialName">Rajni George</span><span class="testimonialFrom">Tamil Nadu,
+                        India</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>A perfect getaway from the hustle and bustle of city life.</p>
+                <cite><span class="testimonialName">Tarak Patel</span><span class="testimonialFrom">Mumbai,
+                        India</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>Thank you for your lovely, gracious hospitality. You’ve helped us create memories!</p>
+                <cite><span class="testimonialName">Rachel O’Hara</span><span class="testimonialFrom">USA</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>A dream house, wonderful food and the best hosts in Goa.</p>
+                <cite><span class="testimonialName">Robin Pagnamenta</span><span
+                        class="testimonialFrom">UK</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>Definitely, a place we recommend for those who want to experience inland Goa.</p>
+                <cite><span class="testimonialName">Jennifer Meunier</span><span
+                        class="testimonialFrom">France</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>We were absolutely and positively surprised to discover such a wonderful place.</p>
+                <cite><span class="testimonialName">Bert Brulez</span><span class="testimonialFrom">Belgium,
+                        Brussels</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>From the first welcome to our leaving Ikshaa we only encountered warmth and friendship.</p>
+                <cite><span class="testimonialName">Mohinderjit Singh Bhangoo</span><span
+                        class="testimonialFrom">London, UK</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>Ikshaa villa is an oasis of calm and comfort. I couldn’t recommend this villa more.</p>
+                <cite><span class="testimonialName">Karelle Walker</span><span class="testimonialFrom">London,
+                        UK</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>The villa is beautiful, lovely décor and such a peaceful atmosphere.</p>
+                <cite><span class="testimonialName">John Watchorn</span><span
+                        class="testimonialFrom">Dubai</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>The place is beautiful in its surroundings and very tastefully done.</p>
+                <cite><span class="testimonialName">Priya Bhasker</span><span class="testimonialFrom">Mumbai,
+                        India</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>Highly recommended for a quiet getaway for family and friends.</p>
+                <cite><span class="testimonialName">Kaushav Mukherjee</span><span class="testimonialFrom">New
+                        Delhi</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>The perfect accommodation for our family holiday.</p>
+                <cite><span class="testimonialName">Federico Fioretta</span><span
+                        class="testimonialFrom">Italy</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>It was relaxing, welcoming, interesting and enjoyable. Will return for sure.</p>
+                <cite><span class="testimonialName">Sarah Jarvis</span><span class="testimonialFrom">UK</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>Ikshaa is an absolutely fantastic place! We had a truly great holiday.</p>
+                <cite><span class="testimonialName">Daniel Eisenegger</span><span
+                        class="testimonialFrom">Switzerland</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>From the moment we arrived at midnight, Carmen and Anthony welcomed us with open arms.</p>
+                <cite><span class="testimonialName">Mary and Daniel Pracny Strass, Zoe, Lucy and Alex</span><span
+                        class="testimonialFrom">Australia</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>Thanks Carmen for a wonderful holiday and kind regards to Anthony.</p>
+                <cite><span class="testimonialName">Linda Ward</span><span class="testimonialFrom">UK</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>We were so blissfully happy here. The villa is gorgeous.</p>
+                <cite><span class="testimonialName">Aditi Mehta</span><span class="testimonialFrom">Mumbai,
+                        India</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>We all had an amazing time, though it was too short.</p>
+                <cite><span class="testimonialName">Sachin Mundra</span><span class="testimonialFrom">Mumbai,
+                        India</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>Thank you for an amazing holiday. Many thanks to Carmen and Anthony.</p>
+                <cite><span class="testimonialName">Michael Knittel</span><span
+                        class="testimonialFrom">Germany</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>We had an amazing time. There have been a lot of memories made at Ikshaa.</p>
+                <cite><span class="testimonialName">Rohit Mahalingam</span><span class="testimonialFrom">Pune,
+                        India</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>We picked Ikshaa to stay at for our honeymoon and were overwhelmed.</p>
+                <cite><span class="testimonialName">Prcilla Morar</span><span class="testimonialFrom">UK</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>Great place to visit. Carmen has done up the place very well.</p>
+                <cite><span class="testimonialName">Harshita Shishodiya</span><span
+                        class="testimonialFrom">Bangalore, India</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>Brilliant food. The location is secluded and beautiful.</p>
+                <cite><span class="testimonialName">Sunny Upadhyay</span><span class="testimonialFrom">Mumbai,
+                        India</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>Easily one of the most beautiful places we’ve stayed in.</p>
+                <cite><span class="testimonialName">Aashika Poovanna</span><span class="testimonialFrom">Bangalore,
+                        India</span></cite>
+            </blockquote>
+
+            <!-- Left in the original French, with lang so screen readers and
+                 hyphenation treat it correctly. -->
+            <blockquote class="testimonial">
+                <p lang="fr">Si Zen et harmonieux. Tout etait parfait et l’accueil tres chaleureux.</p>
+                <cite><span class="testimonialName">Mickael Bonenti</span><span
+                        class="testimonialFrom">Switzerland</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>Wonderful stay. Loved the peace and quiet.</p>
+                <cite><span class="testimonialName">Karthik</span><span class="testimonialFrom">Chennai,
+                        India</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>Go to Ikshaa to experience what paradise really feels like!!</p>
+                <cite><span class="testimonialName">Dr. Anup Rajadhyaksha</span></cite>
+            </blockquote>
+
+            <blockquote class="testimonial">
+                <p>The world and people of today seek nothing but LOVE, CARE, RESPECT and PEACE.</p>
+                <cite><span class="testimonialName">Pankaj Tyagi</span><span class="testimonialFrom">New Delhi,
+                        India</span></cite>
+            </blockquote>
+
+        </div>
+
+        <div class="guestBookOutro">
+            <p><a class="ctaButton" href="stayWithUs.html">Check availability</a></p>
+        </div>
+
+    </main>
+
+    <script src="script.js"></script>
+
+    <!-- Chat widget. Deferred and last: it builds its own DOM, so nothing
+         above depends on it, and none of it blocks the page. Load order
+         matters — bot.js reads NLU and KNOWLEDGE off window. -->
+    <script src="chat/nlu.js" defer></script>
+    <script src="chat/knowledge.js" defer></script>
+    <script src="chat/bot.js" defer></script>
+    <script src="chat/chat.js" defer></script>
+</body>
+
+</html>
