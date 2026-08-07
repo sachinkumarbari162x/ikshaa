@@ -20,6 +20,11 @@ public/_archive/
 public/*.png
 public/ourHeritage.txt
 
+# The newsletter database. Real people's addresses and messages — it is
+# data, not source, and it must never reach a public repository. Recreated
+# empty on first run; back it up separately.
+data/
+
 npm-debug.log*
 .DS_Store
 .env

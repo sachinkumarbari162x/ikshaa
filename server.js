@@ -317,9 +317,21 @@ async function handle(req, res) {
   return fs.createReadStream(filePath).pipe(compressor).pipe(res);
 }
 
-function createServer() {
+/* `api` is opt-in rather than always-on. Mounting it by default would mean
+   every createServer() in a test opened a database file as a side effect,
+   and a test suite that writes to the real store is not a test suite. */
+function createServer(options = {}) {
+  const api = options.api || null;
+
   return http.createServer((req, res) => {
-    handle(req, res).catch(() => {
+    (async () => {
+      // The API answers first and reports whether the request was its own.
+      // It has to come before handle(), which rejects anything but GET/HEAD.
+      if (api && (await api(req, res))) {
+        return;
+      }
+      await handle(req, res);
+    })().catch(() => {
       if (!res.headersSent) {
         res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
       }
@@ -332,8 +344,18 @@ function createServer() {
    bind a port. */
 if (require.main === module) {
   const port = Number(process.env.PORT) || 3000;
-  createServer().listen(port, () => {
+
+  const store = require('./api/db');
+  const { createApi } = require('./api');
+  const db = store.openDatabase(path.join(__dirname, 'data', 'ikshaa.db'));
+
+  createServer({ api: createApi({ db, store }) }).listen(port, () => {
     process.stdout.write('Ikshaa running at http://localhost:' + port + '\n');
+    process.stdout.write(
+      process.env.IKSHAA_API_TOKEN
+        ? '  API at /api — read routes need the bearer token\n'
+        : '  API at /api — IKSHAA_API_TOKEN is unset, so read routes refuse everyone\n'
+    );
   });
 }
 

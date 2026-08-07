@@ -23,9 +23,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # 24, not 20: the newsletter store uses node:sqlite, which is built in
+      # but was behind --experimental-sqlite before 22.13 / 23.4.
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
 
       # `ci` not `install`: installs exactly what package-lock pins, and

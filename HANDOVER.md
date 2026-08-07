@@ -7,7 +7,7 @@ caught someone.
 chat assistant. This file covers *where it currently is*. Read that one first
 if you have not.
 
-**Last updated:** 7 August 2026, at commit `acd7f2c`.
+**Last updated:** 7 August 2026.
 
 ---
 
@@ -19,11 +19,13 @@ if you have not.
 | Repository | https://github.com/sachinkumarbari162x/ikshaa |
 | Hosting | Netlify, connected to GitHub — every push to `main` deploys |
 | CI | GitHub Actions: `npm ci` → `npm run build` → `npm test` |
-| Tests | 198, all passing |
+| Tests | 226, all passing |
 | Build | 16.74 MB, 131 files, from 146 tracked source files |
+| Node | **22.13+ required** — `node:sqlite` is flagged below that. CI runs 24. |
 
-Ten pages, a 35-room scroll-driven villa tour, an offline chat assistant, and
-a newsletter. No framework, no runtime dependencies, one dev dependency (Jest).
+Ten pages, a 35-room scroll-driven villa tour, an offline chat assistant, a
+newsletter, and a local database behind a token-protected API. No framework,
+no runtime dependencies, one dev dependency (Jest).
 
 ### Where the weight is
 
@@ -93,6 +95,78 @@ photo is a new filename."* Code just does not follow it yet.
 
 ---
 
+## The newsletter database (localhost)
+
+`api/` — a real relational store behind a token-protected API, mounted into
+`server.js` at `/api/`. It runs on localhost only; **nothing about it is
+deployed.** The live site still posts to Netlify Forms.
+
+**Why SQLite via `node:sqlite`:** it is built into Node, so the project stays
+zero-dependency. Real constraints, real SQL, one file, no server to run and
+nothing to install. If it ever needs hosting, the same SQL runs on Turso or
+any libSQL host without changing a line.
+
+### The two properties it exists to guarantee
+
+```
+subscribers   one row per address, ever    UNIQUE COLLATE NOCASE
+messages      many rows per address        FK -> subscribers, ON DELETE CASCADE
+```
+
+`COLLATE NOCASE` is the load-bearing part. `Maria@Example.com` and
+`maria@example.com` are one person; without it the table stores both happily
+and they each get a letter. The address is kept as first seen — later casing
+does not rewrite it.
+
+Unsubscribing sets `unsubscribed_at` rather than deleting. The row is the
+record that consent was given and later withdrawn; deleting it loses the proof
+along with the preference. Subscribing again clears the flag.
+
+### Running it
+
+```bash
+npm run token                 # generate a strong token
+IKSHAA_API_TOKEN=<token> npm start
+```
+
+```
+POST /api/subscribe      public   JSON or urlencoded, rate limited 10/min/IP
+GET  /api/subscribers    token
+GET  /api/messages       token    ?email= filters to one person
+GET  /api/stats          token
+POST /api/unsubscribe    token
+```
+
+The database lands at `data/ikshaa.db`, which is **gitignored** — real
+addresses and messages must never reach a public repository. Back it up
+separately; nothing else is holding a copy.
+
+### Security decisions worth not undoing
+
+- **An unset `IKSHAA_API_TOKEN` locks the protected routes rather than opening
+  them.** An unconfigured server is a locked one.
+- **Tokens are compared with `timingSafeEqual` over SHA-256 digests**, not
+  `===`. A plain compare leaks the token's length and first differing byte
+  through timing, which is enough to recover it one character at a time.
+  Hashing first is what makes the lengths always match, since
+  `timingSafeEqual` throws when they differ.
+- **401 says nothing about why.** Which of "no token", "wrong token" and
+  "server has no token set" applies is not the caller's business.
+- **Oversized bodies are drained, not destroyed.** Killing the socket resets
+  the connection before the 413 can be written, and the caller sees a network
+  error instead of the reason.
+- The rate limiter is in-memory and per-process. Fine for localhost; a real
+  deployment needs shared state.
+
+### Wiring the live form to it
+
+Currently `subscribe.html` posts to Netlify Forms. To use this instead, change
+the form's `action` to `/api/subscribe` and drop `data-netlify`. Do not do
+that until the API is actually hosted somewhere — the endpoint does not exist
+in production today, and the change would silently break a working form.
+
+---
+
 ## Testing recipes
 
 ### The newsletter modal
@@ -147,6 +221,10 @@ reasons about that difference is testing a hard drive.
   on by itself. Do not "fill them in" with guesses.
 - **Do not add JPEGs.** New imagery comes from `media/images/` or gets
   converted first.
+- **`data/` is real people's data.** Gitignored, never committed, backed up by
+  nobody but you.
+- **Node 22.13+.** Below that `node:sqlite` needs `--experimental-sqlite` and
+  the API will not start.
 
 ---
 
@@ -155,6 +233,10 @@ reasons about that difference is testing a hard drive.
 - **Netlify Forms** — the form is wired (`data-netlify`), but nobody has
   confirmed a submission lands. Check Site configuration → Forms, submit once,
   set a notification email.
+- **The API is localhost-only.** Hosting it means choosing somewhere that can
+  run Node and keep a file — Fly.io, Railway, or a small VPS — or moving the
+  store to Turso (same SQL) and putting the routes in Netlify Functions. Until
+  then the live form stays on Netlify Forms.
 - **Nothing sends the letters.** The page promises one a week; Netlify only
   collects addresses. Needs a sender (Buttondown, Beehiiv). That is the first
   point where an API key exists, and therefore the first honest reason to add
@@ -171,6 +253,8 @@ reasons about that difference is testing a hard drive.
 ## What changed most recently
 
 ```
+(this session)  Newsletter database: node:sqlite store, token-protected API
+eb2e02b  Add HANDOVER.md
 acd7f2c  Stop the newsletter preview from writing to what it previews
 cdbd779  Show the newsletter modal after 3s
 582b444  Make the newsletter modal testable, and lower its thresholds
