@@ -1177,23 +1177,47 @@ function initNewsletterPrompt() {
     }
   }
 
-  const pop = document.createElement('aside');
+  const pop = document.createElement('div');
   pop.className = 'newsletterPop';
-  pop.setAttribute('aria-label', 'Newsletter');
+  pop.setAttribute('role', 'dialog');
+  pop.setAttribute('aria-modal', 'true');
+  pop.setAttribute('aria-labelledby', 'newsletterPopTitle');
   pop.hidden = true;
+
+  /* The photograph carries data-src, not src, for the same reason the hero
+     slides do: this is built at page load but not shown for at least 20
+     seconds, and it must not compete with the page for bandwidth in the
+     meantime. It is the one portrait image in the set, which is what a
+     half-modal panel wants — and 17 KB of it. */
   pop.innerHTML =
+    '<div class="newsletterPopCard">' +
     '<button class="newsletterPopClose" type="button" aria-label="Close">&times;</button>' +
+    '<div class="newsletterPopFigure">' +
+    '<img data-src="./media/images/machilaChairInCourtyard.avif" alt="" ' +
+    'width="1200" height="1804" decoding="async">' +
+    '</div>' +
+    '<div class="newsletterPopBody">' +
     '<p class="eyebrow">Letters from Ikshaa</p>' +
-    '<p class="newsletterPopText">One letter a week from the house, and a note when ' +
-    'the season turns. No offers, no campaigns.</p>' +
+    '<h2 class="newsletterPopTitle" id="newsletterPopTitle">The house writes, now and then</h2>' +
+    '<p class="newsletterPopText">Not a mailing list. A letter from Loutolim about what is ' +
+    'flowering, what the cook is making, and what the weather has been doing to the courtyard.</p>' +
+    '<ul class="newsletterPopList">' +
+    '<li>One letter a week</li>' +
+    '<li>A note when the season turns</li>' +
+    '<li>No offers, no campaigns</li>' +
+    '</ul>' +
     '<div class="newsletterPopActions">' +
     '<a class="ctaButton" href="subscribe.html">Subscribe</a>' +
     '<button class="newsletterPopLater" type="button">Not now</button>' +
+    '</div>' +
+    '</div>' +
     '</div>';
 
   document.body.appendChild(pop);
 
+  const closeButton = pop.querySelector('.newsletterPopClose');
   let shown = false;
+  let returnFocusTo = null;
 
   function show() {
     if (shown) {
@@ -1203,19 +1227,32 @@ function initNewsletterPrompt() {
     clearTimeout(timer);
     window.removeEventListener('scroll', onScroll);
 
+    hydrate(pop.querySelector('img[data-src]'));
+
+    returnFocusTo = document.activeElement;
     pop.hidden = false;
+    document.body.classList.add('newsletterOpen');
+
     // Two frames, same reason as the hero: the browser has to commit the
     // starting opacity before the class lands, or it appears without the
     // transition running.
     requestAnimationFrame(() => requestAnimationFrame(() => {
       pop.classList.add('isVisible');
+      closeButton.focus();
     }));
   }
 
   function dismiss() {
     pop.classList.remove('isVisible');
+    document.body.classList.remove('newsletterOpen');
     rememberNewsletter({ dismissedAt: Date.now() });
-    setTimeout(() => { pop.hidden = true; }, 600); // after the fade
+
+    // Focus must not be left on an element that is about to be hidden, or
+    // a keyboard user is stranded with nothing selected.
+    if (returnFocusTo && typeof returnFocusTo.focus === 'function') {
+      returnFocusTo.focus();
+    }
+    setTimeout(() => { pop.hidden = true; }, 500); // after the fade
   }
 
   function onScroll() {
@@ -1228,13 +1265,21 @@ function initNewsletterPrompt() {
   const timer = setTimeout(show, NEWSLETTER.DELAY_MS);
   window.addEventListener('scroll', onScroll, { passive: true });
 
-  pop.querySelector('.newsletterPopClose').addEventListener('click', dismiss);
+  closeButton.addEventListener('click', dismiss);
   pop.querySelector('.newsletterPopLater').addEventListener('click', dismiss);
+
+  // Clicking the darkened surround closes it; clicking the card must not.
+  pop.addEventListener('click', (event) => {
+    if (event.target === pop) {
+      dismiss();
+    }
+  });
 
   // Following the link is not a dismissal, but it should not reappear on
   // the way there either.
   pop.querySelector('.ctaButton').addEventListener('click', () => {
     rememberNewsletter({ dismissedAt: Date.now() });
+    document.body.classList.remove('newsletterOpen');
   });
 
   document.addEventListener('keydown', (event) => {

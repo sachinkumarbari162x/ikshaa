@@ -2657,64 +2657,124 @@ body.menuOpen .menu-toggle span {
   display: none;
 }
 
-/* --- the prompt ------------------------------------------------------ */
+/* --- the prompt: a centred modal ----------------------------------
+   Half photograph, half message. It interrupts, so it has to earn it:
+   shown once, remembered for 30 days when dismissed, and never again
+   once somebody has actually subscribed. */
 
 .newsletterPop {
   position: fixed;
-  /* Bottom-LEFT and below the chat: the launcher is fixed bottom-right at
-     z-index 40, so anything sharing that corner would sit on top of it. */
-  left: max(var(--gutter), env(safe-area-inset-left));
-  bottom: max(var(--gutter), env(safe-area-inset-bottom));
-  z-index: 35;
+  inset: 0;
+  /* Above the chat panel (41) and the navbar (30) — a modal that something
+     else can sit on top of is not a modal. */
+  z-index: 60;
 
-  width: min(340px, calc(100vw - var(--gutter) * 2));
-  padding: 24px 26px 22px;
+  display: grid;
+  place-items: center;
+  padding: var(--gutter);
 
-  background-color: var(--cream);
-  color: var(--ink);
-  border-radius: 14px;
-  box-shadow:
-    0 4px 14px rgba(46, 42, 36, 0.08),
-    0 24px 60px rgba(46, 42, 36, 0.22);
+  background-color: rgba(24, 21, 17, 0.62);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
 
   opacity: 0;
-  transform: translateY(14px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition: opacity 0.5s ease;
 }
 .newsletterPop[hidden] {
   display: none;
 }
 .newsletterPop.isVisible {
   opacity: 1;
-  transform: translateY(0);
 }
 
-/* On a phone the chat launcher owns the bottom-right corner, so the card
-   sits above it rather than beside it — there is not room for both. */
-@media (max-width: 560px) {
-  .newsletterPop {
-    right: max(var(--gutter), env(safe-area-inset-right));
-    bottom: calc(max(var(--gutter), env(safe-area-inset-bottom)) + 104px);
-    width: auto;
-  }
+.newsletterPopCard {
+  position: relative;
+  width: min(940px, 100%);
+  /* Tall, as asked — but capped so it never outgrows a short laptop screen
+     and strands the button below the fold. */
+  height: min(86vh, 660px);
+
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* half image, half message */
+
+  overflow: hidden;
+  border-radius: 18px;
+  background-color: var(--cream);
+  color: var(--ink);
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.45);
+
+  transform: translateY(18px) scale(0.985);
+  transition: transform 0.55s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.newsletterPop.isVisible .newsletterPopCard {
+  transform: none;
 }
 
-.newsletterPop .eyebrow {
-  margin-bottom: 0.7em;
+/* min-height:0 so the image column may shrink inside the grid rather than
+   forcing the card taller than its own height cap. */
+.newsletterPopFigure {
+  position: relative;
+  min-height: 0;
+  background-color: #d9cdb8;
+}
+.newsletterPopFigure img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.newsletterPopBody {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(28px, 4vw, 56px);
+  overflow-y: auto;
+}
+.newsletterPopBody .eyebrow {
+  margin-bottom: 1em;
+}
+.newsletterPopTitle {
+  font-family: var(--serif);
+  font-size: var(--text-xl);
+  font-weight: 300;
+  line-height: 1.12;
+  margin: 0 0 0.55em;
 }
 .newsletterPopText {
   font-size: var(--text-sm);
-  line-height: 1.65;
+  line-height: 1.75;
+  opacity: 0.8;
   margin: 0 0 1.4em;
 }
+.newsletterPopList {
+  list-style: none;
+  margin: 0 0 2em;
+  padding: 0;
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+.newsletterPopList li {
+  padding-left: 1.5em;
+  position: relative;
+  margin-bottom: 0.55em;
+}
+.newsletterPopList li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--accent);
+}
+
 .newsletterPopActions {
   display: flex;
   align-items: center;
-  gap: 1.2em;
-}
-.newsletterPop .ctaButton {
-  padding: 0.85em 1.6em;
-  font-size: var(--text-2xs);
+  flex-wrap: wrap;
+  gap: 1.4em;
 }
 .newsletterPopLater {
   background: none;
@@ -2729,31 +2789,47 @@ body.menuOpen .menu-toggle span {
   text-underline-offset: 3px;
 }
 .newsletterPopLater:hover {
-  opacity: 0.9;
+  opacity: 0.95;
 }
 
 .newsletterPopClose {
   position: absolute;
-  top: 8px;
-  right: 10px;
-  width: 30px;
-  height: 30px;
-  background: none;
+  top: 12px;
+  right: 14px;
+  z-index: 2;
+  width: 38px;
+  height: 38px;
+  background-color: rgba(255, 255, 255, 0.82);
   border: none;
-  font-size: 20px;
-  line-height: 1;
-  color: inherit;
-  opacity: 0.45;
-  cursor: pointer;
   border-radius: 50%;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background-color 0.25s ease;
 }
 .newsletterPopClose:hover {
-  opacity: 0.9;
-  background-color: rgba(46, 42, 36, 0.07);
+  background-color: #fff;
+}
+
+/* Stacked on a phone: the photograph takes the top third and the message
+   the rest, because two columns at 380px gives neither enough room. */
+@media (max-width: 720px) {
+  .newsletterPopCard {
+    grid-template-columns: 1fr;
+    grid-template-rows: 34% 1fr;
+    height: min(88vh, 640px);
+  }
+}
+
+/* The scroll lock, so the page behind cannot be moved while this is open. */
+body.newsletterOpen {
+  overflow: hidden;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .newsletterPop {
+  .newsletterPop,
+  .newsletterPopCard {
     transition: none;
     transform: none;
   }
