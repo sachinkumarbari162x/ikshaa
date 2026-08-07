@@ -25,7 +25,7 @@ function createRandomOrder(items) {
   let previous = null;
   let isFirstCall = true;
 
-  return function next() {
+  function next() {
     // Every reload opens on the same image: it's the only one carrying a
     // real src in the markup and the one preloaded in the <head>, so it can
     // paint without waiting on a decision this function hasn't made yet.
@@ -48,23 +48,74 @@ function createRandomOrder(items) {
     }
     previous = queue.shift();
     return previous;
+  }
+
+  // What the next few calls will hand back, without consuming them. This is
+  // what lets a photograph be fetched shortly before it is due on screen
+  // rather than long before, which is the whole point of the schedule below.
+  next.upcoming = function (count) {
+    return isFirstCall ? items.slice(0, count) : queue.slice(0, count);
   };
+
+  return next;
 }
 
-// Everything except the opening slide ships as data-src and is fetched once
-// the page has loaded, so the first paint isn't competing with a dozen
-// full-screen photos for bandwidth.
-function hydrateDeferredImages() {
-  document.querySelectorAll('img[data-src]').forEach((image) => {
+// ---------------------------------------------------------------------
+// When deferred photographs actually get fetched.
+//
+// Everything except the opening slide ships as data-src so the first paint
+// isn't competing with a dozen full-screen photos for bandwidth. Hydrating
+// all of them on window load threw that away: on the homepage it fired 24
+// requests and 2.88 MB at once, of which the guest could see exactly one
+// image. Over HTTP/2 they all multiplex rather than queue, so they share
+// the connection and the one picture that mattered finished as slowly as
+// the twenty-three that did not.
+//
+// 1.65 MB of that was preview imagery inside a *closed* hamburger menu,
+// loading on every page of the site.
+//
+// So each group is fetched when it is nearly needed instead:
+//   slides    — a couple ahead of the fade (see HYDRATE_LEAD)
+//   previews  — on the first menu open
+//   anything else — once the browser is idle
+// ---------------------------------------------------------------------
+
+function hydrate(image) {
+  if (image && image.dataset.src) {
     image.src = image.dataset.src;
     image.removeAttribute('data-src');
-  });
+  }
+}
+
+function hydrateAll(images) {
+  images.forEach(hydrate);
+}
+
+// A slide holds for FADE_MS + HOLD_MS = 3s, so two slides of lead is about
+// six seconds of warning — ample for a ~100 KB photograph even on a slow
+// connection, while still keeping only a couple of requests in flight.
+const HYDRATE_LEAD = 2;
+
+// Whatever is left over: no group claims it, but it must not stay blank.
+// requestIdleCallback waits for a gap in the main thread; the timeout is
+// the ceiling, and the setTimeout is for Safari, which lacks the API.
+function hydrateRemainderWhenIdle() {
+  const rest = () =>
+    hydrateAll(
+      Array.from(document.querySelectorAll('img[data-src]:not(.slide):not(.previewImage)'))
+    );
+
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback(rest, { timeout: 3000 });
+  } else {
+    setTimeout(rest, 1200);
+  }
 }
 
 if (document.readyState === 'complete') {
-  hydrateDeferredImages();
+  hydrateRemainderWhenIdle();
 } else {
-  window.addEventListener('load', hydrateDeferredImages, { once: true });
+  window.addEventListener('load', hydrateRemainderWhenIdle, { once: true });
 }
 
 //===============================================
@@ -378,6 +429,13 @@ let currentCaption = null;
 function showNext() {
   const upcoming = nextSlide();
 
+  // Fetch the slides that are about to be due. Called after the pick so the
+  // lead is measured from the slide now going up, not the one leaving.
+  hydrateAll(nextSlide.upcoming(HYDRATE_LEAD));
+  // Safety net for the wrap between shuffles, where the lead can come up
+  // short. A no-op once a slide has been hydrated, so it costs nothing.
+  hydrate(upcoming);
+
   // Dropping the class on one while adding it to the other makes both
   // transitions run together, so there is no black gap between slides.
   if (current) {
@@ -439,6 +497,11 @@ function setMenu(isOpen) {
   // Reopening should start from the top link again, not from whatever
   // happened to be hovered when it was last closed.
   if (isOpen) {
+    // First open is when these are worth fetching. They are 1.65 MB of
+    // photographs behind a panel that is shut on arrival, and most guests
+    // never open it — paying for them during first paint on every page was
+    // the single largest avoidable cost on the site.
+    hydrateAll(Array.from(navPanel.querySelectorAll('img[data-src]')));
     showPreview(defaultPreview);
   }
 }

@@ -53,7 +53,7 @@ that swaps the 2.7 MB hero video for its 118 KB poster.
 
 ## Why a build step
 
-`public/` is 244 MB. The site is 20 MB.
+`public/` is 244 MB. The site is 16.7 MB.
 
 `build.js` walks what the code actually references and copies only that. It is
 not an ignore list — a file nothing links to cannot ship by accident, and a

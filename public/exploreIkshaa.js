@@ -551,16 +551,24 @@
    *      "Enter the villa" or "Auto tour" is pressed
    *   2. play() returns a promise that rejects when blocked; unhandled, that
    *      throws on every load
-   *   3. preload="none", or 6.4MB of audio competes with the photographs
+   *   3. preload="none", or the audio competes with the photographs
    *      the visitor is actually looking at
    * ------------------------------------------------------------------ */
   var AUDIO = {
     DIR: './media/music/',
-    FADE_MS: 1800,   // long, so the handover at the pool is never abrupt
+    FADE_MS: 1800,   // default: long, so a handover is never abrupt
     STEP_MS: 50,
     TRACKS: {
+      // The bed keeps the long fade — it is background, and nobody should
+      // notice it arrive.
       bed:  { file: 'relaxedMusic.mp3', volume: 0.24 },
-      pool: { file: 'soundForPool.mp3', volume: 0.38 }
+
+      // The pool does not. Water is the thing the guest was brought here to
+      // hear, and 1800ms of ramp meant it was still nearly inaudible a full
+      // second after the pool was on screen — the pause is only 300ms, so
+      // the effect was over before the sound arrived. 700ms still reads as
+      // a fade rather than a cut.
+      pool: { file: 'soundForPool.mp3', volume: 0.38, fadeMs: 700 }
     }
   };
 
@@ -597,7 +605,8 @@
     clearInterval(sound.fades[key]);
 
     var from = a.volume;
-    var steps = Math.max(Math.round(AUDIO.FADE_MS / AUDIO.STEP_MS), 1);
+    var ms = (AUDIO.TRACKS[key] && AUDIO.TRACKS[key].fadeMs) || AUDIO.FADE_MS;
+    var steps = Math.max(Math.round(ms / AUDIO.STEP_MS), 1);
     var i = 0;
 
     sound.fades[key] = setInterval(function () {
@@ -636,7 +645,7 @@
     }
   }
 
-  /* The pool file is 2.4MB. Fetching it on load would compete with the
+  /* The pool file is 1.0MB. Fetching it on load would compete with the
      photographs, so it is warmed only once the pool is a few rooms away —
      early enough to be ready, late enough not to be in the way. */
   var poolWarmed = false;
@@ -652,7 +661,12 @@
     if (poolWarmed || !AUDIO_OK || !sound.on || firstPool < 0) {
       return;
     }
-    if (index >= firstPool - 3) {
+    // Six rooms, not three. In an auto tour a room is ~2.6s, so three rooms
+    // gave roughly 8 seconds of lead for a file that takes longer than that
+    // to arrive on a slow connection — the track was still buffering when
+    // the pool appeared. Six rooms is ~15s, and costs nothing extra: the
+    // file is fetched once either way, just sooner.
+    if (index >= firstPool - 6) {
       poolWarmed = true;
       player('pool').load();
     }
