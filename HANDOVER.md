@@ -7,7 +7,8 @@ caught someone.
 chat assistant. This file covers *where it currently is*. Read that one first
 if you have not.
 
-**Last updated:** 7 August 2026.
+**Last updated:** 7 August 2026, at commit `7203664`. Everything below is
+pushed and, apart from the API, live.
 
 ---
 
@@ -36,6 +37,16 @@ audio         2.54 MB   mono 96kbps
 tour images   2.46 MB   AVIF/WebP already
 code + chat   0.45 MB
 ```
+
+---
+
+## Watch this first
+
+The push at `7203664` is the **first CI run on Node 24** — the bump from 20 was
+forced, because `node:sqlite` was flagged before 22.13 and the old pin could
+not have run the API at all. If a failure email arrives, start there. It passed
+locally against a tree built from `git ls-files` alone, which is as close to
+CI as this machine gets.
 
 ---
 
@@ -253,7 +264,7 @@ reasons about that difference is testing a hard drive.
 ## What changed most recently
 
 ```
-(this session)  Newsletter database: node:sqlite store, token-protected API
+7203664  Add a newsletter database and a token-protected API
 eb2e02b  Add HANDOVER.md
 acd7f2c  Stop the newsletter preview from writing to what it previews
 cdbd779  Show the newsletter modal after 3s
@@ -271,6 +282,12 @@ which one image was visible, and 1.65 MB of it was menu previews behind a shut
 panel. Site-wide first-load image cost went from 14.46 MB to 0.20 MB. Audio
 was 224/256 kbps stereo for ambience played at volume 0.24; mono 96 kbps saved
 3.89 MB, and the pool track's fade was longer than the pause it accompanied.
+
+The newsletter moved off the four content pages, which were taking an address
+under one line of copy and posting it to `action="#"` — silently discarding it.
+It now has its own page that states what arrives before asking, and a centred
+modal that leads there. Then a local database was added behind a token-checked
+API, so addresses and replies can be kept rather than handed to a form service.
 
 The hero crossfade also ran forever, including off-screen and in background
 tabs, with a fixed `backdrop-filter` element over it — a backdrop-filter above
