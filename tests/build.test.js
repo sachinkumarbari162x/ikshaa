@@ -107,13 +107,54 @@ describeIfBuilt('production build', () => {
     expect(headers).toMatch(/X-Content-Type-Options: nosniff/);
   });
 
-  test('the build is a copy — public/ is left intact', () => {
-    // Nothing is moved or deleted out of the source tree.
-    expect(fs.existsSync(path.join(SRC, 'index.html'))).toBe(true);
-    expect(fs.existsSync(path.join(SRC, 'skeletons&Protos'))).toBe(true);
+  test('the build is a copy — everything in dist is still in public', () => {
+    /* The invariant is that build.js copies rather than moves.
+     *
+     * This used to assert that public/skeletons&Protos existed, which tested
+     * the machine rather than the build: that directory is gitignored on
+     * purpose, so it is absent from a fresh clone and CI failed on a file the
+     * project deliberately excludes. Walking dist/ back to public/ tests the
+     * real property, and it holds wherever the checkout came from.
+     */
+    const GENERATED = new Set(['_headers']); // written by build.js, never copied
+    const orphaned = [];
+
+    const walk = (dir) => {
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          walk(full);
+          continue;
+        }
+        const rel = path.relative(DIST, full);
+        if (GENERATED.has(rel)) {
+          continue;
+        }
+        if (!fs.existsSync(path.join(SRC, rel))) {
+          orphaned.push(rel);
+        }
+      }
+    };
+    walk(DIST);
+
+    expect(orphaned).toEqual([]);
   });
 
-  test('dist is a small fraction of public', () => {
+  test('the site stays inside its size budget', () => {
+    /* Replaces a ratio against public/, which was unpassable on CI: locally
+     * public/ is ~244MB of masters and prototypes, but almost all of that is
+     * gitignored, so in a fresh clone public/ is ~16.6MB and dist/ is ~16.7MB
+     * — dist is fractionally LARGER, because of the generated _headers. The
+     * old assertion demanded dist be under a quarter of public/.
+     *
+     * A fixed budget states the thing that was actually meant: if something
+     * unreferenced gets pulled in, or the media grows without anyone looking,
+     * this fails. It is a ceiling, not a target — at the time of writing the
+     * build is ~16.7MB, so there is headroom for a few more photographs but
+     * not for an un-transcoded video or a folder copied in wholesale.
+     */
+    const BUDGET_MB = 22;
+
     const size = (dir) => {
       let total = 0;
       for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -122,8 +163,8 @@ describeIfBuilt('production build', () => {
       }
       return total;
     };
-    // public/ is ~244MB; the site is ~20MB. If this ever inverts, something
-    // unreferenced has been pulled in.
-    expect(size(DIST)).toBeLessThan(size(SRC) / 4);
+
+    const mb = size(DIST) / 1048576;
+    expect(mb).toBeLessThan(BUDGET_MB);
   });
 });
