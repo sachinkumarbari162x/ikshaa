@@ -455,10 +455,62 @@ function showNext() {
     currentCaption = caption;
   }
 
-  setTimeout(showNext, FADE_MS + HOLD_MS);
+  scheduleNext();
+}
+
+/* ---------------------------------------------------------------------
+ * The crossfade only runs while it can actually be seen.
+ *
+ * It used to run forever — while the guest read the footer, while another
+ * tab was in front. A permanent full-viewport opacity animation between
+ * two full-screen photographs is close to free on Apple's compositor and
+ * costly on a Windows laptop with integrated graphics, or on any browser
+ * where GPU rasterisation is partly blocklisted. That is precisely the gap
+ * between an iPad and a desktop browser showing the same page.
+ *
+ * It compounds: .navBook is fixed with backdrop-filter directly over the
+ * hero. A backdrop-filter above STATIC content is cached; above ANIMATING
+ * content it re-samples and re-blurs its backdrop every frame. The hero
+ * never stopping meant that blur never stopped either.
+ * ------------------------------------------------------------------ */
+let heroOnScreen = true;
+let heroTimer = null;
+
+function scheduleNext() {
+  clearTimeout(heroTimer);
+  if (heroOnScreen && document.visibilityState === 'visible') {
+    heroTimer = setTimeout(showNext, FADE_MS + HOLD_MS);
+  }
 }
 
 if (slides.length > 0) {
+  const heroRoot = slides[0].parentElement;
+
+  if (heroRoot && 'IntersectionObserver' in window) {
+    new IntersectionObserver(
+      (entries) => {
+        heroOnScreen = entries[0].isIntersecting;
+        // Resuming restarts the cycle; pausing lets the pending timer go.
+        // A fade already in flight is left to finish on its own — cutting
+        // it short would leave a slide stranded at partial opacity.
+        if (heroOnScreen) {
+          scheduleNext();
+        } else {
+          clearTimeout(heroTimer);
+        }
+      },
+      { threshold: 0 }
+    ).observe(heroRoot);
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      scheduleNext();
+    } else {
+      clearTimeout(heroTimer);
+    }
+  });
+
   // Two frames so the browser commits the starting opacity: 0 before the
   // class lands. Without it the first slide pops in instead of fading.
   requestAnimationFrame(() => requestAnimationFrame(showNext));
