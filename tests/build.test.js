@@ -31,7 +31,7 @@ describeIfBuilt('production build', () => {
     const pages = [
       'index.html', 'ourHeritage.html', 'gallery.html', 'guestBook.html',
       'exploreGoa.html', 'goanCuisine.html', 'findingUs.html',
-      'stayWithUs.html', 'exploreIkshaa.html',
+      'stayWithUs.html', 'exploreIkshaa.html', 'subscribe.html',
     ];
     pages.forEach((p) => {
       expect(fs.existsSync(path.join(DIST, p))).toBe(true);
@@ -97,6 +97,24 @@ describeIfBuilt('production build', () => {
     expect(fs.existsSync(path.join(DIST, '_archive'))).toBe(false);
     expect(fs.existsSync(path.join(DIST, 'node_modules'))).toBe(false);
     expect(fs.existsSync(path.join(DIST, 'package.json'))).toBe(false);
+  });
+
+  test('the newsletter posts somewhere real', () => {
+    /* Four pages shipped with action="#", which silently discards whatever
+       is typed into it. The address is now collected on one page, and that
+       page has to be wired to the host's form handling for it to land. */
+    const page = fs.readFileSync(path.join(DIST, 'subscribe.html'), 'utf8');
+    expect(page).toMatch(/data-netlify="true"/);
+    // Without the hidden form-name the host cannot tell which form posted.
+    expect(page).toMatch(/name="form-name"/);
+
+    // And nothing anywhere still submits into the void.
+    const dead = fs.readdirSync(DIST)
+      .filter((f) => f.endsWith('.html'))
+      .filter((f) => /<form[^>]*action="#"/.test(
+        fs.readFileSync(path.join(DIST, f), 'utf8')
+      ));
+    expect(dead).toEqual([]);
   });
 
   test('the build carries cache headers for the host', () => {

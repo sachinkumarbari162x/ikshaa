@@ -237,16 +237,12 @@
         </section>
 
         <div class="squareWhiteRoundCard" id="subscribe">
-            <h2 class="sectionTitle">Subscribe to Newsletter</h2>
-            <p class="bodyText">Stories about architecture, food, landscape and slow living in South Goa — the Ikshaa
-                Journal, a few times a year.</p>
-            <!-- TODO: action="#" does nothing. Point it at a form handler
-                 before this goes live, or the field silently discards. -->
-            <form class="subscribeForm" action="#" method="post">
-                <label class="visually-hidden" for="cuisineSubscribeEmail">Email address</label>
-                <input type="email" id="cuisineSubscribeEmail" name="email" placeholder="you@example.com" required>
-                <button type="submit" class="ctaButton">Subscribe</button>
-            </form>
+            <h2 class="sectionTitle">Letters from Ikshaa</h2>
+            <p class="bodyText">One letter a week from the house, and a note when the season turns.
+                No offers, no campaigns — and you can stop it in one click.</p>
+            <!-- The address is collected on subscribe.html, where there is room to
+                 say what actually arrives before anyone hands one over. -->
+            <a class="ctaButton" href="subscribe.html">Subscribe</a>
         </div>
 
         <footer class="footer">

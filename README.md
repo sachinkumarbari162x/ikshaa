@@ -1,6 +1,6 @@
 # Ikshaa
 
-Marketing site for a heritage villa in Loutolim, South Goa. Nine pages, a
+Marketing site for a heritage villa in Loutolim, South Goa. Ten pages, a
 35-room scroll-driven villa tour, and an offline chat assistant.
 
 No framework, no build tooling, no runtime dependencies. The only dev
@@ -9,7 +9,7 @@ dependency is Jest.
 ```bash
 npm ci
 npm start     # dev server on :3000
-npm test      # 197 tests
+npm test      # 198 tests
 npm run build # produces dist/
 ```
 
@@ -22,7 +22,7 @@ public/          source — everything the site is made of
 dist/            build output; the ONLY directory that gets published
 server.js        development server (see "Why a server" below)
 build.js         produces dist/ by walking actual references
-tests/           197 tests across delivery, the build, and the chat NLU
+tests/           198 tests across delivery, the build, and the chat NLU
 eval/            corpus the chat assistant is scored against
 ```
 
@@ -95,7 +95,6 @@ deploy until it times out.
 
 ## Known gaps
 
-- Newsletter forms post to `action="#"` on four pages
 - Instagram, Facebook, Privacy and Terms are placeholder links
 - `findingUs.html` has no journey time for Mopa airport — the source predates it
 - The map pin marks the village, not the gate; swap `q=` for coordinates

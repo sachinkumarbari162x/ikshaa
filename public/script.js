@@ -1104,3 +1104,152 @@ syncNavContrast();
 
   update();
 })();
+
+//===============================================
+// Newsletter: the confirmation on subscribe.html, and the prompt that
+// leads people there from everywhere else.
+//
+// The prompt builds its own DOM rather than being marked up on all eight
+// pages. One definition, and adding a page cannot forget it.
+
+const NEWSLETTER = {
+  KEY: 'ikshaa.newsletter',
+  QUIET_DAYS: 30,     // how long a dismissal is respected
+  DELAY_MS: 20000,    // or a scroll past SCROLL_AT, whichever lands first
+  SCROLL_AT: 0.45,
+};
+
+/* localStorage throws outright in some private-browsing modes, so every
+   touch of it is guarded. Failing to remember a dismissal is a small
+   annoyance; throwing here would take the rest of this file down with it. */
+function newsletterState() {
+  try {
+    return JSON.parse(localStorage.getItem(NEWSLETTER.KEY)) || {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function rememberNewsletter(patch) {
+  try {
+    const next = Object.assign(newsletterState(), patch);
+    localStorage.setItem(NEWSLETTER.KEY, JSON.stringify(next));
+  } catch (e) {
+    /* nothing to do — the prompt simply reappears next visit */
+  }
+}
+
+function initSubscribeConfirmation() {
+  const card = document.getElementById('subscribeCard');
+  const thanks = document.getElementById('subscribeThanks');
+  if (!card || !thanks) {
+    return;
+  }
+
+  // The host redirects here with ?subscribed=1 after it has accepted the
+  // post, so this only ever shows for a submission that actually landed.
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('subscribed') !== '1') {
+    return;
+  }
+
+  card.hidden = true;
+  thanks.hidden = false;
+  // Someone who has just subscribed should never be asked again.
+  rememberNewsletter({ subscribed: true });
+  thanks.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function initNewsletterPrompt() {
+  // Not on the subscribe page itself — they are already where it points.
+  if (document.getElementById('subscribeCard')) {
+    return;
+  }
+
+  const state = newsletterState();
+  if (state.subscribed) {
+    return;
+  }
+  if (state.dismissedAt) {
+    const days = (Date.now() - state.dismissedAt) / 86400000;
+    if (days < NEWSLETTER.QUIET_DAYS) {
+      return;
+    }
+  }
+
+  const pop = document.createElement('aside');
+  pop.className = 'newsletterPop';
+  pop.setAttribute('aria-label', 'Newsletter');
+  pop.hidden = true;
+  pop.innerHTML =
+    '<button class="newsletterPopClose" type="button" aria-label="Close">&times;</button>' +
+    '<p class="eyebrow">Letters from Ikshaa</p>' +
+    '<p class="newsletterPopText">One letter a week from the house, and a note when ' +
+    'the season turns. No offers, no campaigns.</p>' +
+    '<div class="newsletterPopActions">' +
+    '<a class="ctaButton" href="subscribe.html">Subscribe</a>' +
+    '<button class="newsletterPopLater" type="button">Not now</button>' +
+    '</div>';
+
+  document.body.appendChild(pop);
+
+  let shown = false;
+
+  function show() {
+    if (shown) {
+      return;
+    }
+    shown = true;
+    clearTimeout(timer);
+    window.removeEventListener('scroll', onScroll);
+
+    pop.hidden = false;
+    // Two frames, same reason as the hero: the browser has to commit the
+    // starting opacity before the class lands, or it appears without the
+    // transition running.
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      pop.classList.add('isVisible');
+    }));
+  }
+
+  function dismiss() {
+    pop.classList.remove('isVisible');
+    rememberNewsletter({ dismissedAt: Date.now() });
+    setTimeout(() => { pop.hidden = true; }, 600); // after the fade
+  }
+
+  function onScroll() {
+    const seen = window.scrollY / Math.max(document.body.scrollHeight - window.innerHeight, 1);
+    if (seen > NEWSLETTER.SCROLL_AT) {
+      show();
+    }
+  }
+
+  const timer = setTimeout(show, NEWSLETTER.DELAY_MS);
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  pop.querySelector('.newsletterPopClose').addEventListener('click', dismiss);
+  pop.querySelector('.newsletterPopLater').addEventListener('click', dismiss);
+
+  // Following the link is not a dismissal, but it should not reappear on
+  // the way there either.
+  pop.querySelector('.ctaButton').addEventListener('click', () => {
+    rememberNewsletter({ dismissedAt: Date.now() });
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !pop.hidden) {
+      dismiss();
+    }
+  });
+}
+
+if (document.readyState === 'complete') {
+  initSubscribeConfirmation();
+  initNewsletterPrompt();
+} else {
+  window.addEventListener('load', () => {
+    initSubscribeConfirmation();
+    initNewsletterPrompt();
+  }, { once: true });
+}

@@ -2440,3 +2440,321 @@ body.menuOpen .menu-toggle span {
     transition: none;
   }
 }
+
+/* =====================================================================
+   Newsletter: the subscribe page, and the prompt that leads people to it.
+
+   The section on the content pages no longer takes an address. Asking for
+   one under a line of copy gives nobody room to say what will actually
+   arrive, and an address handed over blind is the kind that never opens
+   anything. The button now leads here, where the promise is set out first.
+   ===================================================================== */
+
+/* --- the promise, before the form ---------------------------------- */
+
+.subscribeIntro {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: clamp(56px, 9vw, 110px) var(--gutter) clamp(28px, 4vw, 48px);
+  text-align: center;
+}
+
+.promiseList {
+  list-style: none;
+  margin: clamp(36px, 5vw, 60px) 0 0;
+  padding: 0;
+  display: grid;
+  gap: clamp(28px, 4vw, 44px);
+  text-align: left;
+}
+@media (min-width: 860px) {
+  .promiseList {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.promiseMark {
+  display: block;
+  font-family: var(--sans);
+  font-size: var(--text-2xs);
+  letter-spacing: 0.22em;
+  color: var(--accent);
+  margin-bottom: 0.9em;
+}
+.promiseList h3 {
+  font-family: var(--serif);
+  font-size: var(--text-md);
+  font-weight: 400;
+  margin: 0 0 0.5em;
+}
+.promiseList p {
+  font-size: var(--text-sm);
+  line-height: 1.7;
+  opacity: 0.78;
+  margin: 0;
+}
+
+/* --- the form card ------------------------------------------------- */
+
+.subscribeCard {
+  max-width: 760px;
+  margin: 0 auto clamp(64px, 9vw, 120px);
+  padding: clamp(34px, 5.5vw, 64px) clamp(26px, 5vw, 58px);
+  background-color: #fff;
+  border-radius: 20px;
+
+  /* Same two-layer shadow as the cards on the home page, so this reads as
+     the same object at the same height rather than a new kind of panel. */
+  box-shadow:
+    0 4px 14px rgba(46, 42, 36, 0.05),
+    0 30px 80px rgba(46, 42, 36, 0.13);
+}
+.subscribeCard .sectionTitle,
+.subscribeCard .bodyText {
+  text-align: center;
+}
+.subscribeCard .bodyText {
+  max-width: 46ch;
+  margin: 0 auto 2.4em;
+}
+
+.subscribeThanks {
+  text-align: center;
+}
+
+/* --- fields --------------------------------------------------------- */
+
+.fieldRow {
+  display: grid;
+  gap: clamp(18px, 3vw, 26px);
+}
+@media (min-width: 620px) {
+  .fieldRow {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.field {
+  display: block;
+  margin-bottom: clamp(18px, 3vw, 26px);
+  border: none;
+  padding: 0;
+}
+.field > label,
+.field > legend {
+  display: block;
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.72;
+  margin-bottom: 0.7em;
+  padding: 0;
+}
+
+.field input[type="text"],
+.field input[type="email"],
+.field textarea {
+  width: 100%;
+  padding: 0.95em 1.1em;
+  font-family: var(--sans);
+  font-size: var(--text-base);
+  color: var(--ink);
+  background-color: #fcfaf6;
+  border: 1px solid rgba(46, 42, 36, 0.16);
+  border-radius: 8px;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.field textarea {
+  resize: vertical;
+  min-height: 6em;
+  line-height: 1.6;
+}
+.field input:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  /* A ring rather than an outline, so the rounded corner is respected. */
+  box-shadow: 0 0 0 3px rgba(140, 106, 69, 0.16);
+}
+.field input::placeholder,
+.field textarea::placeholder {
+  color: rgba(46, 42, 36, 0.36);
+}
+
+.req {
+  font-size: var(--text-2xs);
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  margin-left: 0.5em;
+}
+.fieldHint {
+  font-size: var(--text-xs);
+  opacity: 0.6;
+  margin: 0.6em 0 0;
+}
+
+/* --- checkboxes ------------------------------------------------------ */
+
+.fieldChoices {
+  margin-top: clamp(26px, 4vw, 36px);
+}
+
+.choice {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.9em;
+  align-items: start;
+  padding: 0.9em 0;
+  cursor: pointer;
+}
+.choice input[type="checkbox"] {
+  width: 1.15em;
+  height: 1.15em;
+  margin-top: 0.15em;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.choice strong {
+  display: block;
+  font-weight: 400;
+  font-size: var(--text-base);
+}
+.choice em {
+  display: block;
+  font-style: normal;
+  font-size: var(--text-sm);
+  opacity: 0.66;
+  margin-top: 0.15em;
+}
+
+.choiceConsent {
+  margin: clamp(18px, 3vw, 26px) 0 clamp(26px, 4vw, 34px);
+  padding: 1.1em 1.2em;
+  background-color: #fcfaf6;
+  border-radius: 10px;
+}
+
+.subscribeFormFull .ctaButton {
+  display: block;
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  font-family: var(--sans);
+}
+
+.formFoot {
+  font-size: var(--text-xs);
+  line-height: 1.7;
+  opacity: 0.62;
+  text-align: center;
+  margin: 1.8em 0 0;
+}
+
+/* A field only a robot fills in. Hidden from everyone else — display:none
+   rather than the visually-hidden class, which is still reachable by a
+   screen reader and would read as a stray unlabelled input. */
+.honeypot {
+  display: none;
+}
+
+/* --- the prompt ------------------------------------------------------ */
+
+.newsletterPop {
+  position: fixed;
+  /* Bottom-LEFT and below the chat: the launcher is fixed bottom-right at
+     z-index 40, so anything sharing that corner would sit on top of it. */
+  left: max(var(--gutter), env(safe-area-inset-left));
+  bottom: max(var(--gutter), env(safe-area-inset-bottom));
+  z-index: 35;
+
+  width: min(340px, calc(100vw - var(--gutter) * 2));
+  padding: 24px 26px 22px;
+
+  background-color: var(--cream);
+  color: var(--ink);
+  border-radius: 14px;
+  box-shadow:
+    0 4px 14px rgba(46, 42, 36, 0.08),
+    0 24px 60px rgba(46, 42, 36, 0.22);
+
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.newsletterPop[hidden] {
+  display: none;
+}
+.newsletterPop.isVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* On a phone the chat launcher owns the bottom-right corner, so the card
+   sits above it rather than beside it — there is not room for both. */
+@media (max-width: 560px) {
+  .newsletterPop {
+    right: max(var(--gutter), env(safe-area-inset-right));
+    bottom: calc(max(var(--gutter), env(safe-area-inset-bottom)) + 104px);
+    width: auto;
+  }
+}
+
+.newsletterPop .eyebrow {
+  margin-bottom: 0.7em;
+}
+.newsletterPopText {
+  font-size: var(--text-sm);
+  line-height: 1.65;
+  margin: 0 0 1.4em;
+}
+.newsletterPopActions {
+  display: flex;
+  align-items: center;
+  gap: 1.2em;
+}
+.newsletterPop .ctaButton {
+  padding: 0.85em 1.6em;
+  font-size: var(--text-2xs);
+}
+.newsletterPopLater {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--sans);
+  font-size: var(--text-xs);
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.newsletterPopLater:hover {
+  opacity: 0.9;
+}
+
+.newsletterPopClose {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  line-height: 1;
+  color: inherit;
+  opacity: 0.45;
+  cursor: pointer;
+  border-radius: 50%;
+}
+.newsletterPopClose:hover {
+  opacity: 0.9;
+  background-color: rgba(46, 42, 36, 0.07);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .newsletterPop {
+    transition: none;
+    transform: none;
+  }
+}

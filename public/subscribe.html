@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Letters from Ikshaa — Subscribe</title>
+    <meta name="description"
+        content="One letter a week from a heritage villa in Loutolim, and a note when the season turns. No marketing.">
+    <!-- Cormorant Garamond for display, Jost for text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Jost:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="chat/chat.css">
+    <!-- From media/images/, not imagesIkshaa/: everything in the latter is a
+         JPEG of 0.7 MP or less, which upscales badly behind a full-screen
+         title. This is 1440x956 at 76 KB — twice the pixels of the largest
+         JPEG on the site for half the bytes. -->
+    <link rel="preload" as="image" href="./media/images/theCourtyard.avif" fetchpriority="high">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false"
+            aria-controls="navPanel">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="villaName"><a href="index.html">Ikshaa</a></div>
+
+        <a class="navBook" href="stayWithUs.html">Book Now</a>
+
+        <div class="nav-panel" id="navPanel">
+            <ul class="nav-links" id="navLinks">
+                <li><a href="ourHeritage.html" data-preview="ourHeritage">Our Heritage</a></li>
+                <li><a href="gallery.html" data-preview="gallery">Gallery</a></li>
+                <li><a href="exploreIkshaa.html" data-preview="villaTour">Villa Tour</a></li>
+                <li><a href="exploreGoa.html" data-preview="exploreGoa">Explore Goa</a></li>
+                <li><a href="goanCuisine.html" data-preview="goanCuisine">Goan Cuisine</a></li>
+                <li><a href="index.html#outdoor" data-preview="outdoor">Outdoor</a></li>
+                <li><a href="index.html#local-eateries" data-preview="localEateries">Local Eateries</a></li>
+                <li><a href="index.html#life-in-goa" data-preview="lifeInGoa">Life in Goa</a></li>
+                <li><a href="index.html#goa-fit" data-preview="goaFit">Goa Fit</a></li>
+                <li><a href="guestBook.html" data-preview="guestBook">Guest Book</a></li>
+                <li><a href="findingUs.html" data-preview="findingUs">Finding Us</a></li>
+                <li><a href="stayWithUs.html" data-preview="stayWithUs">Stay With Us</a></li>
+            </ul>
+
+            <div class="nav-preview" id="navPreview">
+                <img class="previewImage isVisible" data-preview="ourHeritage"
+                    data-src="./hamBurgerDropImages/OurHeritage/IkshaaDoor.jpg" alt="">
+                <img class="previewImage" data-preview="gallery"
+                    data-src="./hamBurgerDropImages/Gallery/IkshaaPool.jpg" alt="">
+                <img class="previewImage" data-preview="villaTour"
+                    data-src="./hamBurgerDropImages/VillaTour/mainGateOfIkshaa.avif" alt="">
+                <img class="previewImage" data-preview="exploreGoa"
+                    data-src="./hamBurgerDropImages/ExploreGoa/goaRoads.jpg" alt="">
+                <img class="previewImage" data-preview="goanCuisine"
+                    data-src="./hamBurgerDropImages/GoanCuisine/dining.jpg" alt="">
+                <img class="previewImage" data-preview="outdoor"
+                    data-src="./hamBurgerDropImages/Outdoor/paragliding.jpg" alt="">
+                <img class="previewImage" data-preview="localEateries"
+                    data-src="./hamBurgerDropImages/localEatery/eclairs.jpg" alt="">
+                <img class="previewImage" data-preview="lifeInGoa"
+                    data-src="./hamBurgerDropImages/lifeInGoa/boatingGoa.jpg" alt="">
+                <img class="previewImage" data-preview="goaFit"
+                    data-src="./hamBurgerDropImages/GoAfiT/ParraRoadGoa.jpg" alt="">
+                <img class="previewImage" data-preview="guestBook"
+                    data-src="./hamBurgerDropImages/GuestBook/toasting.jpg" alt="">
+                <img class="previewImage" data-preview="findingUs"
+                    data-src="./hamBurgerDropImages/FindingUs/chorlaghat.jpg" alt="">
+                <img class="previewImage" data-preview="stayWithUs"
+                    data-src="./hamBurgerDropImages/StayWithUs/Courtyard.jpg" alt="">
+            </div>
+        </div>
+    </nav>
+
+    <header class="pageHero" data-nav-dark>
+        <img class="pageHeroImage" src="./media/images/theCourtyard.avif" alt="" fetchpriority="high"
+            decoding="async" width="1440" height="956">
+        <div class="pageHeroScrim"></div>
+        <h1 class="pageHeroTitle">Letters from Ikshaa</h1>
+        <p class="scrollCue">Scroll</p>
+    </header>
+
+    <main class="siteContent">
+
+        <section class="subscribeIntro">
+            <p class="eyebrow">Keeping in touch</p>
+            <h2 class="sectionTitle">What arrives, and how often</h2>
+            <p class="bodyText">
+                A house this old keeps its own calendar. The light moves, the rains come and go,
+                the garden turns over. We write when there is something worth telling you about.
+            </p>
+
+            <ul class="promiseList">
+                <li>
+                    <span class="promiseMark" aria-hidden="true">01</span>
+                    <h3>One letter a week</h3>
+                    <p>Short, and from the house itself — what is flowering, what the cook is making,
+                        what the weather has been doing to the courtyard.</p>
+                </li>
+                <li>
+                    <span class="promiseMark" aria-hidden="true">02</span>
+                    <h3>A note when the season turns</h3>
+                    <p>The monsoon breaking, the Carnival, the quiet weeks after Christmas. Only
+                        when Goa genuinely changes — a handful of times a year.</p>
+                </li>
+                <li>
+                    <span class="promiseMark" aria-hidden="true">03</span>
+                    <h3>Nothing else</h3>
+                    <p>No offers, no discounts, no campaigns. We do not sell or pass on your
+                        address, and one click at the foot of any letter ends it.</p>
+                </li>
+            </ul>
+        </section>
+
+        <!-- The confirmation. Hidden until the form has actually been posted;
+             script.js reveals it when it sees ?subscribed=1 on the URL, which
+             is where the host sends the visitor after a successful submit. -->
+        <div class="subscribeCard subscribeThanks" id="subscribeThanks" hidden>
+            <p class="eyebrow">Thank you</p>
+            <h2 class="sectionTitle">You are on the list</h2>
+            <p class="bodyText">
+                The first letter will reach you within the week. If it does not, look in your
+                spam folder once — and if it is not there either, write to us directly at
+                <a href="mailto:nyaragoa@gmail.com">nyaragoa@gmail.com</a>.
+            </p>
+            <a class="ctaButton" href="index.html">Back to the villa</a>
+        </div>
+
+        <div class="subscribeCard" id="subscribeCard">
+            <h2 class="sectionTitle">Write to us</h2>
+            <p class="bodyText">
+                Only the email address is needed. Everything else simply helps us write
+                something worth your time.
+            </p>
+
+            <!-- data-netlify: the host detects this at deploy time and captures
+                 submissions itself. No function, no API key, no server. The
+                 hidden form-name is what tells it which form this is, and the
+                 honeypot is a field only a bot will fill in. -->
+            <form class="subscribeFormFull" name="newsletter" method="POST" data-netlify="true"
+                data-netlify-honeypot="bot-field" action="subscribe.html?subscribed=1">
+
+                <input type="hidden" name="form-name" value="newsletter">
+                <p class="honeypot">
+                    <label>Leave this empty <input name="bot-field"></label>
+                </p>
+
+                <div class="fieldRow">
+                    <div class="field">
+                        <label for="subName">Your name</label>
+                        <input type="text" id="subName" name="name" autocomplete="name"
+                            placeholder="Maria Fernandes">
+                    </div>
+
+                    <div class="field">
+                        <label for="subEmail">Email address <span class="req">required</span></label>
+                        <input type="email" id="subEmail" name="email" autocomplete="email"
+                            placeholder="you@example.com" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="subFrom">Where you are writing from</label>
+                    <input type="text" id="subFrom" name="from" autocomplete="country-name"
+                        placeholder="Mumbai, or Lisbon, or anywhere">
+                    <p class="fieldHint">So we know what season you are reading us in.</p>
+                </div>
+
+                <fieldset class="field fieldChoices">
+                    <legend>What you would like</legend>
+
+                    <label class="choice">
+                        <input type="checkbox" name="weekly" value="yes" checked>
+                        <span>
+                            <strong>The weekly letter</strong>
+                            <em>One a week, from the house.</em>
+                        </span>
+                    </label>
+
+                    <label class="choice">
+                        <input type="checkbox" name="seasonal" value="yes" checked>
+                        <span>
+                            <strong>Seasonal notes</strong>
+                            <em>Only when the season turns. A few times a year.</em>
+                        </span>
+                    </label>
+                </fieldset>
+
+                <div class="field">
+                    <label for="subNote">Anything you would like us to know</label>
+                    <textarea id="subNote" name="note" rows="4"
+                        placeholder="A question, or what brings you to Goa — we read and reply to these."></textarea>
+                    <p class="fieldHint">This goes to a person, not an autoresponder.</p>
+                </div>
+
+                <label class="choice choiceConsent">
+                    <input type="checkbox" name="consent" value="yes" required>
+                    <span>
+                        <strong>Yes, write to me.</strong>
+                        <em>You may email me as described above. I can stop it at any time.</em>
+                    </span>
+                </label>
+
+                <button type="submit" class="ctaButton">Subscribe</button>
+
+                <p class="formFoot">
+                    We keep your address to write to you and nothing else. Every letter carries an
+                    unsubscribe link. Questions first? <a href="mailto:nyaragoa@gmail.com">Email us</a>.
+                </p>
+            </form>
+        </div>
+
+        <footer class="footer">
+            <div class="footerGrid">
+                <div class="footerCol footerBrand">
+                    <h2 class="sectionTitle">Ikshaa</h2>
+                    <p>A 3 bedroom luxury villa with private pool in Loutolim, South Goa.</p>
+                </div>
+
+                <div class="footerCol">
+                    <p class="eyebrow">Contact</p>
+                    <p><a href="mailto:nyaragoa@gmail.com">nyaragoa@gmail.com</a></p>
+                </div>
+
+                <div class="footerCol">
+                    <p class="eyebrow">Finding us</p>
+                    <ul>
+                        <li>Loutolim, South Goa</li>
+                        <li>20 minutes from Goa airport</li>
+                        <li>10 minutes from Margao station</li>
+                        <li>15 minutes from the beaches</li>
+                    </ul>
+                </div>
+
+                <div class="footerCol">
+                    <p class="eyebrow">Discover</p>
+                    <ul>
+                        <li><a href="ourHeritage.html">Our heritage</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                        <li><a href="guestBook.html">Guest book</a></li>
+                        <li><a href="index.html#outdoor">Outdoor</a></li>
+                    </ul>
+                    <p class="eyebrow" style="margin-top:1.6em">Connect</p>
+                    <ul class="footerSocial">
+                        <!-- TODO: no social accounts are linked from ikshaa.com.
+                             Add the real handles or drop this list. -->
+                        <li><a href="#">Instagram</a></li>
+                        <li><a href="#">Facebook</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="platformRow">
+                <p class="eyebrow">Also book us on</p>
+                <ul class="platformList">
+                    <li><a href="https://www.airbnb.co.in/rooms/17852391" target="_blank"
+                            rel="noopener noreferrer">Airbnb</a></li>
+                </ul>
+            </div>
+
+            <div class="footerLegal">
+                <p class="footerBase" style="margin:0">&copy; 2026 Ikshaa. All rights reserved.</p>
+                <ul>
+                    <!-- TODO: these pages do not exist yet -->
+                    <li><a href="#">Privacy</a></li>
+                    <li><a href="#">Terms</a></li>
+                </ul>
+            </div>
+        </footer>
+    </main>
+
+    <script src="script.js"></script>
+
+    <!-- Chat widget. Deferred and last: it builds its own DOM, so nothing
+         above depends on it, and none of it blocks the page. Load order
+         matters — bot.js reads NLU and KNOWLEDGE off window. -->
+    <script src="chat/nlu.js" defer></script>
+    <script src="chat/knowledge.js" defer></script>
+    <script src="chat/bot.js" defer></script>
+    <script src="chat/chat.js" defer></script>
+</body>
+
+</html>
