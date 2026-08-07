@@ -1115,8 +1115,8 @@ syncNavContrast();
 const NEWSLETTER = {
   KEY: 'ikshaa.newsletter',
   QUIET_DAYS: 30,     // how long a dismissal is respected
-  DELAY_MS: 20000,    // or a scroll past SCROLL_AT, whichever lands first
-  SCROLL_AT: 0.45,
+  DELAY_MS: 12000,    // or a scroll past SCROLL_AT, whichever lands first
+  SCROLL_AT: 0.3,
 };
 
 /* localStorage throws outright in some private-browsing modes, so every
@@ -1166,14 +1166,23 @@ function initNewsletterPrompt() {
     return;
   }
 
-  const state = newsletterState();
-  if (state.subscribed) {
-    return;
-  }
-  if (state.dismissedAt) {
-    const days = (Date.now() - state.dismissedAt) / 86400000;
-    if (days < NEWSLETTER.QUIET_DAYS) {
+  /* ?newsletter=now shows it immediately and ignores what has been stored.
+     Without this there is no way to look at the thing once you have
+     dismissed it: the same key silences it for thirty days across every
+     page, so "it never appears" and "it appeared and I closed it last
+     Tuesday" are indistinguishable from the outside. */
+  const forced = new URLSearchParams(window.location.search).get('newsletter') === 'now';
+
+  if (!forced) {
+    const state = newsletterState();
+    if (state.subscribed) {
       return;
+    }
+    if (state.dismissedAt) {
+      const days = (Date.now() - state.dismissedAt) / 86400000;
+      if (days < NEWSLETTER.QUIET_DAYS) {
+        return;
+      }
     }
   }
 
@@ -1262,7 +1271,7 @@ function initNewsletterPrompt() {
     }
   }
 
-  const timer = setTimeout(show, NEWSLETTER.DELAY_MS);
+  const timer = setTimeout(show, forced ? 400 : NEWSLETTER.DELAY_MS);
   window.addEventListener('scroll', onScroll, { passive: true });
 
   closeButton.addEventListener('click', dismiss);
