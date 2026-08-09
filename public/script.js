@@ -80,9 +80,44 @@ function createRandomOrder(items) {
 //   anything else — once the browser is idle
 // ---------------------------------------------------------------------
 
+/* ---------------------------------------------------------------------
+ * Picking the format, for images JavaScript sets.
+ *
+ * A <picture> element lets the browser choose, but only for markup. Most of
+ * the photographs here are set from script — the hero slides, the menu
+ * previews, the rotating figures, the gallery layers — and for those the
+ * choice has to be made in code.
+ *
+ * So: probe once for AVIF, then swap the extension. Every reference in the
+ * markup points at the .webp, which is the SAFE one; the swap is an upgrade
+ * applied only when the browser has proved it can decode AVIF. Getting the
+ * probe wrong therefore costs bytes, never a broken image.
+ *
+ * The probe is a 2x2 AVIF as a data URI — no network, and decoding is the
+ * only honest test. Checking the user agent would be a guess, and canvas
+ * .toDataURL('image/avif') tests ENCODE support, which is a different
+ * question and answers false in browsers that display AVIF perfectly well.
+ * ------------------------------------------------------------------ */
+
+let avifOk = false;
+
+(function probeAvif() {
+  const probe = new Image();
+  probe.onload = function () { avifOk = probe.width === 2; };
+  probe.onerror = function () { avifOk = false; };
+  probe.src = 'data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAAD5bWV0YQAAAAAAAAAvaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAFBpY3R1cmVIYW5kbGVyAAAAAA5waXRtAAAAAAABAAAAHmlsb2MAAAAARAAAAQABAAAAAQAAASEAAAAUAAAAKGlpbmYAAAAAAAEAAAAaaW5mZQIAAAAAAQAAYXYwMUNvbG9yAAAAAGppcHJwAAAAS2lwY28AAAAUaXNwZQAAAAAAAAACAAAAAgAAABBwaXhpAAAAAAMICAgAAAAMYXYxQ4EADAAAAAATY29scm5jbHgAAgACAAIAAAAAF2lwbWEAAAAAAAAAAQABBAECgwQAAAAcbWRhdAoFGAA2wCAyCx/wAABYAAAAAK8w';
+})();
+
+/* Until the probe resolves, avifOk is false and WebP is served. That is the
+   correct default: an image that loads slightly larger beats one that does
+   not load at all. */
+function bestFormat(path) {
+  return avifOk ? String(path).replace(/\.webp$/i, '.avif') : path;
+}
+
 function hydrate(image) {
   if (image && image.dataset.src) {
-    image.src = image.dataset.src;
+    image.src = bestFormat(image.dataset.src);
     image.removeAttribute('data-src');
   }
 }
@@ -126,13 +161,13 @@ if (document.readyState === 'complete') {
 // fixed hero, and outside/IkshaaFlower are the same shots the static figures
 // use. Any of them turning up in a rotating frame would read as a duplicate.
 const FIGURE_POOL = [
-  './heritagePageImages/Courtyard.jpg',
-  './heritagePageImages/IkshaaSitting2.jpg',
-  './heritagePageImages/IkshaaPool.jpg',
-  './heritagePageImages/IkshaaPool2.jpg',
-  './heritagePageImages/IkshaaMaster.jpg',
-  './heritagePageImages/bath1.jpg',
-  './heritagePageImages/stream.jpg',
+  './heritagePageImages/Courtyard.webp',
+  './heritagePageImages/IkshaaSitting2.webp',
+  './heritagePageImages/IkshaaPool.webp',
+  './heritagePageImages/IkshaaPool2.webp',
+  './heritagePageImages/IkshaaMaster.webp',
+  './heritagePageImages/bath1.webp',
+  './heritagePageImages/stream.webp',
 ];
 
 const FIGURE_MIN_MS = 4000;
@@ -154,7 +189,9 @@ function initRandomFigures() {
   // fade in an empty layer while the file downloaded.
   FIGURE_POOL.forEach((source) => {
     const preload = new Image();
-    preload.src = source;
+    // Warm the same URL the swap will actually request, or the first change
+    // of each frame downloads a second copy.
+    preload.src = bestFormat(source);
   });
 
   // What each frame is showing right now, so a photo can't appear in two
@@ -183,7 +220,7 @@ function initRandomFigures() {
     // Claim it up front: the reveal is async, and without this two frames
     // resolving at once could both pick the same photo.
     showing.set(figure, nextSource);
-    hidden.src = nextSource;
+    hidden.src = bestFormat(nextSource);
 
     const reveal = () => {
       hidden.classList.add('isVisible');

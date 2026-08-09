@@ -30,20 +30,91 @@
     var ICON_SEND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg>';
 
 
-    /* Questions the bot can actually answer well — each maps onto a real
-       intent in knowledge.js. A prompt the bot then fumbles is worse than
-       no prompt, so this list is deliberately conservative and avoids
-       everything sitting behind an unverified fact (rates, check-in). */
+    /* What the bubble offers, and what it actually asks.
+     *
+     * Two separate strings, deliberately. The old list showed the guest a
+     * question they had not asked — "How many bedrooms are there?" — which
+     * reads as a quiz rather than an offer of help, and made the widget feel
+     * like a form waiting to be filled in.
+     *
+     * `say` is Carman offering something, in her voice. `ask` is the question
+     * put to the bot when it is clicked, phrased the way the matcher expects.
+     * Every `ask` here routes to a real intent and avoids anything sitting
+     * behind an unverified fact — a prompt the bot then fumbles is worse than
+     * no prompt at all.
+     *
+     * `where` scopes a prompt to a page, and `near` to a section on it, so
+     * what Carman offers is about whatever the guest is actually looking at.
+     * A prompt with neither is general and can appear anywhere.
+     */
     var PROMPTS = [
-        'How many bedrooms are there?',
-        'What is included in a stay?',
-        'How do I get there from the airport?',
-        'Is the pool private?',
-        'Is breakfast included?',
-        'Can you cook for us?',
-        'When is the best time to come?',
-        'How do I book?'
+        // --- the house ---------------------------------------------------
+        { where: 'index',      near: 'outdoor',
+          say: 'That is our pool — yours alone. Want the details?',
+          ask: 'is the pool private' },
+        { where: 'index',      near: 'local-eateries',
+          say: 'I can point you at the places we actually eat at.',
+          ask: 'are there restaurants nearby' },
+        { where: 'index',      near: 'subscribe',
+          say: 'I write a letter from the house each week, if you would like it.',
+          ask: 'what can i ask you' },
+
+        // --- per page ----------------------------------------------------
+        { where: 'gallery',
+          say: 'Carman here — happy to say which room any of these is.',
+          ask: 'how many bedrooms are there' },
+        { where: 'ourHeritage',
+          say: 'The house has a long story. Ask me anything about staying in it.',
+          ask: 'what can i ask you' },
+        { where: 'findingUs',
+          say: 'Getting here catches people out. Shall I talk you through it?',
+          ask: 'how do i get there from the airport' },
+        { where: 'goanCuisine',
+          say: 'I can arrange a cook for your stay, if you would like one.',
+          ask: 'can someone cook for us' },
+        { where: 'exploreGoa',
+          say: 'I live here — ask me what is genuinely worth the trip.',
+          ask: 'what is there to do nearby' },
+        { where: 'stayWithUs',
+          say: 'Thinking about dates? I can tell you how booking works.',
+          ask: 'how do i book' },
+        { where: 'guestBook',
+          say: 'Anything you would like to ask before you decide?',
+          ask: 'how do i book' },
+        { where: 'subscribe',
+          say: 'Any questions before you hand over your address?',
+          ask: 'what can i ask you' },
+
+        // --- anywhere ------------------------------------------------------
+        { say: 'I am Carman, I look after Ikshaa. Ask me anything.',
+          ask: 'what can i ask you' },
+        { say: 'Wondering about breakfast? It is included, and I can explain.',
+          ask: 'is breakfast included' },
+        { say: 'Ask me when the weather is at its best here.',
+          ask: 'when is the best time to come' },
+        { say: 'Not sure it sleeps your group? Ask me.',
+          ask: 'how many people does it sleep' }
     ];
+
+    /* Which page this is, from the filename, so a prompt can be scoped to it.
+       "/" and "/index.html" are the same page. */
+    function pageName() {
+        var last = location.pathname.split('/').pop() || 'index';
+        return last.replace(/\.html$/, '') || 'index';
+    }
+
+    /* Prompts for here: the ones scoped to this page or to a section of it,
+       plus the general ones. A section-scoped prompt only counts once its
+       element has actually been on screen — offering to talk about the pool
+       before the guest has reached it is the same guesswork as before. */
+    function promptsFor(seenSections) {
+        var page = pageName();
+        return PROMPTS.filter(function (p) {
+            if (p.where && p.where !== page) { return false; }
+            if (p.near) { return seenSections.indexOf(p.near) >= 0; }
+            return true;
+        });
+    }
 
     var NUDGE_KEY = 'ikshaa.chat.nudged';
 
@@ -438,7 +509,29 @@
             var GAP_MS = 24000;    // and long enough away not to nag
             var FIRST_MS = 3200;   // let the page arrive first
 
-            var index = Math.floor(Math.random() * PROMPTS.length);
+            /* Sections the guest has actually scrolled to. A prompt about the
+               pool is only honest once they have reached the pool; offering it
+               on arrival is the same guesswork the old list did. */
+            var seenSections = [];
+            var here = promptsFor(seenSections);
+
+            var sections = document.querySelectorAll('[id]');
+            if (sections.length && 'IntersectionObserver' in window) {
+                var watcher = new IntersectionObserver(function (entries) {
+                    var changed = false;
+                    entries.forEach(function (e) {
+                        if (e.isIntersecting && seenSections.indexOf(e.target.id) === -1) {
+                            seenSections.push(e.target.id);
+                            changed = true;
+                        }
+                    });
+                    // Recompute only when something new came into view.
+                    if (changed) { here = promptsFor(seenSections); }
+                }, { threshold: 0.25 });
+                Array.prototype.forEach.call(sections, function (el) { watcher.observe(el); });
+            }
+
+            var index = Math.floor(Math.random() * Math.max(here.length, 1));
             var timer = null;
             var dismissed = false;
 
@@ -459,8 +552,17 @@
                 if (dismissed) {
                     return;
                 }
-                ui.nudgeAsk.textContent = PROMPTS[index];
-                index = (index + 1) % PROMPTS.length;
+                /* `here` grows as sections come into view, so re-read it each
+                   time rather than caching a length that may be stale. */
+                if (here.length === 0) { return; }
+                var prompt = here[index % here.length];
+                index = (index + 1) % here.length;
+
+                ui.nudgeAsk.textContent = prompt.say;
+                // What actually gets asked. Kept off the visible text so the
+                // offer can be in Carman's voice while the question stays in
+                // the phrasing the matcher expects.
+                ui.nudgeAsk.dataset.ask = prompt.ask;
                 ui.nudge.hidden = false;
                 // A frame's delay so the transition has a start state to run
                 // from; setting both at once just snaps it in.
@@ -500,7 +602,11 @@
             });
 
             ui.nudgeAsk.addEventListener('click', function () {
-                var question = ui.nudgeAsk.textContent;
+                /* The visible text is an offer ("I can arrange a cook, if you
+                   would like one"); the question is what the bot is good at
+                   answering. Submitting the offer would send the bot a
+                   statement it has no intent for. */
+                var question = ui.nudgeAsk.dataset.ask || ui.nudgeAsk.textContent;
                 dismiss();
                 open();
                 submit(question);

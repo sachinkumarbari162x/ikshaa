@@ -26,6 +26,9 @@
 
         // ---- VERIFIED ----
         name: 'Ikshaa Luxury Villa',
+        /* Verified: the owner's name. Used so the prompts read as a person
+           offering help rather than a form asking questions. */
+        owner: 'Carman',
         area: 'Loutolim, South Goa',
         bedrooms: 3,
         bathrooms: 3,

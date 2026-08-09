@@ -2,7 +2,7 @@
   "name": "ikshaa",
   "version": "1.0.0",
   "private": true,
-  "description": "Ikshaa — a luxury heritage villa in Loutolim, South Goa. Static site, zero-dependency delivery server, and an offline chat assistant.",
+  "description": "Ikshaa \u2014 a luxury heritage villa in Loutolim, South Goa. Static site, zero-dependency delivery server, and an offline chat assistant.",
   "main": "server.js",
   "scripts": {
     "start": "node --env-file-if-exists=.env server.js",
@@ -13,7 +13,8 @@
     "token": "node -e \"console.log(require('crypto').randomBytes(32).toString('base64url'))\"",
     "export": "node --env-file-if-exists=.env -e \"const s=require('./api/db'),e=require('./api/export');const db=s.openDatabase('data/ikshaa.db');const o=e.writeMailingList(db,s);console.log('wrote to '+o.dir);o.files.forEach(f=>console.log('  '+f.list+': '+f.count))\"",
     "chat:probe": "node --env-file-if-exists=.env eval/probe.js",
-    "chat:bench": "node --env-file-if-exists=.env eval/bench.js"
+    "chat:bench": "node --env-file-if-exists=.env eval/bench.js",
+    "deploy:cf": "npm run build && npx --yes wrangler@latest pages deploy dist --project-name=ikshaa --commit-dirty=true"
   },
   "devDependencies": {
     "jest": "^29.7.0"

@@ -145,7 +145,7 @@ function connectionIsPoor(headers) {
    still. The page already falls back to the poster if the video never
    plays, so nothing breaks — it simply weighs 25x less. */
 const SAVE_DATA_SWAPS = {
-  '/media/videos/mainPageVideoWeb.mp4': '/media/videos/mainPageVideoPoster.jpg',
+  '/media/videos/mainPageVideoWeb.mp4': '/media/videos/mainPageVideoPoster.webp',
 };
 
 /* ---------------------------------------------------------------------------

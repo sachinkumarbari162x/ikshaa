@@ -239,7 +239,10 @@ describe('adaptive delivery', () => {
     const lite = await get('/media/videos/mainPageVideoWeb.mp4', { 'Save-Data': 'on' });
 
     expect(lite.status).toBe(200);
-    expect(lite.headers.get('content-type')).toBe('image/jpeg');
+    // WebP since the poster was converted: 116K -> 103K, and it is the
+    // one image on the page that cannot use <picture>, because the video
+    // poster attribute takes a single URL.
+    expect(lite.headers.get('content-type')).toBe('image/webp');
     expect(lite.headers.get('x-adaptive-substitute')).toBe('save-data');
 
     // The point of the exercise: far fewer bytes.
