@@ -172,13 +172,10 @@
                 something worth your time.
             </p>
 
-            <!-- Submitted by script.js to the Worker, which stores the address
-                 and sends the confirmation.
-
-                 data-netlify is gone: it captured submissions while the site
-                 was on Netlify, and on Cloudflare Pages it means nothing —
-                 a POST to a static file is a 405. The action below is a
-                 last-resort target only; the real path is the fetch. -->
+            <!-- script.js submits this to the Worker, which stores the address
+                 and sends the confirmation. The honeypot below is checked
+                 there, not here: FormData sweeps every field into the request,
+                 so a filled bot-field is rejected server-side. -->
             <form class="subscribeFormFull" name="newsletter" method="POST"
                 action="subscribe.html?subscribed=1">
 
