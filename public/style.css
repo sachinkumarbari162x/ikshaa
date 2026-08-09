@@ -2114,7 +2114,10 @@ body.menuOpen .menu-toggle span {
   background-color: var(--ink);
 }
 
-.findPeaceGoaSection > img {
+/* The wrapper breaks this child selector even with display:contents —
+   matching is structural, and display does not change the tree. */
+.findPeaceGoaSection > img,
+.findPeaceGoaSection > picture > img {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -2953,3 +2956,19 @@ body.newsletterOpen {
   text-underline-offset: 3px;
 }
 .thanksQuiet:hover { opacity: 0.95; }
+
+/* <picture> must not exist as far as layout is concerned.
+ *
+ * Wrapping an <img> in <picture> inserts an element between the image and
+ * its parent. <picture> is display:inline by default, so an image that was
+ * a grid item, a flex child, or absolutely positioned against that parent
+ * silently stops being any of those — it collapses to inline size and lands
+ * in the wrong place. That is what shrank and displaced images across the
+ * site after the AVIF conversion.
+ *
+ * display:contents removes the wrapper box from the layout tree while
+ * keeping its children, so the <img> is laid out by the parent exactly as
+ * it was before the wrapper existed. */
+picture {
+  display: contents;
+}
