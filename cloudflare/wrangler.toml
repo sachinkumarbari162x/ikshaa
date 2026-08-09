@@ -1,0 +1,49 @@
+# Cloudflare deployment for the Ikshaa site.
+#
+# This directory holds CONFIGURATION, not a second copy of the site. The
+# thing published is `dist/` — the same directory Netlify publishes, built by
+# the same `npm run build`. Two copies of a site are two sites, and the one
+# nobody is looking at is always the one that is wrong.
+#
+# The comparison this exists to settle: does Cloudflare actually render
+# faster than Netlify for THIS site, on a real domain, or was that just
+# received wisdom? Both get the identical bytes, so the answer is about
+# delivery and nothing else.
+
+name = "ikshaa"
+compatibility_date = "2026-01-01"
+
+# node:crypto, node:buffer and friends inside a Worker. The API code shares
+# modules with the Node server, and without this the shared bits would have
+# to be forked.
+compatibility_flags = ["nodejs_compat"]
+
+# ---------------------------------------------------------------------------
+# Pages: the static site
+# ---------------------------------------------------------------------------
+# dist/ already contains a `_headers` file, and Cloudflare Pages reads that
+# format natively — the same file Netlify uses. So the cache policy written
+# by build.js (fingerprinted assets immutable for a year, HTML no-cache)
+# applies on both hosts without a second definition.
+pages_build_output_dir = "../dist"
+
+# ---------------------------------------------------------------------------
+# Worker: the API
+# ---------------------------------------------------------------------------
+# Only needed once the newsletter and the chat router move off localhost.
+# Left commented until the Postgres instance is reachable from the internet:
+# a Worker cannot see your machine, so Hyperdrive has to point at a hosted
+# database (Neon, Supabase, Render), not at localhost:5432.
+#
+# [[hyperdrive]]
+# binding = "DB"
+# id = "<created with: wrangler hyperdrive create ikshaa --connection-string=...>"
+#
+# [vars]
+# PUBLIC_BASE_URL = "https://ikshaa.brownodin.com"
+#
+# Secrets are NOT set here. They go in with `wrangler secret put`, which
+# keeps them out of the repository:
+#   wrangler secret put GROQ_API_KEY
+#   wrangler secret put IKSHAA_API_TOKEN
+#   wrangler secret put MAIL_API_KEY
