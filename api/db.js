@@ -20,6 +20,9 @@
 
 const { DatabaseSync } = require('node:sqlite');
 const crypto = require('crypto');
+/* The rules live on their own so the Postgres store can use them without
+   loading this file — and therefore without loading node:sqlite. */
+const { validateSubscription, cleanText, LIMITS } = require('./validate');
 const fs = require('fs');
 const path = require('path');
 
@@ -112,55 +115,6 @@ function hashToken(token) {
 function newToken() {
   // 32 bytes of CSPRNG. base64url so it survives a URL without escaping.
   return crypto.randomBytes(32).toString('base64url');
-}
-
-/* ---------------------------------------------------------------------
- * Validation. Kept here rather than in the route so the rules hold no
- * matter who calls in — a CLI import has to obey them too.
- * ------------------------------------------------------------------ */
-
-const LIMITS = { email: 254, name: 120, origin: 120, note: 4000 };
-
-// Deliberately loose. Anything stricter rejects addresses that genuinely
-// work; the real proof an address exists is that mail to it arrives.
-const EMAIL = /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)+$/;
-
-function cleanText(value, max) {
-  if (typeof value !== 'string') {
-    return null;
-  }
-  const trimmed = value.trim();
-  return trimmed ? trimmed.slice(0, max) : null;
-}
-
-function validateSubscription(input) {
-  const errors = [];
-  const email = cleanText(input.email, LIMITS.email);
-
-  if (!email) {
-    errors.push('email is required');
-  } else if (!EMAIL.test(email)) {
-    errors.push('email is not a valid address');
-  }
-
-  // Long text is cut, not refused. Someone who writes past the limit has
-  // still said something worth keeping, and losing all of it to protect a
-  // column width would be the wrong trade.
-  const note = cleanText(input.note, LIMITS.note);
-
-  return {
-    errors,
-    value: {
-      email,
-      name: cleanText(input.name, LIMITS.name),
-      origin: cleanText(input.origin, LIMITS.origin),
-      // Absent means yes: the form ships both boxes ticked, and an unchecked
-      // box is simply not submitted.
-      weekly: input.weekly === undefined ? 1 : (input.weekly ? 1 : 0),
-      seasonal: input.seasonal === undefined ? 1 : (input.seasonal ? 1 : 0),
-      note,
-    },
-  };
 }
 
 /* ---------------------------------------------------------------------

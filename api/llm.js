@@ -33,7 +33,7 @@ const DEFAULTS = {
   // Overridable with GROQ_MODEL. This is a classification, not an essay --
   // the whole output is one short id -- so the model is chosen for latency
   // and instruction-following, not for prose.
-  model: process.env.GROQ_MODEL || 'openai/gpt-oss-20b',
+  model: process.env.GROQ_MODEL || 'qwen/qwen3.6-27b',
   timeoutMs: 6000,         // a reasoning model thinks first; 3.5s cut it off
   maxTranscript: 6,      // turns of context sent
   maxChars: 400,         // per turn
@@ -46,6 +46,12 @@ function redact(text) {
   return String(text)
     .replace(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi, '[email]')
     .replace(/\+?\d[\d\s\-()]{7,14}\d/g, '[phone]');
+}
+
+function reasoningFor(model) {
+  if (/gpt-oss/.test(model)) { return { reasoning_effort: 'low' }; }
+  if (/qwen/i.test(model)) { return { reasoning_effort: 'none' }; }
+  return {};                       // compound and anything unknown: send nothing
 }
 
 function tidy(turns, options) {
@@ -101,8 +107,23 @@ function buildMessages(input) {
 
 /* Everything the model says is treated as untrusted. It gets uppercased,
    stripped of punctuation and checked for membership; anything else is NONE. */
+/* Qwen writes its reasoning INTO content, wrapped in <think></think>, rather
+   than in a separate field the way gpt-oss does. That text argues with
+   itself — "not price, more like housekeeping" — so parsing it would either
+   find two ids and give up, or worse, pick the one the model had just
+   rejected. Strip it before reading anything.
+
+   The unclosed case matters too: if the budget runs out mid-thought there is
+   an opening tag and no closing one, and everything after it is thinking. */
+function withoutThinking(text) {
+  return String(text)
+    .replace(/<think>[\s\S]*?<\/think>/gi, ' ')
+    .replace(/<think>[\s\S]*$/i, ' ')
+    .trim();
+}
+
 function parseChoice(raw, allowed) {
-  const text = String(raw || '').trim();
+  const text = withoutThinking(raw);
 
   // The normal case: the reply is the id and nothing else.
   const word = (text.split(/[\s.,:;'"`\n]+/)[0] || '').toLowerCase();
@@ -165,9 +186,16 @@ async function understand(input) {
 
            Low effort plus real headroom. The answer is still one word; the
            budget is for the thinking in front of it. */
-        reasoning_effort: 'low',
         max_tokens: 512,
         stream: false,
+        /* Every family spells this differently, and getting it wrong is a
+           hard 400 on every call rather than a degraded answer:
+             gpt-oss  low | medium | high
+             qwen     none | default
+             compound rejects the parameter entirely
+           We are classifying, so where thinking can be switched off, it is:
+           cheaper, faster, and it keeps the reply to the one word we want. */
+        ...reasoningFor(options.model),
       }),
     });
 
@@ -182,7 +210,7 @@ async function understand(input) {
     /* Running out of budget mid-thought is worth distinguishing from a real
        decline: one is a misconfiguration, the other is the model doing its
        job. They looked identical until this was separated out. */
-    if (choice0 && choice0.finish_reason === 'length' && !String(said || '').trim()) {
+    if (choice0 && choice0.finish_reason === 'length' && !withoutThinking(said)) {
       return { intent: null, reason: 'truncated' };
     }
 
@@ -197,4 +225,4 @@ async function understand(input) {
   }
 }
 
-module.exports = { understand, buildMessages, parseChoice, redact, tidy, DEFAULTS };
+module.exports = { understand, buildMessages, parseChoice, withoutThinking, reasoningFor, redact, tidy, DEFAULTS };
