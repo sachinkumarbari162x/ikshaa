@@ -1,0 +1,186 @@
+# 100 questions for the Ikshaa chat assistant
+#
+# Written fresh for this audit. NONE of these come from eval/corpus.js — the
+# bot was tuned against that corpus, so scoring it there measures the
+# questions we already thought of. These are the ones we did not.
+#
+# Deliberately mixed: formal and casual, typos and shorthand, single-topic and
+# compound, and a tail of things the villa has no facts for at all. That tail
+# is the point. Answering it confidently is the failure mode that matters.
+#
+# One question per line. Blank lines and # comments are ignored.
+
+# ---- rates, booking, availability ----
+What does a week in December cost?
+Is there a discount for a longer stay?
+how much for new years eve
+Do you charge per room or for the whole house?
+Can I hold dates without paying yet?
+whats ur cheapest month
+Is the villa free from the 3rd to the 8th of March?
+Do you take bookings for a single night?
+Is there a minimum stay over Christmas?
+Can I book directly instead of through Airbnb?
+
+# ---- the house, rooms, capacity ----
+How many people can sleep there comfortably?
+Are all the bedrooms the same size?
+Is there a room on the ground floor?
+Can you add an extra mattress for a child?
+Do the rooms have their own bathrooms?
+is it a whole villa or just a room
+How big is the living room?
+
+# ---- pool and outdoor ----
+How big is the swimming pool?
+Is the pool cleaned every day?
+Can children use the pool unsupervised?
+Is there a garden to sit out in?
+Do you have sun loungers?
+Is the pool lit at night?
+
+# ---- kitchen, food, cook ----
+Can we cook our own meals?
+Is the cook included in the price?
+Can the cook make Goan food?
+Do you provide tea and coffee?
+Is there a barbecue we can use?
+can we get dinner made for us
+Are there pots and pans provided?
+Is there a supermarket close by?
+Can you cater for vegetarians?
+Is breakfast included every day?
+
+# ---- getting there and around ----
+How long is the drive from Dabolim?
+Is Mopa airport far away?
+Can you pick us up from the railway station?
+Do we need a car while we are there?
+Is the road to the villa in good condition?
+How far is the nearest town?
+can u arrange a driver for a day
+
+# ---- check-in and check-out ----
+What time can we arrive?
+Can we leave our bags after checking out?
+Is anyone there to let us in?
+What if our flight lands at 2am?
+Can we check out late on the last day?
+
+# ---- house rules ----
+Are dogs allowed in the garden?
+Can we smoke outside?
+Is it alright to play music in the evening?
+Can we invite friends over for dinner?
+Are children welcome?
+Is it suitable for a birthday party?
+Can we bring our own alcohol?
+
+# ---- housekeeping, staff, laundry ----
+Who cleans the house during our stay?
+Is there someone on site all the time?
+Can we get our clothes washed?
+Are towels changed every day?
+Is there an iron and ironing board?
+
+# ---- safety and security ----
+Is the property gated at night?
+Are there security cameras inside the house?
+Is the area safe to walk around after dark?
+What happens if there is a medical emergency?
+Is there a safe for valuables?
+
+# ---- things to do ----
+What is there to see nearby?
+Can you arrange a guided tour?
+Is there a good place to watch the sunset?
+Are there any spice plantations near you?
+Can we do a river cruise?
+What is the nightlife like around there?
+Is there a market worth visiting?
+How far is Palolem beach?
+
+# ---- weather and season ----
+What is the weather like in July?
+Is it too hot in May?
+Does it flood during the monsoon?
+When is the best time to come?
+
+# ---- payment, deposits, cancellation ----
+Do you accept card payments?
+How much deposit do I pay upfront?
+What happens if I have to cancel?
+Is the security deposit refundable?
+Can I pay in pounds?
+
+# ---- practical, often missing ----
+Is there hot water in all the bathrooms?
+Do the rooms have mosquito nets?
+Is there a backup generator?
+Is the wifi fast enough for a video call?
+Can I charge an electric car there?
+Are there fans as well as air conditioning?
+
+# ---- things the villa has no facts for ----
+Is there a gym on the property?
+Do you have a sauna?
+Can I hire a boat through you?
+Is there a tennis court?
+Do you have a home cinema?
+Can I bring a drone to film the house?
+Is there a chapel on site?
+Do you rent out bicycles?
+Is there a jacuzzi?
+
+# ---- awkward, compound and conversational ----
+hi is the pool private and can we bring a dog
+we are 8 people is that ok
+Sorry, are you a real person?
+what can you help me with
+This place looks beautiful
+I asked about rates and got nothing useful
+
+# =============================================================================
+# CONVERSATIONS — lines starting with ">" continue the previous one.
+#
+# Everything above is a single turn against a fresh assistant. These are not:
+# each block is one guest talking, so the bot's memory, its topic and its
+# count of what has already been asked all carry across the lines.
+#
+# This is where repetition is tested. A guest who asks the same thing three
+# different ways has asked once, and should be answered as such.
+# =============================================================================
+
+# ---- the same question, three ways ----
+how much does it cost
+> what are your rates
+> whats the price for a week
+
+# ---- a repeat with something else in between ----
+is there a pool
+> how do we get from the airport
+> is there a swimming pool
+
+# ---- repeating an unanswerable one ----
+are there cameras in the house
+> do you record inside the villa
+
+# ---- memory: dates given once, used later ----
+we want to come 12 December for 3 nights
+> there are 4 of us
+> is that available
+
+# ---- follow-up that leans on the last topic ----
+tell me about the pool
+> is it heated
+> is it safe for children
+
+# ---- correcting themselves ----
+we are 6 people
+> sorry make that 8
+> is that too many
+
+# ---- a guest getting frustrated ----
+what does it cost
+> you have not answered my question
+> just tell me the price

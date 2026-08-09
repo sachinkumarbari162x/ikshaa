@@ -1,0 +1,1216 @@
+=============================================================================
+ Ikshaa chat assistant — 100 questions and the answers given
+=============================================================================
+
+ Source     : https://ikshaa.pages.dev
+ Run at     : 2026-08-09 23:27 UTC
+ Questions  : 120, none of them from eval/corpus.js
+
+ Each question was asked to a FRESH assistant, so no answer here depends
+ on the one before it.
+
+ ---- how it went -------------------------------------------------------
+
+   answered from the facts    62   a real answer, drawn from what the villa has told us
+   deferred to the owner      33   understood, but the fact is null — says so, gives the email
+   declined by name            9   "nothing on file about X" — the villa has no such thing
+   repeat handled              0   same topic raised again — restated formally with a next step
+   did not understand         16   asked the guest to rephrase, or handed over
+                             ---
+                             120
+
+ A deferral is a correct answer, not a miss. Rates, check-in times and the
+ security questions are deliberately null in knowledge.js so the bot hands
+ them to a person instead of inventing them.
+
+=============================================================================
+
+  1. Q: What does a week in December cost?
+
+     A: I do not have the nightly rates — they move with the season, so I
+        would only mislead you. The live prices are on the listing:
+        https://www.airbnb.co.in/rooms/17852391, or ask nyaragoa@gmail.com.
+        Tell them your exact dates and they will quote you properly.
+
+     [topic: price  |  offered: What about December? / How do I pay? / Is a deposit needed?]
+
+-----------------------------------------------------------------------------
+
+  2. Q: Is there a discount for a longer stay?
+
+     A: I did not catch that. I am good on rates, availability, the rooms and
+        pool, check-in, house rules and getting here — try me on one of those.
+
+     [topic: not understood  |  offered: What are the rates? / How many bedrooms? / Is there a pool? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+  3. Q: how much for new years eve
+
+     A: I do not have the nightly rates — they move with the season, so I
+        would only mislead you. The live prices are on the listing:
+        https://www.airbnb.co.in/rooms/17852391, or ask nyaragoa@gmail.com.
+
+     [topic: price  |  offered: What about December? / How do I pay? / Is a deposit needed?]
+
+-----------------------------------------------------------------------------
+
+  4. Q: Do you charge per room or for the whole house?
+
+     A: I do not have the nightly rates — they move with the season, so I
+        would only mislead you. The live prices are on the listing:
+        https://www.airbnb.co.in/rooms/17852391, or ask nyaragoa@gmail.com.
+        (Or did you mean how many it sleeps?)
+
+     [topic: price  |  offered: What about December? / How do I pay? / Is a deposit needed?]
+
+-----------------------------------------------------------------------------
+
+  5. Q: Can I hold dates without paying yet?
+
+     A: I did not catch that. I am good on rates, availability, the rooms and
+        pool, check-in, house rules and getting here — try me on one of those.
+
+     [topic: not understood  |  offered: What are the rates? / How many bedrooms? / Is there a pool? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+  6. Q: whats ur cheapest month
+
+     A: I am not certain I follow. Were you asking about what it costs?
+
+     [topic: not understood  |  offered: What are the rates?]
+
+-----------------------------------------------------------------------------
+
+  7. Q: Is the villa free from the 3rd to the 8th of March?
+
+     A: Got it — 3 Mar 2027 to 8 Mar 2027, 5 nights. How many guests
+        altogether?
+
+     [topic: availability  |  offered: 2 guests / 4 guests / 6 guests]
+
+-----------------------------------------------------------------------------
+
+  8. Q: Do you take bookings for a single night?
+
+     A: Happy to note that down. Which date would you arrive? "12 Dec" or "20
+        to 24 December" both work.
+
+     [topic: availability  |  offered: Next weekend / 20 to 24 December]
+
+-----------------------------------------------------------------------------
+
+  9. Q: Is there a minimum stay over Christmas?
+
+     A: I did not catch that. I am good on rates, availability, the rooms and
+        pool, check-in, house rules and getting here — try me on one of those.
+
+     [topic: not understood  |  offered: What are the rates? / How many bedrooms? / Is there a pool? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+ 10. Q: Can I book directly instead of through Airbnb?
+
+     A: Happy to note that down. Which date would you arrive? "12 Dec" or "20
+        to 24 December" both work.
+
+     [topic: availability  |  offered: Next weekend / 20 to 24 December]
+
+-----------------------------------------------------------------------------
+
+ 11. Q: How many people can sleep there comfortably?
+
+     A: 3 bedrooms and 3 bathrooms, sleeping 6 comfortably.
+
+     [topic: capacity]
+
+-----------------------------------------------------------------------------
+
+ 12. Q: Are all the bedrooms the same size?
+
+     A: 3 bedrooms and 3 bathrooms, sleeping 6 comfortably.
+
+     [topic: capacity]
+
+-----------------------------------------------------------------------------
+
+ 13. Q: Is there a room on the ground floor?
+
+     A: 3 bedrooms and 3 bathrooms, sleeping 6 comfortably.
+
+     [topic: capacity]
+
+-----------------------------------------------------------------------------
+
+ 14. Q: Can you add an extra mattress for a child?
+
+     A: Children are something the owner can confirm — nyaragoa@gmail.com. A
+        cot can usually be arranged with a bit of notice.
+
+     [topic: children]
+
+-----------------------------------------------------------------------------
+
+ 15. Q: Do the rooms have their own bathrooms?
+
+     A: 3 bedrooms and 3 bathrooms, sleeping 6 comfortably.
+
+     [topic: capacity]
+
+-----------------------------------------------------------------------------
+
+ 16. Q: is it a whole villa or just a room
+
+     A: 3 bedrooms and 3 bathrooms, sleeping 6 comfortably.
+
+     [topic: capacity]
+
+-----------------------------------------------------------------------------
+
+ 17. Q: How big is the living room?
+
+     A: 3 bedrooms and 3 bathrooms, sleeping 6 comfortably.
+
+     [topic: capacity]
+
+-----------------------------------------------------------------------------
+
+ 18. Q: How big is the swimming pool?
+
+     A: Yes — the pool is private, for the use of your party alone. It is not
+        heated, though Goa rarely makes you want that.
+
+     [topic: pool  |  offered: Is it safe for kids? / How far is the beach?]
+
+-----------------------------------------------------------------------------
+
+ 19. Q: Is the pool cleaned every day?
+
+     A: Housekeeping comes on a schedule the owner can confirm —
+        nyaragoa@gmail.com. Linen and towels are provided and changed during
+        your stay. Laundry: personal laundry included.
+        (Or did you mean the pool?)
+
+     [topic: housekeeping]
+
+-----------------------------------------------------------------------------
+
+ 20. Q: Can children use the pool unsupervised?
+
+     A: Yes — the pool is private, for the use of your party alone. It is not
+        heated, though Goa rarely makes you want that.
+        (Or did you mean coming with kids?)
+
+     [topic: pool  |  offered: Is it safe for kids? / How far is the beach?]
+
+-----------------------------------------------------------------------------
+
+ 21. Q: Is there a garden to sit out in?
+
+     A: I did not catch that. I am good on rates, availability, the rooms and
+        pool, check-in, house rules and getting here — try me on one of those.
+
+     [topic: not understood  |  offered: What are the rates? / How many bedrooms? / Is there a pool? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+ 22. Q: Do you have sun loungers?
+
+     A: I have nothing on file about "sun loungers" at the villa, and I would
+        rather say that than answer with something close but wrong.
+        nyaragoa@gmail.com will know for certain.
+
+     [topic: declined  |  offered: What are the rates? / Is there a pool? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+ 23. Q: Is the pool lit at night?
+
+     A: Yes — the pool is private, for the use of your party alone. It is not
+        heated, though Goa rarely makes you want that.
+
+     [topic: pool  |  offered: Is it safe for kids? / How far is the beach?]
+
+-----------------------------------------------------------------------------
+
+ 24. Q: Can we cook our own meals?
+
+     A: There is a kitchen — large and fully equipped. And a cook can be
+        arranged — ask when booking.
+
+     [topic: kitchen]
+
+-----------------------------------------------------------------------------
+
+ 25. Q: Is the cook included in the price?
+
+     A: I do not have the nightly rates — they move with the season, so I
+        would only mislead you. The live prices are on the listing:
+        https://www.airbnb.co.in/rooms/17852391, or ask nyaragoa@gmail.com.
+        (Or did you mean the kitchen?)
+
+     [topic: price  |  offered: What about December? / How do I pay? / Is a deposit needed?]
+
+-----------------------------------------------------------------------------
+
+ 26. Q: Can the cook make Goan food?
+
+     A: Breakfast is complimentary English breakfast every morning, plus
+        unlimited tea, coffee and juices all day. A cook can be arranged — ask
+        when booking. There are also plenty of shacks and restaurants around
+        the virgin beaches of South Goa, and delivery apps cover the area.
+        (Or did you mean the kitchen?)
+
+     [topic: food]
+
+-----------------------------------------------------------------------------
+
+ 27. Q: Do you provide tea and coffee?
+
+     A: I did not catch that. I am good on rates, availability, the rooms and
+        pool, check-in, house rules and getting here — try me on one of those.
+
+     [topic: not understood  |  offered: What are the rates? / How many bedrooms? / Is there a pool? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+ 28. Q: Is there a barbecue we can use?
+
+     A: I did not catch that. I am good on rates, availability, the rooms and
+        pool, check-in, house rules and getting here — try me on one of those.
+
+     [topic: not understood  |  offered: What are the rates? / How many bedrooms? / Is there a pool? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+ 29. Q: can we get dinner made for us
+
+     A: Breakfast is complimentary English breakfast every morning, plus
+        unlimited tea, coffee and juices all day. A cook can be arranged — ask
+        when booking. There are also plenty of shacks and restaurants around
+        the virgin beaches of South Goa, and delivery apps cover the area.
+
+     [topic: food]
+
+-----------------------------------------------------------------------------
+
+ 30. Q: Are there pots and pans provided?
+
+     A: There is a kitchen — large and fully equipped. And a cook can be
+        arranged — ask when booking.
+
+     [topic: kitchen]
+
+-----------------------------------------------------------------------------
+
+ 31. Q: Is there a supermarket close by?
+
+     A: I have nothing on file about "supermarket" at the villa, and I would
+        rather say that than answer with something close but wrong.
+        nyaragoa@gmail.com will know for certain.
+
+     [topic: declined  |  offered: What are the rates? / Is there a pool? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+ 32. Q: Can you cater for vegetarians?
+
+     A: For something small and private the house is well set up: the kitchen
+        is large and fully equipped, a cook can be arranged — ask when
+        booking, and dinner is provided on request; there is also a barbeque
+        in the gazebo. Bringing in a caterer or extra staff is a question for
+        nyaragoa@gmail.com, who will know who is good locally and what the
+        house allows. The policy on larger events is a separate matter: the
+        owner decides that case by case.
+
+     [topic: gatherings]
+
+-----------------------------------------------------------------------------
+
+ 33. Q: Is breakfast included every day?
+
+     A: Breakfast is complimentary English breakfast every morning, plus
+        unlimited tea, coffee and juices all day. A cook can be arranged — ask
+        when booking. There are also plenty of shacks and restaurants around
+        the virgin beaches of South Goa, and delivery apps cover the area.
+
+     [topic: food]
+
+-----------------------------------------------------------------------------
+
+ 34. Q: How long is the drive from Dabolim?
+
+     A: The nearest airport is Goa International (GOI, Dabolim) — a 20 minute
+        drive. The transfer is complimentary — tell us your flight and we will
+        arrange the car.
+
+     [topic: airport]
+
+-----------------------------------------------------------------------------
+
+ 35. Q: Is Mopa airport far away?
+
+     A: The nearest airport is Goa International (GOI, Dabolim) — a 20 minute
+        drive. The transfer is complimentary — tell us your flight and we will
+        arrange the car.
+
+     [topic: airport]
+
+-----------------------------------------------------------------------------
+
+ 36. Q: Can you pick us up from the railway station?
+
+     A: I did not catch that. I am good on rates, availability, the rooms and
+        pool, check-in, house rules and getting here — try me on one of those.
+
+     [topic: not understood  |  offered: What are the rates? / How many bedrooms? / Is there a pool? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+ 37. Q: Do we need a car while we are there?
+
+     A: I think you are asking about parking — parking is something the owner
+        can confirm — nyaragoa@gmail.com. Scooters park inside too.
+        If that was not it, say it another way and I will try again.
+
+     [topic: parking  |  offered: What are the rates? / Is it available? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+ 38. Q: Is the road to the villa in good condition?
+
+     A: I did not catch that. I am good on rates, availability, the rooms and
+        pool, check-in, house rules and getting here — try me on one of those.
+
+     [topic: not understood  |  offered: What are the rates? / How many bedrooms? / Is there a pool? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+ 39. Q: How far is the nearest town?
+
+     A: I am not certain I follow. Were you asking about the airport?
+
+     [topic: not understood  |  offered: How far is the airport? / How far is the beach?]
+
+-----------------------------------------------------------------------------
+
+ 40. Q: can u arrange a driver for a day
+
+     A: Airport transfers are complimentary — tell us your flight and we will
+        arrange the car. Scooters and cars are easy to rent locally and the
+        caretaker can set that up — having your own wheels makes a big
+        difference in Goa.
+
+     [topic: transfer]
+
+-----------------------------------------------------------------------------
+
+ 41. Q: What time can we arrive?
+
+     A: Check-in is flexible and check-out is flexible — nyaragoa@gmail.com
+        can give you exact times. Late arrivals are fine; early check-in
+        depends on the day before.
+
+     [topic: checkin]
+
+-----------------------------------------------------------------------------
+
+ 42. Q: Can we leave our bags after checking out?
+
+     A: Check-out is flexible. Late check-out is usually possible if nobody
+        arrives the same day — worth asking the caretaker the night before.
+        (Or did you mean check-in times?)
+
+     [topic: checkout]
+
+-----------------------------------------------------------------------------
+
+ 43. Q: Is anyone there to let us in?
+
+     A: I did not catch that. I am good on rates, availability, the rooms and
+        pool, check-in, house rules and getting here — try me on one of those.
+
+     [topic: not understood  |  offered: What are the rates? / How many bedrooms? / Is there a pool? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+ 44. Q: What if our flight lands at 2am?
+
+     A: The nearest airport is Goa International (GOI, Dabolim) — a 20 minute
+        drive. The transfer is complimentary — tell us your flight and we will
+        arrange the car.
+
+     [topic: airport]
+
+-----------------------------------------------------------------------------
+
+ 45. Q: Can we check out late on the last day?
+
+     A: Check-out is flexible. Late check-out is usually possible if nobody
+        arrives the same day — worth asking the caretaker the night before.
+
+     [topic: checkout]
+
+-----------------------------------------------------------------------------
+
+ 46. Q: Are dogs allowed in the garden?
+
+     A: I do not want to guess at the pet policy — nyaragoa@gmail.com will
+        tell you straight away.
+
+     [topic: pets]
+
+-----------------------------------------------------------------------------
+
+ 47. Q: Can we smoke outside?
+
+     A: Smoking is something the owner can confirm — nyaragoa@gmail.com.
+
+     [topic: smoking]
+
+-----------------------------------------------------------------------------
+
+ 48. Q: Is it alright to play music in the evening?
+
+     A: House policy: something the owner can confirm — nyaragoa@gmail.com. A
+        quiet family celebration is fine — a full event is not. If you are
+        unsure which yours is, check with the owner first on
+        nyaragoa@gmail.com.
+
+     [topic: parties]
+
+-----------------------------------------------------------------------------
+
+ 49. Q: Can we invite friends over for dinner?
+
+     A: Breakfast is complimentary English breakfast every morning, plus
+        unlimited tea, coffee and juices all day. A cook can be arranged — ask
+        when booking. There are also plenty of shacks and restaurants around
+        the virgin beaches of South Goa, and delivery apps cover the area.
+
+     [topic: food]
+
+-----------------------------------------------------------------------------
+
+ 50. Q: Are children welcome?
+
+     A: Children are something the owner can confirm — nyaragoa@gmail.com. A
+        cot can usually be arranged with a bit of notice.
+
+     [topic: children]
+
+-----------------------------------------------------------------------------
+
+ 51. Q: Is it suitable for a birthday party?
+
+     A: House policy: something the owner can confirm — nyaragoa@gmail.com. A
+        quiet family celebration is fine — a full event is not. If you are
+        unsure which yours is, check with the owner first on
+        nyaragoa@gmail.com.
+
+     [topic: parties]
+
+-----------------------------------------------------------------------------
+
+ 52. Q: Can we bring our own alcohol?
+
+     A: I did not catch that. I am good on rates, availability, the rooms and
+        pool, check-in, house rules and getting here — try me on one of those.
+
+     [topic: not understood  |  offered: What are the rates? / How many bedrooms? / Is there a pool? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+ 53. Q: Who cleans the house during our stay?
+
+     A: Housekeeping comes on a schedule the owner can confirm —
+        nyaragoa@gmail.com. Linen and towels are provided and changed during
+        your stay. Laundry: personal laundry included.
+
+     [topic: housekeeping]
+
+-----------------------------------------------------------------------------
+
+ 54. Q: Is there someone on site all the time?
+
+     A: How the grounds are enclosed, and whether anyone is on site overnight,
+        is worth asking nyaragoa@gmail.com directly. The villa is let on an
+        exclusive basis, so the house and grounds are yours alone, and
+        Loutolim, South Goa is a quiet residential stretch that is comfortable
+        to walk at night.
+        (Or did you mean contacting the owner?)
+
+     [topic: safety]
+
+-----------------------------------------------------------------------------
+
+ 55. Q: Can we get our clothes washed?
+
+     A: Housekeeping comes on a schedule the owner can confirm —
+        nyaragoa@gmail.com. Linen and towels are provided and changed during
+        your stay. Laundry: personal laundry included.
+
+     [topic: housekeeping]
+
+-----------------------------------------------------------------------------
+
+ 56. Q: Are towels changed every day?
+
+     A: Housekeeping comes on a schedule the owner can confirm —
+        nyaragoa@gmail.com. Linen and towels are provided and changed during
+        your stay. Laundry: personal laundry included.
+
+     [topic: housekeeping]
+
+-----------------------------------------------------------------------------
+
+ 57. Q: Is there an iron and ironing board?
+
+     A: I have nothing on file about "iron" at the villa, and I would rather
+        say that than answer with something close but wrong.
+        nyaragoa@gmail.com will know for certain.
+
+     [topic: declined  |  offered: What are the rates? / Is there a pool? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+ 58. Q: Is the property gated at night?
+
+     A: How the grounds are enclosed, and whether anyone is on site overnight,
+        is worth asking nyaragoa@gmail.com directly. The villa is let on an
+        exclusive basis, so the house and grounds are yours alone, and
+        Loutolim, South Goa is a quiet residential stretch that is comfortable
+        to walk at night.
+
+     [topic: safety]
+
+-----------------------------------------------------------------------------
+
+ 59. Q: Are there security cameras inside the house?
+
+     A: I am not going to guess about cameras. Whether any are fitted, and
+        where, is something to get in writing before you book rather than from
+        me. Write to nyaragoa@gmail.com and ask directly. The villa is let on
+        an exclusive basis, so the house and grounds are yours alone, and
+        Loutolim, South Goa is a quiet residential stretch that is comfortable
+        to walk at night.
+
+     [topic: safety]
+
+-----------------------------------------------------------------------------
+
+ 60. Q: Is the area safe to walk around after dark?
+
+     A: The villa is let on an exclusive basis, so the house and grounds are
+        yours alone, and Loutolim, South Goa is a quiet residential stretch
+        that is comfortable to walk at night. There is also medical service on
+        call.
+
+     [topic: safety]
+
+-----------------------------------------------------------------------------
+
+ 61. Q: What happens if there is a medical emergency?
+
+     A: The villa is let on an exclusive basis, so the house and grounds are
+        yours alone, and Loutolim, South Goa is a quiet residential stretch
+        that is comfortable to walk at night. There is also medical service on
+        call.
+
+     [topic: safety]
+
+-----------------------------------------------------------------------------
+
+ 62. Q: Is there a safe for valuables?
+
+     A: The villa is let on an exclusive basis, so the house and grounds are
+        yours alone, and Loutolim, South Goa is a quiet residential stretch
+        that is comfortable to walk at night. There is also medical service on
+        call.
+
+     [topic: safety]
+
+-----------------------------------------------------------------------------
+
+ 63. Q: What is there to see nearby?
+
+     A: Plenty within reach — the virgin beaches of South Goa and the shacks
+        along it, the Saturday night market, old Portuguese houses around
+        Loutolim and Chandor, spice farms inland, and Palolem a bit further
+        south. The caretaker knows the good, non-touristy versions of all of
+        it.
+
+     [topic: activities]
+
+-----------------------------------------------------------------------------
+
+ 64. Q: Can you arrange a guided tour?
+
+     A: A guide is not something I can confirm. Ask nyaragoa@gmail.com and
+        they will tell you what can be arranged and roughly what it costs.
+        What I can tell you is where to point one: the old Portuguese houses
+        at Loutolim and Chandor, the spice farms inland, the Latin quarter in
+        Panjim, and the beaches further south. The caretaker can usually set
+        up a car and driver, which covers most of what a guide would.
+
+     [topic: tourguide]
+
+-----------------------------------------------------------------------------
+
+ 65. Q: Is there a good place to watch the sunset?
+
+     A: Ikshaa Luxury Villa is in Loutolim, South Goa. It is a 15 minute drive
+        to the virgin beaches of South Goa, and Margao station is a 10 minute
+        drive. The exact pin is shared once a booking is confirmed.
+
+     [topic: location  |  offered: How far is the airport? / How far is the beach?]
+
+-----------------------------------------------------------------------------
+
+ 66. Q: Are there any spice plantations near you?
+
+     A: Reach us on nyaragoa@gmail.com. A real person answers, usually
+        quickly.
+
+     [topic: contact]
+
+-----------------------------------------------------------------------------
+
+ 67. Q: Can we do a river cruise?
+
+     A: I think you are asking about parking — parking is something the owner
+        can confirm — nyaragoa@gmail.com. Scooters park inside too.
+        If that was not it, say it another way and I will try again.
+
+     [topic: parking  |  offered: What are the rates? / Is it available? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+ 68. Q: What is the nightlife like around there?
+
+     A: Plenty within reach — the virgin beaches of South Goa and the shacks
+        along it, the Saturday night market, old Portuguese houses around
+        Loutolim and Chandor, spice farms inland, and Palolem a bit further
+        south. The caretaker knows the good, non-touristy versions of all of
+        it.
+
+     [topic: activities]
+
+-----------------------------------------------------------------------------
+
+ 69. Q: Is there a market worth visiting?
+
+     A: Plenty within reach — the virgin beaches of South Goa and the shacks
+        along it, the Saturday night market, old Portuguese houses around
+        Loutolim and Chandor, spice farms inland, and Palolem a bit further
+        south. The caretaker knows the good, non-touristy versions of all of
+        it.
+        (Or did you mean what it costs?)
+
+     [topic: activities]
+
+-----------------------------------------------------------------------------
+
+ 70. Q: How far is Palolem beach?
+
+     A: It is a 15 minute drive to the virgin beaches of South Goa. Not
+        beachfront, but easily walkable.
+
+     [topic: beach]
+
+-----------------------------------------------------------------------------
+
+ 71. Q: What is the weather like in July?
+
+     A: November to February is dry and warm. June to September is the monsoon
+        — green, dramatic, and the house at its most private.
+
+     [topic: weather]
+
+-----------------------------------------------------------------------------
+
+ 72. Q: Is it too hot in May?
+
+     A: November to February is dry and warm. June to September is the monsoon
+        — green, dramatic, and the house at its most private.
+
+     [topic: weather]
+
+-----------------------------------------------------------------------------
+
+ 73. Q: Does it flood during the monsoon?
+
+     A: November to February is dry and warm. June to September is the monsoon
+        — green, dramatic, and the house at its most private.
+
+     [topic: weather]
+
+-----------------------------------------------------------------------------
+
+ 74. Q: When is the best time to come?
+
+     A: November to February is dry and warm. June to September is the monsoon
+        — green, dramatic, and the house at its most private.
+
+     [topic: weather]
+
+-----------------------------------------------------------------------------
+
+ 75. Q: Do you accept card payments?
+
+     A: Which payment methods are accepted is something the owner can confirm
+        — nyaragoa@gmail.com. Terms are 50% to confirm the booking,
+        non-refundable, plus a refundable security deposit, the amount of
+        which is set by the owner.
+
+     [topic: payment]
+
+-----------------------------------------------------------------------------
+
+ 76. Q: How much deposit do I pay upfront?
+
+     A: Which payment methods are accepted is something the owner can confirm
+        — nyaragoa@gmail.com. Terms are 50% to confirm the booking,
+        non-refundable, plus a refundable security deposit, the amount of
+        which is set by the owner.
+
+     [topic: payment]
+
+-----------------------------------------------------------------------------
+
+ 77. Q: What happens if I have to cancel?
+
+     A: The cancellation policy is something the owner can confirm —
+        nyaragoa@gmail.com. Date changes are usually easier than cancelling —
+        ask early and they will normally accommodate you.
+
+     [topic: cancellation]
+
+-----------------------------------------------------------------------------
+
+ 78. Q: Is the security deposit refundable?
+
+     A: Which payment methods are accepted is something the owner can confirm
+        — nyaragoa@gmail.com. Terms are 50% to confirm the booking,
+        non-refundable, plus a refundable security deposit, the amount of
+        which is set by the owner.
+        (Or did you mean safety?)
+
+     [topic: payment]
+
+-----------------------------------------------------------------------------
+
+ 79. Q: Can I pay in pounds?
+
+     A: Which payment methods are accepted is something the owner can confirm
+        — nyaragoa@gmail.com. Terms are 50% to confirm the booking,
+        non-refundable, plus a refundable security deposit, the amount of
+        which is set by the owner.
+
+     [topic: payment]
+
+-----------------------------------------------------------------------------
+
+ 80. Q: Is there hot water in all the bathrooms?
+
+     A: Whether every bathroom runs hot water around the clock is something
+        the owner can confirm — nyaragoa@gmail.com. The showers themselves are
+        Goa's biggest rainshower heads.
+
+     [topic: hotwater  |  offered: What is in the bathrooms? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+ 81. Q: Do the rooms have mosquito nets?
+
+     A: Nets and repellent are something the owner can confirm —
+        nyaragoa@gmail.com. Goa has mosquitoes, more so through the monsoon,
+        so it is a fair thing to ask before you come.
+
+     [topic: mosquitoes  |  offered: Talk to a human]
+
+-----------------------------------------------------------------------------
+
+ 82. Q: Is there a backup generator?
+
+     A: Power backup is something the owner can confirm — nyaragoa@gmail.com.
+        Cuts happen occasionally in Goa but are usually short.
+
+     [topic: power]
+
+-----------------------------------------------------------------------------
+
+ 83. Q: Is the wifi fast enough for a video call?
+
+     A: Yes — complimentary WiFi throughout, included at no extra cost. It
+        holds up fine for video calls, so remote work is realistic.
+        (Or did you mean contacting the owner?)
+
+     [topic: wifi]
+
+-----------------------------------------------------------------------------
+
+ 84. Q: Can I charge an electric car there?
+
+     A: A charging point for an electric car is something the owner can
+        confirm — nyaragoa@gmail.com. Worth settling before you drive down
+        rather than after.
+
+     [topic: evcharging  |  offered: Is there parking? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+ 85. Q: Are there fans as well as air conditioning?
+
+     A: Yes — air-conditioned bedrooms and living room.
+
+     [topic: ac]
+
+-----------------------------------------------------------------------------
+
+ 86. Q: Is there a gym on the property?
+
+     A: I have nothing on file about "gym" at the villa, and I would rather
+        say that than answer with something close but wrong.
+        nyaragoa@gmail.com will know for certain.
+
+     [topic: declined  |  offered: What are the rates? / Is there a pool? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+ 87. Q: Do you have a sauna?
+
+     A: I have nothing on file about "sauna" at the villa, and I would rather
+        say that than answer with something close but wrong.
+        nyaragoa@gmail.com will know for certain.
+
+     [topic: declined  |  offered: What are the rates? / Is there a pool? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+ 88. Q: Can I hire a boat through you?
+
+     A: Airport transfers are complimentary — tell us your flight and we will
+        arrange the car. Scooters and cars are easy to rent locally and the
+        caretaker can set that up — having your own wheels makes a big
+        difference in Goa.
+
+     [topic: transfer]
+
+-----------------------------------------------------------------------------
+
+ 89. Q: Is there a tennis court?
+
+     A: I have nothing on file about "tennis court" at the villa, and I would
+        rather say that than answer with something close but wrong.
+        nyaragoa@gmail.com will know for certain.
+
+     [topic: declined  |  offered: What are the rates? / Is there a pool? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+ 90. Q: Do you have a home cinema?
+
+     A: I have nothing on file about "home cinema" at the villa, and I would
+        rather say that than answer with something close but wrong.
+        nyaragoa@gmail.com will know for certain.
+
+     [topic: declined  |  offered: What are the rates? / Is there a pool? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+ 91. Q: Can I bring a drone to film the house?
+
+     A: I did not catch that. I am good on rates, availability, the rooms and
+        pool, check-in, house rules and getting here — try me on one of those.
+
+     [topic: not understood  |  offered: What are the rates? / How many bedrooms? / Is there a pool? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+ 92. Q: Is there a chapel on site?
+
+     A: I have nothing on file about "chapel" at the villa, and I would rather
+        say that than answer with something close but wrong.
+        nyaragoa@gmail.com will know for certain.
+
+     [topic: declined  |  offered: What are the rates? / Is there a pool? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+ 93. Q: Do you rent out bicycles?
+
+     A: Happy to note that down. Which date would you arrive? "12 Dec" or "20
+        to 24 December" both work.
+
+     [topic: availability  |  offered: Next weekend / 20 to 24 December]
+
+-----------------------------------------------------------------------------
+
+ 94. Q: Is there a jacuzzi?
+
+     A: I have nothing on file about "jacuzzi" at the villa, and I would
+        rather say that than answer with something close but wrong.
+        nyaragoa@gmail.com will know for certain.
+
+     [topic: declined  |  offered: What are the rates? / Is there a pool? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+ 95. Q: hi is the pool private and can we bring a dog
+
+     A: Hello!
+        I do not want to guess at the pet policy — nyaragoa@gmail.com will
+        tell you straight away.
+
+     [topic: greeting]
+
+-----------------------------------------------------------------------------
+
+ 96. Q: we are 8 people is that ok
+
+     A: Happy to note that down. Which date would you arrive? "12 Dec" or "20
+        to 24 December" both work.
+
+     [topic: availability  |  offered: Next weekend / 20 to 24 December]
+
+-----------------------------------------------------------------------------
+
+ 97. Q: Sorry, are you a real person?
+
+     A: I am a small script, not a person and not an AI — just pattern
+        matching over what I have been told about Ikshaa Luxury Villa. I am
+        good with the practical questions; for anything unusual,
+        nyaragoa@gmail.com reaches a human.
+
+     [topic: bot_identity]
+
+-----------------------------------------------------------------------------
+
+ 98. Q: what can you help me with
+
+     A: I did not catch that. I am good on rates, availability, the rooms and
+        pool, check-in, house rules and getting here — try me on one of those.
+
+     [topic: not understood  |  offered: What are the rates? / How many bedrooms? / Is there a pool? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+ 99. Q: This place looks beautiful
+
+     A: Glad it appeals! It photographs well, and it holds up in person.
+
+     [topic: compliment]
+
+-----------------------------------------------------------------------------
+
+100. Q: I asked about rates and got nothing useful
+
+     A: I do not have the nightly rates — they move with the season, so I
+        would only mislead you. The live prices are on the listing:
+        https://www.airbnb.co.in/rooms/17852391, or ask nyaragoa@gmail.com.
+
+     [topic: price  |  offered: What about December? / How do I pay? / Is a deposit needed?]
+
+-----------------------------------------------------------------------------
+
+101. Q: how much does it cost
+
+     A: I do not have the nightly rates — they move with the season, so I
+        would only mislead you. The live prices are on the listing:
+        https://www.airbnb.co.in/rooms/17852391, or ask nyaragoa@gmail.com.
+
+     [topic: price  |  offered: What about December? / How do I pay? / Is a deposit needed?]
+
+-----------------------------------------------------------------------------
+
+102. ↳ Q: what are your rates
+
+     A: I do not have the nightly rates — they move with the season, so I
+        would only mislead you. The live prices are on the listing:
+        https://www.airbnb.co.in/rooms/17852391, or ask nyaragoa@gmail.com.
+
+     [topic: price  |  offered: What about December? / How do I pay? / Is a deposit needed?]
+
+-----------------------------------------------------------------------------
+
+103. ↳ Q: whats the price for a week
+
+     A: I do not have the nightly rates — they move with the season, so I
+        would only mislead you. The live prices are on the listing:
+        https://www.airbnb.co.in/rooms/17852391, or ask nyaragoa@gmail.com.
+        Tell them your exact dates and they will quote you properly.
+
+     [topic: price  |  offered: What about December? / How do I pay? / Is a deposit needed?]
+
+-----------------------------------------------------------------------------
+
+104. Q: is there a pool
+
+     A: Yes — the pool is private, for the use of your party alone. It is not
+        heated, though Goa rarely makes you want that.
+
+     [topic: pool  |  offered: Is it safe for kids? / How far is the beach?]
+
+-----------------------------------------------------------------------------
+
+105. ↳ Q: how do we get from the airport
+
+     A: The nearest airport is Goa International (GOI, Dabolim) — a 20 minute
+        drive. The transfer is complimentary — tell us your flight and we will
+        arrange the car.
+
+     [topic: airport]
+
+-----------------------------------------------------------------------------
+
+106. ↳ Q: is there a swimming pool
+
+     A: Yes — the pool is private, for the use of your party alone. It is not
+        heated, though Goa rarely makes you want that.
+
+     [topic: pool  |  offered: Is it safe for kids? / How far is the beach?]
+
+-----------------------------------------------------------------------------
+
+107. Q: are there cameras in the house
+
+     A: I am not going to guess about cameras. Whether any are fitted, and
+        where, is something to get in writing before you book rather than from
+        me. Write to nyaragoa@gmail.com and ask directly. The villa is let on
+        an exclusive basis, so the house and grounds are yours alone, and
+        Loutolim, South Goa is a quiet residential stretch that is comfortable
+        to walk at night.
+
+     [topic: safety]
+
+-----------------------------------------------------------------------------
+
+108. ↳ Q: do you record inside the villa
+
+     A: I am not going to guess about cameras. Whether any are fitted, and
+        where, is something to get in writing before you book rather than from
+        me. Write to nyaragoa@gmail.com and ask directly. The villa is let on
+        an exclusive basis, so the house and grounds are yours alone, and
+        Loutolim, South Goa is a quiet residential stretch that is comfortable
+        to walk at night.
+
+     [topic: safety]
+
+-----------------------------------------------------------------------------
+
+109. Q: we want to come 12 December for 3 nights
+
+     A: Got it — 12 Dec 2026 to 15 Dec 2026, 3 nights. How many guests
+        altogether?
+
+     [topic: availability  |  offered: 2 guests / 4 guests / 6 guests]
+
+-----------------------------------------------------------------------------
+
+110. ↳ Q: there are 4 of us
+
+     A: Here is what I have: 12 Dec 2026 to 15 Dec 2026, 3 nights, 4 guests. I
+        do not know the minimum stay, so worth confirming. I cannot hold dates
+        myself — send exactly that to nyaragoa@gmail.com and they will confirm
+        availability.
+
+     [topic: availability  |  offered: What will that cost? / Cancellation policy? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+111. ↳ Q: is that available
+
+     A: Here is what I have: 12 Dec 2026 to 15 Dec 2026, 3 nights, 4 guests. I
+        do not know the minimum stay, so worth confirming. I cannot hold dates
+        myself — send exactly that to nyaragoa@gmail.com and they will confirm
+        availability.
+
+     [topic: availability  |  offered: What will that cost? / Cancellation policy? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+112. Q: tell me about the pool
+
+     A: Yes — the pool is private, for the use of your party alone. It is not
+        heated, though Goa rarely makes you want that.
+
+     [topic: pool  |  offered: Is it safe for kids? / How far is the beach?]
+
+-----------------------------------------------------------------------------
+
+113. ↳ Q: is it heated
+
+     A: Yes — the pool is private, for the use of your party alone. It is not
+        heated, though Goa rarely makes you want that.
+
+     [topic: pool  |  offered: Is it safe for kids? / How far is the beach?]
+
+-----------------------------------------------------------------------------
+
+114. ↳ Q: is it safe for children
+
+     A: Children are something the owner can confirm — nyaragoa@gmail.com. A
+        cot can usually be arranged with a bit of notice.
+        (Or did you mean safety?)
+
+     [topic: children]
+
+-----------------------------------------------------------------------------
+
+115. Q: we are 6 people
+
+     A: Happy to note that down. Which date would you arrive? "12 Dec" or "20
+        to 24 December" both work.
+
+     [topic: availability  |  offered: Next weekend / 20 to 24 December]
+
+-----------------------------------------------------------------------------
+
+116. ↳ Q: sorry make that 8
+
+     A: I did not catch that. I am good on rates, availability, the rooms and
+        pool, check-in, house rules and getting here — try me on one of those.
+
+     [topic: not understood  |  offered: What are the rates? / How many bedrooms? / Is there a pool? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+117. ↳ Q: is that too many
+
+     A: Happy to note that down. Which date would you arrive? "12 Dec" or "20
+        to 24 December" both work.
+
+     [topic: availability  |  offered: Next weekend / 20 to 24 December]
+
+-----------------------------------------------------------------------------
+
+118. Q: what does it cost
+
+     A: I do not have the nightly rates — they move with the season, so I
+        would only mislead you. The live prices are on the listing:
+        https://www.airbnb.co.in/rooms/17852391, or ask nyaragoa@gmail.com.
+
+     [topic: price  |  offered: What about December? / How do I pay? / Is a deposit needed?]
+
+-----------------------------------------------------------------------------
+
+119. ↳ Q: you have not answered my question
+
+     A: I did not catch that. I am good on rates, availability, the rooms and
+        pool, check-in, house rules and getting here — try me on one of those.
+
+     [topic: not understood  |  offered: What are the rates? / How many bedrooms? / Is there a pool? / Talk to a human]
+
+-----------------------------------------------------------------------------
+
+120. ↳ Q: just tell me the price
+
+     A: I do not have the nightly rates — they move with the season, so I
+        would only mislead you. The live prices are on the listing:
+        https://www.airbnb.co.in/rooms/17852391, or ask nyaragoa@gmail.com.
+
+     [topic: price  |  offered: What about December? / How do I pay? / Is a deposit needed?]
+
+-----------------------------------------------------------------------------

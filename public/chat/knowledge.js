@@ -326,8 +326,12 @@
         {
             id: 'capabilities',
             examples: ['what can you do', 'help', 'what can i ask', 'how does this work', 'what do you know',
-                'give me options', 'menu'],
+                'give me options', 'menu', 'what can you help me with', 'what are you able to answer'],
+            /* "what can you help me with" fell through to "I did not catch
+               that" — the most basic question a guest can ask, and the one
+               the widget's own opener invites. */
             patterns: [/^\s*(help|menu|options)\s*[?!.]*$/,
+                /\bwhat can you (help|assist)\b/,
                 /\bwhat (can|sort of things can|kind of things can) (you do|i ask)/,
                 /\bhow (do i|does this) (use|work)/,
                 /\bshow me (the )?(options|choices)\b/],
@@ -341,7 +345,8 @@
             id: 'price',
             negativeExamples: ['is the deposit paid by card or transfer', 'what payment methods do you take', 'which payment methods do you take', 'how do i send the money', 'is a deposit needed'],
             concepts: ['@price'],
-            keywords: ['price', 'cost', 'rate', 'charge', 'expensive', 'budget'],
+            keywords: ['price', 'cost', 'rate', 'charge', 'expensive', 'budget',
+                'discount', 'deal', 'offer', 'minimum stay', 'min stay'],
             /* "what would a week come to" is a price question phrased without
                any of the words above. */
             questionTypes: ['how_much', 'what'],
@@ -349,7 +354,11 @@
                 'what is the tariff', 'is it expensive', 'cost for 3 nights', 'what does a weekend cost',
                 'rates for december', 'how much for the whole villa', 'give me a quote', 'nightly price',
                 'what is the charge', 'how much money for two nights', 'daily rent'],
-            patterns: [/\b(come to|work out at|set (us|me) back)\b/,
+            /* Multi-word keywords are tokenised and stemmed, so "minimum stay"
+               never matched as a phrase. Patterns match the text itself. */
+            patterns: [/\bminimum\s+(stay|nights?|booking|period)\b/, /\bmin\s+nights?\b/,
+                /\b(discount|cheaper rate|better rate|any deals?)\b/,
+                /\b(come to|work out at|set (us|me) back)\b/,
                 /\bhow much\b.*\b(night|stay|cost|villa|it)\b/, /\bwhat.*(price|rate|tariff|cost)\b/],
             answer: function (ctx) {
                 var e = ctx.entities || {};
@@ -500,10 +509,17 @@
             id: 'food',
             negativeExamples: ['is there a fridge', 'are utensils provided', 'is there a gas stove'],
             concepts: ['@food'],
-            keywords: ['food', 'breakfast', 'meal', 'restaurant', 'chef', 'dinner', 'lunch'],
+            /* The breakfast fact already promises "unlimited tea, coffee and
+               juices all day", and the answer already mentions groceries —
+               but "do you provide tea and coffee" and "is there a supermarket
+               close by" both missed. The words were in the answer and not in
+               the index, which is the easiest gap of all to leave open. */
+            keywords: ['food', 'breakfast', 'meal', 'restaurant', 'chef', 'dinner', 'lunch',
+                'tea', 'coffee', 'supermarket', 'vegetarian', 'vegan'],
             examples: ['is breakfast included', 'do you serve food', 'are there restaurants nearby',
                 'can you arrange a cook', 'where do we eat', 'is there a chef', 'food options',
-                'can we order in'],
+                'can we order in', 'do you provide tea and coffee',
+                'is there a supermarket close by', 'can you cater for vegetarians'],
             patterns: [/\b(can|could|will) (someone|somebody|anyone) cook\b/,
                 /\bbreakfast\b/, /\b(serve|provide|include).*(food|meal)/],
             answer: function () {
@@ -520,7 +536,10 @@
             examples: ['where is the villa', 'what is the address', 'where exactly is it located',
                 'which part of goa', 'is it north or south goa', 'how do i get there', 'send me the location',
                 'is it far from the city'],
-            patterns: [/\bwhere (is|are) (it|the villa|you|this)\b/, /\b(exact )?(address|location)\b/],
+            // "how far is the nearest town" was answered with the airport.
+            patterns: [/\bwhere (is|are) (it|the villa|you|this)\b/, /\b(exact )?(address|location)\b/,
+                /\bnearest (town|village|city|shops?)\b/,
+                /\bhow far.*\b(town|village|margao|panjim|city)\b/],
             answer: function () {
                 return FACTS.name + ' is in ' + FACTS.area + '. It is ' + FACTS.beachDistance +
                     ' to ' + FACTS.beachName + ', and ' + FACTS.railway +
@@ -566,7 +585,11 @@
             keywords: ['transfer', 'pickup', 'taxi', 'cab', 'transport', 'scooter', 'driver'],
             examples: ['can you arrange a pickup', 'do you provide transport', 'is a taxi available',
                 'can i rent a scooter', 'how do we get around', 'do you have a driver'],
+            // "pick us up" missed: the pattern wanted "pick up" adjacent, so
+            // any object between the verb and its particle slipped through.
             patterns: [/\b(pick ?up|drop off|taxi|cab|driver|chauffeur)\b/,
+                /\bpick\s+(us|me|the group|everyone)\s+up\b/,
+                /\b(railway|train)\s+station\b/,
                 /\b(rent|hire)\w*\s+(a\s+|an\s+)?(scooter|bike|moped|motorbike|car|vehicle)\b/,
                 /* "can you arrange a car" was answered with parking, because
                    @parking owns the word "car". Arranging one is a transport
@@ -602,11 +625,16 @@
             id: 'checkin',
             negativeExamples: ['when do we have to leave', 'can we stay later on the final day'],
             concepts: ['@checkin'],
-            keywords: ['checkin', 'arrival', 'arrive', 'early'],
+            keywords: ['checkin', 'arrival', 'arrive', 'early', 'let us in', 'caretaker', 'meet us'],
             questionTypes: ['when', 'what'],
             examples: ['what time is check in', 'when can we arrive', 'can we check in early',
                 'is late arrival ok', 'what time can i get in'],
-            patterns: [/\bcheck ?-?in\b/, /\bwhat time.*(arrive|arrival)\b/],
+            /* "is anyone there to let us in" scored as a greeting — it reads
+               like "is anyone there?" — and fell through. It is an arrival
+               question about who meets you with the keys. */
+            patterns: [/\bcheck ?-?in\b/, /\bwhat time.*(arrive|arrival)\b/,
+                /\b(let|lets|letting) (us|me) in\b/, /\bmeet(ing)? us\b/,
+                /\b(hand over|collect|pick up) the keys?\b/],
             answer: function () {
                 return 'Check-in is ' + fact(FACTS.checkIn, 'flexible') + ' and check-out is ' +
                     fact(FACTS.checkOut, 'flexible') + ' — ' + contact() + ' can give you exact times. ' +
@@ -663,11 +691,13 @@
         {
             id: 'parties',
             concepts: ['@party'],
-            keywords: ['party', 'event', 'celebration', 'music', 'birthday', 'wedding', 'guests'],
+            keywords: ['party', 'event', 'celebration', 'music', 'birthday', 'wedding', 'guests',
+                'alcohol', 'drinks', 'booze', 'bar'],
             negativeExamples: ['is extra staff available for a celebration',
                 'can you arrange catering for a get together', 'can a caterer come in'],
             examples: ['can we throw a party', 'are events allowed', 'can we play loud music',
-                'is it ok for a birthday celebration', 'can we host a wedding', 'bachelor party'],
+                'is it ok for a birthday celebration', 'can we host a wedding', 'bachelor party',
+                'can we bring our own alcohol', 'is it alright to play music in the evening'],
             patterns: [/\b(hold|throw|host|have) (a|an|our) [a-z ]{0,18}(party|do|bash|event|wedding|birthday)\b/,
                 /\b(part(y|ies)|event|celebration|wedding|dj)\b/],
             answer: function (ctx) {
@@ -850,6 +880,28 @@
            them to an honest deferral is still strictly better than routing
            them confidently somewhere else, and it puts the three questions on
            the list of things to find out. */
+        /* The outside of the house had no intent at all, so "is there a garden
+           to sit out in" missed and "is there a barbecue we can use" missed —
+           even though the dinner fact says, in as many words, that there is a
+           barbeque in the gazebo. Both spellings are indexed, because British
+           and Indian English disagree and a guest should not have to know
+           which one the file uses. */
+        {
+            id: 'grounds',
+            keywords: ['garden', 'lawn', 'grounds', 'outdoor', 'outside', 'gazebo',
+                'barbecue', 'barbeque', 'bbq', 'grill', 'terrace', 'veranda', 'courtyard'],
+            examples: ['is there a garden to sit out in', 'is there a barbecue we can use',
+                'can we eat outside', 'is there outdoor seating', 'do you have a lawn',
+                'is there a terrace', 'can we grill'],
+            patterns: [/\b(garden|lawn|gazebo|barbe?c?que|bbq|terrace|veranda|courtyard)\b/,
+                /\bsit\s+out(side)?\b/, /\beat\s+outside\b/],
+            answer: function () {
+                return 'There are grounds around the house, and they are yours alone — ' +
+                    FACTS.exclusive.replace(/^The villa is let on an /, '') + '. ' +
+                    'Dinner is ' + FACTS.dinner + '. The pool is ' + FACTS.pool + '.';
+            },
+            chips: ['Is there a pool?', 'Can we get dinner made?']
+        },
         {
             id: 'hotwater',
             keywords: ['hot water', 'geyser', 'water heater', 'immersion'],
@@ -999,5 +1051,65 @@
         }
     ];
 
-    return { FACTS: FACTS, CONCEPTS: CONCEPTS, INTENTS: INTENTS, BOOKING: BOOKING };
+    /* ---------------------------------------------------------------
+     * What to actually DO next, per topic.
+     *
+     * A guest who asks the same thing twice did not get what they needed the
+     * first time. Repeating the same sentence more loudly is what makes an
+     * assistant infuriating, so the second answer states the position
+     * formally and then names a concrete next step — a link to open, an
+     * address to write to, and what to put in the message.
+     *
+     * "Email the owner" on its own is not a step. "Email the owner with your
+     * dates and party size, and ask them to confirm in writing" is one.
+     * ------------------------------------------------------------ */
+    function nextStep(intentId) {
+        var who = contact();
+
+        switch (intentId) {
+            case 'price':
+            case 'payment':
+                return 'open the live listing at ' + FACTS.bookingUrl +
+                    ', where the current prices sit, and email ' + who +
+                    ' with your exact dates for a written quote';
+            case 'availability':
+                return 'email ' + who + ' with your arrival date, the number of nights and how many ' +
+                    'of you there are — that is everything needed to check the calendar and hold it';
+            case 'cancellation':
+                return 'ask ' + who + ' for the cancellation terms in writing before you pay the deposit, ' +
+                    'so what you agreed is on record';
+            case 'checkin':
+            case 'checkout':
+                return 'send ' + who + ' your flight or train time and ask them to confirm the arrival ' +
+                    'arrangement — the caretaker needs to know when to meet you';
+            case 'airport':
+            case 'transfer':
+                return 'send ' + who + ' your flight number and landing time, and they will arrange the car';
+            case 'cameras':
+            case 'safety':
+                return 'ask ' + who + ' directly what is fitted and where. This is a privacy question and ' +
+                    'you are entitled to a straight answer in writing';
+            case 'pets':
+            case 'smoking':
+            case 'parties':
+            case 'children':
+                return 'put the specifics to ' + who + ' — the breed and size, or the number of guests and ' +
+                    'the hours — and get the answer in writing before you book';
+            case 'accessibility':
+                return 'tell ' + who + ' exactly what access you need, and ask them to describe the ' +
+                    'steps, doorways and bathrooms honestly rather than in general terms';
+            case 'tourguide':
+            case 'gatherings':
+                return 'email ' + who + ' with the date and what you have in mind, and they will tell you ' +
+                    'what can be arranged and what it costs';
+            default:
+                return 'email ' + who + ' with the question exactly as you have put it here — a person ' +
+                    'answers, usually quickly, and can tell you what I cannot';
+        }
+    }
+
+    return {
+        FACTS: FACTS, CONCEPTS: CONCEPTS, INTENTS: INTENTS, BOOKING: BOOKING,
+        nextStep: nextStep
+    };
 }));

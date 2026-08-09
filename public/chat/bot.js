@@ -68,6 +68,12 @@
             pendingClarify: null,
             turn: 0,
             recentVariants: {},  // intentId -> last variant index used
+            /* How many times each topic has been raised this conversation.
+               Keyed by INTENT, not by wording, which is the whole point: "how
+               much is it", "what are your rates" and "whats the price" are one
+               question asked three times, and the guest knows that even if a
+               string comparison does not. */
+            asked: {},
             unknownStreak: 0
         };
         return this;
@@ -93,6 +99,10 @@
             pendingClarify: c.pendingClarify,
             lastIntentId: c.lastIntentId,
             topicTokens: c.topicTokens,
+            // Without this a reload forgets that a topic was already covered,
+            // and the guest gets the same unhelpful answer a second time as
+            // though it were the first.
+            asked: c.asked,
             turn: c.turn
         };
     };
@@ -120,6 +130,15 @@
         c.pendingClarify = strings(state.pendingClarify).length ? strings(state.pendingClarify) : null;
         c.lastIntentId = typeof state.lastIntentId === 'string' ? state.lastIntentId : null;
         c.topicTokens = strings(state.topicTokens);
+        // Counts only: anything else in there did not come from exportState.
+        c.asked = {};
+        var restored = plain(state.asked);
+        Object.keys(restored).forEach(function (id) {
+            var count = restored[id];
+            if (typeof count === 'number' && isFinite(count) && count > 0) {
+                c.asked[id] = Math.min(Math.floor(count), 9);
+            }
+        });
         c.turn = typeof state.turn === 'number' && isFinite(state.turn) ? state.turn : 0;
         return true;
     };
@@ -319,6 +338,45 @@
     };
 
     /* --------------------------------------------------------------
+     * The same question, asked again
+     *
+     * A guest who raises a topic twice did not get what they needed the first
+     * time. Saying the same sentence again is the single most infuriating
+     * thing an assistant does, and it is what this one did: ask about rates
+     * three different ways and you got the same paragraph three times, word
+     * for word, as though each were the first.
+     *
+     * Sameness is judged by INTENT, not by wording. "How much is it", "what
+     * are your rates" and "whats the price" are one question asked three
+     * times; a string comparison sees three questions, and the guest sees an
+     * assistant that is not listening.
+     *
+     * Second ask  — say it again formally and completely, then name the one
+     *               concrete thing the guest should do next.
+     * Third ask   — stop restating. Admit the limit and give the step alone.
+     *
+     * The counter survives a reload, because a guest who refreshes and asks
+     * again has still asked twice.
+     * ------------------------------------------------------------ */
+    Bot.prototype.restate = function (intent, body, times) {
+        var topic = this.describe(intent.id);
+        var step = this.knowledge.nextStep
+            ? this.knowledge.nextStep(intent.id)
+            : 'email ' + (this.knowledge.FACTS.phone || this.knowledge.FACTS.email);
+
+        if (times >= 3) {
+            /* Nothing further exists to say. Repeating it a third time would
+               be padding, and padding around a non-answer reads as evasion. */
+            return 'I have given you everything I hold on ' + topic + ', and saying it a third ' +
+                'time will not add to it. What will: ' + step + '.';
+        }
+
+        return 'You have asked about ' + topic + ' again, so my first answer cannot have been much ' +
+            'use. Putting it as precisely as I can:\n\n' + body +
+            '\n\nIf that still leaves the question open, the next step is to ' + step + '.';
+    };
+
+    /* --------------------------------------------------------------
      * "Is there a gym?" — asking about things that are not here
      *
      * The matcher's job is to find the closest topic, and it always finds
@@ -495,6 +553,7 @@
            the raw id — "bot identity" reads oddly in "I think you are asking
            about…", and the router prompt needs a real description for every
            id it is allowed to choose. */
+        grounds: 'the garden and outdoor space',
         hotwater: 'hot water in the bathrooms',
         mosquitoes: 'mosquitoes, nets and repellent',
         evcharging: 'charging an electric car',
@@ -694,6 +753,20 @@
                     pending = [intent.id, result.ambiguousWith.id];
                     body = body + '\n\n(Or did you mean ' + self.describe(result.ambiguousWith.id) + '?)';
                 }
+
+                /* Counted before the reply is chosen, so the second ask is
+                   answered as a second ask. A hedge is not counted: the guest
+                   was told "I think you mean X", so asking again is them
+                   answering our question, not repeating theirs. */
+                if (result.status !== 'unsure') {
+                    var timesAsked = (self.context.asked[intent.id] || 0) + 1;
+                    self.context.asked[intent.id] = timesAsked;
+                    if (timesAsked > 1) {
+                        body = self.restate(intent, body, timesAsked);
+                        chips = chips.concat(['Talk to a human']);
+                    }
+                }
+
                 replies.push(body);
                 chips = chips.concat(intent.chips || []);
             }

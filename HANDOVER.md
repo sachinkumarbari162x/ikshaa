@@ -14,17 +14,17 @@ against production, not planned. Where a number is optimistic, it says so.
 
 ## Current state
 
-| | |
-|---|---|
-| Site | https://ikshaa.pages.dev — Cloudflare Pages |
-| API | https://ikshaa-api.sachinkumarbari162x.workers.dev — Cloudflare Worker |
-| Database | Neon Postgres, `ap-southeast-1` (Singapore) |
-| Email | Resend, sending as `Carman at Ikshaa <carman@brownodin.com>` |
-| Timer | Cloudflare cron, `*/15 * * * *` |
-| Repository | https://github.com/sachinkumarbari162x/ikshaa |
-| Tests | 378, all passing |
-| Build | 15.25 MB, 194 files |
-| Node | **22.13+** — `node:sqlite` is flagged below that. CI runs 24. |
+|            |                                                                         |
+| ---------- | ----------------------------------------------------------------------- |
+| Site       | https://ikshaa.pages.dev — Cloudflare Pages                            |
+| API        | https://ikshaa-api.sachinkumarbari162x.workers.dev — Cloudflare Worker |
+| Database   | Neon Postgres,`ap-southeast-1` (Singapore)                            |
+| Email      | Resend, sending as`Carman at Ikshaa <carman@brownodin.com>`           |
+| Timer      | Cloudflare cron,`*/15 * * * *`                                        |
+| Repository | https://github.com/sachinkumarbari162x/ikshaa                           |
+| Tests      | 378, all passing                                                        |
+| Build      | 15.25 MB, 194 files                                                     |
+| Node       | **22.13+** — `node:sqlite` is flagged below that. CI runs 24.  |
 
 Ten pages, a 35-room villa tour, an offline chat assistant, and a newsletter
 with double opt-in that actually delivers mail.
@@ -42,16 +42,16 @@ unconfirmed, Resend sends a designed confirmation from a DKIM-signed domain,
 clicking it flips `confirmed_at`, and the cron delivers the weekly letter.
 Every step of that has been run against production, not mocked.
 
-| | |
-|---|---|
-| Double opt-in | single-use token, only its SHA-256 is stored, 72h expiry |
-| Case-insensitive addresses | `citext` — `Maria@` and `maria@` are one person |
-| Idempotent confirm | a second click says "already", never "invalid" |
-| Outbox | `UNIQUE (campaign_id, subscriber_id)` — re-running sends nobody twice |
-| Concurrency | `FOR UPDATE SKIP LOCKED` — two senders never collide |
-| Retries | backoff moves `visible_at`; a crash mid-backoff loses nothing |
-| One reminder | `reminded_at`, so a 15-minute cron cannot nudge 96×/day |
-| Unsubscribe | per-recipient link, plus `List-Unsubscribe` headers |
+|                            |                                                                          |
+| -------------------------- | ------------------------------------------------------------------------ |
+| Double opt-in              | single-use token, only its SHA-256 is stored, 72h expiry                 |
+| Case-insensitive addresses | `citext` — `Maria@` and `maria@` are one person                   |
+| Idempotent confirm         | a second click says "already", never "invalid"                           |
+| Outbox                     | `UNIQUE (campaign_id, subscriber_id)` — re-running sends nobody twice |
+| Concurrency                | `FOR UPDATE SKIP LOCKED` — two senders never collide                  |
+| Retries                    | backoff moves`visible_at`; a crash mid-backoff loses nothing           |
+| One reminder               | `reminded_at`, so a 15-minute cron cannot nudge 96×/day               |
+| Unsubscribe                | per-recipient link, plus`List-Unsubscribe` headers                     |
 
 **Images are AVIF with a WebP fallback.** 8.96 MB of JPEG became 3.39 MB of
 AVIF, or 5.19 MB of WebP for Safari 15 and older. Zero JPEGs ship. Two
