@@ -85,6 +85,19 @@
         children: null,
         accessible: null,
         poolHeated: null,
+
+        /* Security. These stay null on purpose and are the last facts anyone
+           should be tempted to guess at: a guest asking whether they are being
+           recorded is asking a privacy question, and an invented "no cameras"
+           is a lie with consequences. Fill them in from the owner or leave
+           them alone. */
+        cameras: null,          // are any fitted, and where — indoors is the part that matters
+        perimeter: null,        // walls, gates, whether anyone is on site overnight
+
+        /* Things guests keep asking to arrange. Unknown, not unavailable —
+           the bot says "ask the owner", never "no". */
+        tourGuide: null,        // can a guide be booked, and roughly what it costs
+        eventCatering: null,    // extra staff / catering for a gathering
         bestTime: 'November to February is dry and warm. June to September is the monsoon — green, dramatic, and the house at its most private',
 
         // ikshaa.com publishes no telephone number. Until one exists the
@@ -113,6 +126,13 @@
     }
 
     // For facts that may be missing: say the value, or say we will find out.
+    /* fact() fallbacks are written as mid-sentence clauses so they can be
+       embedded in a larger reply. When one has to open a sentence instead, it
+       needs a capital — otherwise the answer reads as a broken fragment. */
+    function Cap(text) {
+        return text ? text.charAt(0).toUpperCase() + text.slice(1) : text;
+    }
+
     function fact(value, fallback) {
         return value ? value : (fallback || 'something the owner can confirm — ' + contact());
     }
@@ -441,7 +461,8 @@
         },
         {
             id: 'kitchen',
-            negativeExamples: ['can you provide a chef', 'is breakfast served', 'where can we eat out'],
+            negativeExamples: ['can you provide a chef', 'is breakfast served', 'where can we eat out',
+                'can you arrange a cook', 'is there a chef available'],
             concepts: ['@kitchen'],
             keywords: ['kitchen', 'cook', 'stove', 'fridge'],
             examples: ['is there a kitchen', 'can we cook', 'does the kitchen have a fridge',
@@ -510,10 +531,15 @@
         {
             id: 'transfer',
             concepts: ['@transfer'],
-            keywords: ['transfer', 'pickup', 'taxi', 'cab', 'transport'],
+            /* 'rent' as a bare keyword pulled "can i rent a scooter" into the
+               availability intent, which is about renting the villa. What is
+               wanted here is renting a VEHICLE, so it moves to patterns, where
+               the object of the verb is part of the match. */
+            keywords: ['transfer', 'pickup', 'taxi', 'cab', 'transport', 'scooter', 'driver'],
             examples: ['can you arrange a pickup', 'do you provide transport', 'is a taxi available',
                 'can i rent a scooter', 'how do we get around', 'do you have a driver'],
-            patterns: [/\b(pick ?up|drop off|taxi|cab|driver|chauffeur)\b/],
+            patterns: [/\b(pick ?up|drop off|taxi|cab|driver|chauffeur)\b/,
+                /\b(rent|hire)\w*\s+(a\s+|an\s+)?(scooter|bike|moped|motorbike|car|vehicle)\b/],
             negativeExamples: ['what time can we arrive', 'can we leave luggage before check in',
                 'where do i park the car'],
             answer: function () {
@@ -524,7 +550,12 @@
         {
             id: 'parking',
             concepts: ['@parking'],
-            keywords: ['parking', 'car', 'vehicle', 'scooter'],
+            /* 'scooter' alone was enough to pull 'can i rent a scooter' in here.
+               Renting one is transport; this intent is only about where to
+               leave it once you have it. */
+            keywords: ['parking', 'park', 'vehicle'],
+            negativeExamples: ['can i rent a scooter', 'can we hire a car', 'do you have a driver',
+                'how do we get around'],
             examples: ['is there parking', 'where do i park', 'can i park two cars', 'is parking free',
                 'somewhere to keep the scooter'],
             patterns: [/\bpark(ing)?\b/],
@@ -594,6 +625,8 @@
             id: 'parties',
             concepts: ['@party'],
             keywords: ['party', 'event', 'celebration', 'music'],
+            negativeExamples: ['is extra staff available for a celebration',
+                'can you arrange catering for a get together', 'can a caterer come in'],
             examples: ['can we throw a party', 'are events allowed', 'can we play loud music',
                 'is it ok for a birthday celebration', 'can we host a wedding', 'bachelor party'],
             patterns: [/\b(part(y|ies)|event|celebration|wedding|dj)\b/],
@@ -654,13 +687,92 @@
             id: 'safety',
             negativeExamples: ['what is the address', 'which part of goa is it', 'send me directions'],
             concepts: ['@safety'],
-            keywords: ['safe', 'security', 'cctv', 'emergency'],
+            keywords: ['safe', 'security', 'cctv', 'camera', 'surveillance', 'emergency',
+                'gate', 'perimeter', 'guard', 'watchman'],
             examples: ['is it safe', 'is there security', 'are there cameras', 'is the area safe at night',
-                'what if there is an emergency', 'is anyone on site'],
-            patterns: [/\b(safe|security|cctv|emergenc)/],
+                'what if there is an emergency', 'is anyone on site', 'is the property gated',
+                'are we being recorded', 'is there cctv inside', 'do you have a night guard',
+                'is the perimeter secure', 'are there cameras in the bedrooms'],
+            patterns: [/\b(safe|security|cctv|camera|surveill|record|emergenc|perimeter|gated?|guard|watchman)/],
+            answer: function (ctx) {
+                /* This intent listed 'are there cameras' as an example and then
+                   answered with 'it is a quiet residential stretch', which is
+                   not an answer to the question that was asked.
+
+                   Whether a guest is being recorded is a privacy question. The
+                   only honest replies are the true one or 'ask the owner'. An
+                   invented, reassuring 'no cameras' would be the single worst
+                   thing in this file to get wrong. */
+                var asked = (ctx && ctx.analysis && ctx.analysis.normalised) || '';
+                var aboutWatching = /\b(camera|cctv|surveill|record|watch|monitor|film)/.test(asked);
+                var aboutPerimeter = /\b(perimeter|gated?|guard|watchman|wall|fence|on ?site)/.test(asked);
+
+                var neighbourhood = 'The villa is let on an exclusive basis, so the house and grounds are yours ' +
+                    'alone, and ' + FACTS.area + ' is a quiet residential stretch that is comfortable to walk at night.';
+
+                if (aboutWatching) {
+                    if (FACTS.cameras === null) {
+                        return 'I am not going to guess about cameras. Whether any are fitted, and where, is ' +
+                            'something to get in writing before you book rather than from me. Write to ' +
+                            contact() + ' and ask directly. ' + neighbourhood;
+                    }
+                    return FACTS.cameras + ' ' + neighbourhood;
+                }
+
+                if (aboutPerimeter) {
+                    return Cap(fact(FACTS.perimeter, 'how the grounds are enclosed, and whether anyone is on ' +
+                        'site overnight, is worth asking ' + contact() + ' directly')) + '. ' + neighbourhood;
+                }
+
+                return neighbourhood + ' There is also ' + FACTS.medical + '.';
+            }
+        },
+
+        {
+            /* Distinct from `activities`, which lists what there is to see.
+               This is about a person to show you round, which nobody has
+               confirmed exists. */
+            id: 'tourguide',
+            concepts: ['@activities'],
+            keywords: ['guide', 'guided', 'excursion', 'itinerary', 'sightseeing'],
+            examples: ['can you arrange a guide', 'is there a tour guide', 'can we book a guided tour',
+                'do you organise excursions', 'can someone show us around', 'is there a sightseeing tour',
+                'can you plan an itinerary for us', 'we want a day trip with a driver'],
+            patterns: [/\b(guide|guided tour|excursion|itinerar)\b/, /\bshow us (a|)round\b/,
+                /\b(day trip|plan .*itinerary)\b/],
+            negativeExamples: ['what is there to do nearby', 'which beach is closest', 'can i rent a scooter'],
             answer: function () {
-                return 'The villa is private and yours alone. ' + FACTS.area +
-                    ' is a quiet residential stretch and comfortable to walk at night.';
+                return Cap(fact(FACTS.tourGuide,
+                    'a guide is not something I can confirm. Ask ' + contact() + ' and they will tell you what ' +
+                    'can be arranged and roughly what it costs')) +
+                    '. What I can tell you is where to point one: the old Portuguese houses at Loutolim and ' +
+                    'Chandor, the spice farms inland, the Latin quarter in Panjim, and the beaches further south. ' +
+                    'The caretaker can usually set up a car and driver, which covers most of what a guide would.';
+            }
+        },
+
+        {
+            /* `parties` answers whether an event is ALLOWED. This answers
+               whether one can be ARRANGED: catering, extra hands, hiring in.
+               Two different questions that were collapsing into one answer. */
+            id: 'gatherings',
+            concepts: ['@parties'],
+            keywords: ['catering', 'caterer', 'gathering', 'celebration', 'decorations',
+                'staff', 'waiter', 'server', 'hire'],
+            examples: ['can you arrange catering for a get together', 'can we have a small family gathering',
+                'can you organise a birthday dinner', 'is extra staff available for a celebration',
+                'can you set up decorations', 'we want to host a lunch for twelve',
+                'can a caterer come in', 'can you arrange a special dinner'],
+            patterns: [/\b(cater|gathering|get.?together|celebrat|decoration)\b/],
+            negativeExamples: ['can we throw a party', 'is loud music allowed', 'can we host a wedding'],
+            answer: function () {
+                return 'For something small and private the house is well set up: the kitchen is ' +
+                    FACTS.kitchen + ', ' + FACTS.cook + ', and dinner is ' + FACTS.dinner + '. ' +
+                    Cap(fact(FACTS.eventCatering,
+                        'bringing in a caterer or extra staff is a question for ' + contact() +
+                        ', who will know who is good locally and what the house allows')) + '. ' +
+                    'The policy on larger events is a separate matter: ' +
+                    fact(FACTS.parties, 'the owner decides that case by case') + '.';
             }
         },
         {

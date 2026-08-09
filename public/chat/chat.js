@@ -9,6 +9,15 @@
     var STATE_KEY = 'ikshaa.chat.state';
     var MAX_STORED = 40;
 
+    /* An unbounded message is the cheapest way to make this widget misbehave:
+       the matcher is TF-IDF over the input, so a pasted megabyte is a
+       megabyte of tokenising and cosine scoring on the main thread, and it
+       then goes into sessionStorage until the quota throws. Nobody asks a
+       villa a 2000-character question — this is generous for a real one and
+       flatly refuses the other kind. */
+    var MAX_INPUT = 600;
+    var ROLES = { me: true, bot: true };
+
     var ICON_CHAT = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.9-.9L3 20.5l1.6-4.4A8.4 8.4 0 0 1 3.6 11.5a8.4 8.4 0 0 1 9-8.4 8.4 8.4 0 0 1 8.4 8.4z"/></svg>';
     var ICON_SEND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg>';
 
@@ -121,6 +130,7 @@
         var form = el('form', 'chat__form');
         var input = el('textarea', 'chat__input');
         input.rows = 1;
+        input.maxLength = MAX_INPUT;
         input.placeholder = 'Type your question…';
         input.setAttribute('aria-label', 'Your message');
         var send = el('button', 'chat__send', ICON_SEND);
@@ -200,11 +210,22 @@
             } catch (e) { /* private mode — transcript just won't persist */ }
         }
 
+        /* sessionStorage is same-origin, not trusted. Anything already able to
+           write to it could put a crafted role in here, and `role` is
+           concatenated straight into a class name. Text is safe either way —
+           bubble() writes textContent — but the shape is checked before use
+           rather than after something has gone wrong. */
         function restore() {
             var hist = [];
             try { hist = JSON.parse(sessionStorage.getItem(STORE_KEY) || '[]'); } catch (e) { }
-            hist.forEach(function (m) { bubble(m.role, m.text); });
-            return hist.length > 0;
+            if (!Array.isArray(hist)) { return false; }
+
+            var clean = hist.filter(function (m) {
+                return m && ROLES[m.role] === true && typeof m.text === 'string';
+            }).slice(-MAX_STORED);
+
+            clean.forEach(function (m) { bubble(m.role, m.text.slice(0, MAX_INPUT * 8)); });
+            return clean.length > 0;
         }
 
         // Persist what the bot knows, not just what was said — otherwise a
@@ -244,7 +265,10 @@
         }
 
         function submit(text) {
-            text = String(text || '').trim();
+            /* Sliced here as well as capped on the element. maxLength is a
+               courtesy to someone typing; it does nothing about a chip, a
+               paste handled oddly, or anything calling submit() directly. */
+            text = String(text || '').trim().slice(0, MAX_INPUT);
             if (!text || busy) return;
 
             bubble('me', text);
@@ -422,6 +446,62 @@
         if (/[?&]chat=open\b/.test(location.search) || location.hash === '#chat') open();
     }
 
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-    else init();
+    /* ---------------------------------------------------------------------
+     * Loading the brain.
+     *
+     * nlu.js, knowledge.js and bot.js are 34KB of language processing across
+     * three requests, and they used to be three <script defer> tags on every
+     * page of the site — paid on every first visit, by everyone, for a panel
+     * most people never open.
+     *
+     * They are fetched here instead: when the browser goes idle, or on the
+     * first sign of a human, whichever comes first. First paint no longer
+     * competes with them, and by the time anybody reaches for the launcher
+     * they have long since arrived.
+     *
+     * Order matters and is why this is a chain rather than three parallel
+     * appends: bot.js reads NLU and KNOWLEDGE off window at parse time.
+     * ------------------------------------------------------------------ */
+    var BRAIN = ['chat/nlu.js', 'chat/knowledge.js', 'chat/bot.js'];
+
+    function loadBrain(done) {
+        var i = 0;
+        (function next() {
+            if (i >= BRAIN.length) { return done(); }
+            var s = document.createElement('script');
+            s.src = BRAIN[i++];
+            s.async = false;              // preserve execution order
+            s.onload = next;
+            s.onerror = function () {
+                // One missing file must not leave a launcher that does
+                // nothing when pressed. Give up quietly and draw no widget.
+                console.warn('[chat] could not load ' + s.src);
+            };
+            document.head.appendChild(s);
+        })();
+    }
+
+    var started = false;
+    function start() {
+        if (started) { return; }
+        started = true;
+        WAKE.forEach(function (evt) { window.removeEventListener(evt, start); });
+        loadBrain(init);
+    }
+
+    var WAKE = ['pointerdown', 'keydown', 'touchstart', 'scroll'];
+
+    function schedule() {
+        WAKE.forEach(function (evt) {
+            window.addEventListener(evt, start, { once: true, passive: true });
+        });
+        if (typeof requestIdleCallback === 'function') {
+            requestIdleCallback(start, { timeout: 2500 });
+        } else {
+            setTimeout(start, 1500);      // Safari has no requestIdleCallback
+        }
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', schedule);
+    else schedule();
 })();

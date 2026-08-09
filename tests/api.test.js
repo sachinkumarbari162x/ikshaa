@@ -14,7 +14,11 @@
  * ========================================================================= */
 
 const http = require('http');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
 const store = require('../api/db');
+const { writeMailingList } = require('../api/export');
 const { createApi, tokenMatches, createRateLimiter, parseBody } = require('../api');
 const { createServer } = require('../server');
 
@@ -299,4 +303,206 @@ describe('body parsing', () => {
   test('a JSON array is not accepted as an object', () => {
     expect(parseBody('[1,2]', 'application/json')).toEqual({});
   });
+});
+
+describe('double opt-in', () => {
+    let db;
+    beforeEach(() => { db = store.openDatabase(':memory:'); });
+    afterEach(() => { db.close(); });
+
+    test('a new address is stored but not yet on the mailing list', () => {
+        const r = store.subscribe(db, { email: 'maria@example.com' });
+        expect(r.confirmToken).toEqual(expect.any(String));
+        expect(store.stats(db)).toMatchObject({ subscribers: 1, confirmed: 0, awaiting: 1 });
+        // The whole point: an unconfirmed address is never sendable.
+        expect(store.mailingList(db)).toHaveLength(0);
+    });
+
+    test('confirming puts them on the list', () => {
+        const r = store.subscribe(db, { email: 'maria@example.com' });
+        expect(store.confirm(db, r.confirmToken)).toMatchObject({ ok: true, already: false });
+        expect(store.mailingList(db).map((x) => x.email)).toEqual(['maria@example.com']);
+    });
+
+    test('clicking the link twice is not an error', () => {
+        // People double-click, and mail clients prefetch URLs. Clearing the
+        // hash on success used to make the second click report an unknown
+        // link to somebody who had just confirmed.
+        const r = store.subscribe(db, { email: 'm@example.com' });
+        store.confirm(db, r.confirmToken);
+        expect(store.confirm(db, r.confirmToken)).toMatchObject({ ok: true, already: true });
+    });
+
+    test('an unknown or expired token is refused', () => {
+        expect(store.confirm(db, 'not-a-token')).toMatchObject({ ok: false, reason: 'unknown' });
+        expect(store.confirm(db, '')).toMatchObject({ ok: false, reason: 'missing' });
+
+        const r = store.subscribe(db, { email: 'old@example.com' });
+        db.prepare('UPDATE subscribers SET confirm_expires = ? WHERE email = ?')
+            .run('2020-01-01T00:00:00.000Z', 'old@example.com');
+        expect(store.confirm(db, r.confirmToken)).toMatchObject({ ok: false, reason: 'expired' });
+        expect(store.mailingList(db)).toHaveLength(0);
+    });
+
+    test('the raw token is never stored — only its hash', () => {
+        const r = store.subscribe(db, { email: 'm@example.com' });
+        const row = db.prepare('SELECT confirm_hash FROM subscribers').get();
+        expect(row.confirm_hash).not.toBe(r.confirmToken);
+        expect(row.confirm_hash).toBe(store.hashToken(r.confirmToken));
+    });
+
+    test('somebody already confirmed is not sent round the loop again', () => {
+        const first = store.subscribe(db, { email: 'm@example.com' });
+        store.confirm(db, first.confirmToken);
+        const again = store.subscribe(db, { email: 'M@Example.com' });
+        expect(again.confirmed).toBe(true);
+        expect(again.confirmToken).toBeNull();
+    });
+
+    test('unsubscribing removes them from the list without losing the record', () => {
+        const r = store.subscribe(db, { email: 'm@example.com' });
+        store.confirm(db, r.confirmToken);
+        store.unsubscribe(db, 'm@example.com');
+        expect(store.mailingList(db)).toHaveLength(0);
+        expect(store.stats(db).subscribers).toBe(1);
+    });
+
+    test('preferences decide which list somebody appears on', () => {
+        const a = store.subscribe(db, { email: 'weekly@example.com', weekly: 1, seasonal: 0 });
+        const b = store.subscribe(db, { email: 'seasonal@example.com', weekly: 0, seasonal: 1 });
+        store.confirm(db, a.confirmToken);
+        store.confirm(db, b.confirmToken);
+
+        expect(store.mailingList(db, { list: 'weekly' }).map((x) => x.email))
+            .toEqual(['weekly@example.com']);
+        expect(store.mailingList(db, { list: 'seasonal' }).map((x) => x.email))
+            .toEqual(['seasonal@example.com']);
+    });
+});
+
+describe('the export', () => {
+    let db;
+    let dir;
+    beforeEach(() => {
+        db = store.openDatabase(':memory:');
+        dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ikshaa-export-'));
+    });
+    afterEach(() => {
+        db.close();
+        fs.rmSync(dir, { recursive: true, force: true });
+    });
+
+    test('writes only confirmed addresses', () => {
+        const yes = store.subscribe(db, { email: 'yes@example.com', name: 'Maria' });
+        store.confirm(db, yes.confirmToken);
+        store.subscribe(db, { email: 'notyet@example.com' });      // left unconfirmed
+
+        const out = writeMailingList(db, store, { dir: dir, now: new Date('2026-08-09T10:00:00Z') });
+        const weekly = out.files.find((f) => f.list === 'weekly');
+
+        expect(weekly.count).toBe(1);
+        const csv = fs.readFileSync(weekly.csv, 'utf8');
+        expect(csv).toContain('yes@example.com');
+        expect(csv).not.toContain('notyet@example.com');
+    });
+
+    test('quotes a name containing a comma, so columns cannot shift', () => {
+        const r = store.subscribe(db, { email: 'm@example.com', name: 'Fernandes, Maria' });
+        store.confirm(db, r.confirmToken);
+        const out = writeMailingList(db, store, { dir: dir });
+        const csv = fs.readFileSync(out.files[0].csv, 'utf8');
+        expect(csv).toContain('"Fernandes, Maria"');
+        expect(csv.trim().split('\r\n')).toHaveLength(2);   // header + one row
+    });
+
+    test('states the basis for consent inside the file', () => {
+        const r = store.subscribe(db, { email: 'm@example.com' });
+        store.confirm(db, r.confirmToken);
+        const out = writeMailingList(db, store, { dir: dir });
+        const json = JSON.parse(fs.readFileSync(out.files[0].json, 'utf8'));
+        expect(json.basis).toMatch(/double opt-in/);
+        expect(json.count).toBe(1);
+    });
+});
+
+describe('opt-in over HTTP', () => {
+    let db;
+    let server;
+
+    beforeEach((done) => {
+        db = store.openDatabase(':memory:');
+        server = createServer({ api: createApi({ db, store, token: TOKEN, exporter: null }) });
+        server.listen(0, done);
+    });
+    afterEach((done) => {
+        server.closeAllConnections();
+        server.close(() => { db.close(); done(); });
+    });
+
+    test('a public subscriber is told to check their email, and gets NO token', async () => {
+        const res = await request(server, 'POST', '/api/subscribe', {
+            body: JSON.stringify({ email: 'maria@example.com' }),
+        });
+        expect(res.status).toBe(201);
+        expect(res.json.next).toBe('check-your-email');
+        // Handing the token back to whoever posted the form would defeat the
+        // entire point: the person typing an address could confirm it.
+        expect(res.json.confirmToken).toBeUndefined();
+        expect(res.body).not.toContain('confirmToken');
+    });
+
+    test('the owner does get the token, so an email can be sent', async () => {
+        const res = await request(server, 'POST', '/api/subscribe', {
+            body: JSON.stringify({ email: 'maria@example.com' }),
+            token: TOKEN,
+        });
+        expect(res.json.confirmToken).toEqual(expect.any(String));
+    });
+
+    test('the confirm link works, and is public', async () => {
+        const sub = await request(server, 'POST', '/api/subscribe', {
+            body: JSON.stringify({ email: 'maria@example.com' }), token: TOKEN,
+        });
+        const ok = await request(server, 'GET', '/api/confirm?token=' +
+            encodeURIComponent(sub.json.confirmToken));
+        expect(ok.status).toBe(200);
+        expect(ok.json).toMatchObject({ ok: true, already: false });
+        expect(store.mailingList(db)).toHaveLength(1);
+    });
+
+    test('a bad token is 400 and an expired one is 410', async () => {
+        const bad = await request(server, 'GET', '/api/confirm?token=nope');
+        expect(bad.status).toBe(400);
+
+        const sub = await request(server, 'POST', '/api/subscribe', {
+            body: JSON.stringify({ email: 'old@example.com' }), token: TOKEN,
+        });
+        db.prepare('UPDATE subscribers SET confirm_expires = ? WHERE email = ?')
+            .run('2020-01-01T00:00:00.000Z', 'old@example.com');
+        const gone = await request(server, 'GET', '/api/confirm?token=' +
+            encodeURIComponent(sub.json.confirmToken));
+        expect(gone.status).toBe(410);
+    });
+
+    test('export needs the token', async () => {
+        const res = await request(server, 'POST', '/api/export', { body: '{}' });
+        expect(res.status).toBe(401);
+    });
+
+    test('?confirmed=1 returns only the sendable list', async () => {
+        const sub = await request(server, 'POST', '/api/subscribe', {
+            body: JSON.stringify({ email: 'yes@example.com' }), token: TOKEN,
+        });
+        await request(server, 'POST', '/api/subscribe', {
+            body: JSON.stringify({ email: 'notyet@example.com' }),
+        });
+        await request(server, 'GET', '/api/confirm?token=' +
+            encodeURIComponent(sub.json.confirmToken));
+
+        const all = await request(server, 'GET', '/api/subscribers', { token: TOKEN });
+        const some = await request(server, 'GET', '/api/subscribers?confirmed=1', { token: TOKEN });
+        expect(all.json.subscribers).toHaveLength(2);
+        expect(some.json.subscribers).toHaveLength(1);
+        expect(some.json.subscribers[0].email).toBe('yes@example.com');
+    });
 });

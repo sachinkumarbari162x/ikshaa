@@ -2834,3 +2834,38 @@ body.newsletterOpen {
     transform: none;
   }
 }
+
+/* A mistyped address is silent and total: the form succeeds, the
+   confirmation goes nowhere, and the person waits for a letter that cannot
+   arrive. This warns in the accent rather than in red — it is a suggestion,
+   not a rejection, and a real address that trips a rule must still go
+   through. */
+.fieldWarn {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6em;
+  font-size: var(--text-xs);
+  line-height: 1.6;
+  color: var(--accent);
+  margin: 0.6em 0 0;
+}
+.fieldWarn[hidden] {
+  display: none;
+}
+.fieldWarnFix {
+  font-family: var(--sans);
+  font-size: var(--text-2xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cream);
+  background-color: var(--accent);
+  border: none;
+  border-radius: 999px;
+  padding: 0.5em 1.1em;
+  cursor: pointer;
+  transition: opacity 0.25s ease;
+}
+.fieldWarnFix:hover {
+  opacity: 0.85;
+}

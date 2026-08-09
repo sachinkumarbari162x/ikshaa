@@ -19,6 +19,7 @@
  * ========================================================================= */
 
 const { DatabaseSync } = require('node:sqlite');
+const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
@@ -39,6 +40,16 @@ CREATE TABLE IF NOT EXISTS subscribers (
 
   created_at      TEXT    NOT NULL,
   updated_at      TEXT    NOT NULL,
+
+  /* Double opt-in. An address is worthless until its owner has proved they
+     asked for this: anybody can type someone else's address into a form, and
+     a promotion sent to an unconfirmed list is how a sending domain gets
+     blocked. Only rows with confirmed_at set are ever exported. */
+  confirmed_at    TEXT,
+  /* The SHA-256 of the token, never the token. If this file leaks, the
+     hashes in it cannot be used to confirm anybody. */
+  confirm_hash    TEXT,
+  confirm_expires TEXT,
   /* Null means subscribed. Unsubscribing is not a delete: the row is the
      record that consent was given and later withdrawn, and deleting it would
      lose the proof along with the preference. */
@@ -74,7 +85,33 @@ function openDatabase(file) {
   }
 
   db.exec(SCHEMA);
+
+  /* CREATE TABLE IF NOT EXISTS does nothing to a table that already exists,
+     so a database made before opt-in was added would silently lack these
+     columns and every insert would throw. Add them if they are missing. */
+  const have = new Set(db.prepare('PRAGMA table_info(subscribers)').all().map((c) => c.name));
+  for (const [column, type] of [['confirmed_at', 'TEXT'], ['confirm_hash', 'TEXT'],
+                                ['confirm_expires', 'TEXT']]) {
+    if (!have.has(column)) {
+      db.exec('ALTER TABLE subscribers ADD COLUMN ' + column + ' ' + type);
+    }
+  }
+
   return db;
+}
+
+/* How long somebody has to click the link before it stops working. Long
+   enough to survive a weekend and a spam folder; short enough that a token
+   found in an old mailbox years later is inert. */
+const CONFIRM_TTL_HOURS = 72;
+
+function hashToken(token) {
+  return crypto.createHash('sha256').update(String(token)).digest('hex');
+}
+
+function newToken() {
+  // 32 bytes of CSPRNG. base64url so it survives a URL without escaping.
+  return crypto.randomBytes(32).toString('base64url');
 }
 
 /* ---------------------------------------------------------------------
@@ -142,11 +179,23 @@ function subscribe(db, input) {
 
   const now = new Date().toISOString();
 
-  const before = db.prepare('SELECT id FROM subscribers WHERE email = ?').get(value.email);
+  const before = db.prepare(
+    'SELECT id, confirmed_at FROM subscribers WHERE email = ?'
+  ).get(value.email);
+
+  /* Somebody already confirmed does not get sent round the loop again — they
+     asked once, and re-confirming an address on every form submission is how
+     people end up unsubscribing. */
+  const alreadyConfirmed = Boolean(before && before.confirmed_at);
+  const token = alreadyConfirmed ? null : newToken();
+  const expires = alreadyConfirmed
+    ? null
+    : new Date(Date.now() + CONFIRM_TTL_HOURS * 3600 * 1000).toISOString();
 
   db.prepare(`
-    INSERT INTO subscribers (email, name, origin, weekly, seasonal, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO subscribers
+      (email, name, origin, weekly, seasonal, created_at, updated_at, confirm_hash, confirm_expires)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(email) DO UPDATE SET
       name       = COALESCE(excluded.name, subscribers.name),
       origin     = COALESCE(excluded.origin, subscribers.origin),
@@ -154,8 +203,14 @@ function subscribe(db, input) {
       seasonal   = excluded.seasonal,
       updated_at = excluded.updated_at,
       -- Subscribing again is how somebody comes back.
-      unsubscribed_at = NULL
-  `).run(value.email, value.name, value.origin, value.weekly, value.seasonal, now, now);
+      unsubscribed_at = NULL,
+      -- A fresh token supersedes any outstanding one, so the newest link in
+      -- somebody's inbox is always the one that works. Null here means they
+      -- were already confirmed, and COALESCE leaves the old value alone.
+      confirm_hash    = COALESCE(excluded.confirm_hash, subscribers.confirm_hash),
+      confirm_expires = COALESCE(excluded.confirm_expires, subscribers.confirm_expires)
+  `).run(value.email, value.name, value.origin, value.weekly, value.seasonal, now, now,
+         token ? hashToken(token) : null, expires);
 
   const row = db.prepare('SELECT id FROM subscribers WHERE email = ?').get(value.email);
 
@@ -170,7 +225,52 @@ function subscribe(db, input) {
     id: row.id,
     created: !before,
     messageStored: Boolean(value.note),
+    confirmed: alreadyConfirmed,
+    /* The only time the raw token exists. It is not stored and cannot be
+       recovered — whoever calls this has to put it in the email now or issue
+       a new one later. */
+    confirmToken: token,
+    confirmExpires: expires,
   };
+}
+
+/* Turning a click into a confirmed subscriber.
+   Constant-time is not needed here: the token is 256 bits of CSPRNG, so
+   there is nothing to guess a byte at a time. What matters is that it is
+   single-use and expires. */
+function confirm(db, token) {
+  if (!token || typeof token !== 'string') {
+    return { ok: false, reason: 'missing' };
+  }
+
+  const row = db.prepare(
+    'SELECT id, email, confirmed_at, confirm_expires FROM subscribers WHERE confirm_hash = ?'
+  ).get(hashToken(token));
+
+  if (!row) {
+    return { ok: false, reason: 'unknown' };
+  }
+  if (row.confirmed_at) {
+    // Clicking twice is not an error. Say so plainly rather than failing.
+    return { ok: true, email: row.email, already: true };
+  }
+  if (row.confirm_expires && row.confirm_expires < new Date().toISOString()) {
+    return { ok: false, reason: 'expired', email: row.email };
+  }
+
+  const now = new Date().toISOString();
+  /* confirm_hash is deliberately NOT cleared. Clearing it made a second click
+     report "unknown link" to somebody who had just successfully confirmed —
+     and second clicks are normal: people double-click, and mail clients
+     prefetch URLs. Keeping the hash lets the branch above answer "already
+     confirmed" instead. Re-using the token cannot do anything except set a
+     flag that is already set. The expiry is cleared, since it no longer
+     governs anything. */
+  db.prepare(
+    'UPDATE subscribers SET confirmed_at = ?, updated_at = ?, confirm_expires = NULL WHERE id = ?'
+  ).run(now, now, row.id);
+
+  return { ok: true, email: row.email, already: false };
 }
 
 function unsubscribe(db, email) {
@@ -197,16 +297,35 @@ function page(options) {
 
 function listSubscribers(db, options = {}) {
   const { limit, offset } = page(options);
+  const where = options.confirmedOnly
+    ? 'WHERE s.confirmed_at IS NOT NULL AND s.unsubscribed_at IS NULL'
+    : '';
   return db.prepare(`
     SELECT s.id, s.email, s.name, s.origin, s.weekly, s.seasonal,
-           s.created_at, s.updated_at, s.unsubscribed_at,
+           s.created_at, s.updated_at, s.unsubscribed_at, s.confirmed_at,
            COUNT(m.id) AS message_count
     FROM subscribers s
     LEFT JOIN messages m ON m.subscriber_id = s.id
+    ${where}
     GROUP BY s.id
     ORDER BY s.created_at DESC
     LIMIT ? OFFSET ?
   `).all(limit, offset);
+}
+
+/* The mailing list, as something you can actually send to.
+   Confirmed, not unsubscribed, and split by what each person asked for — a
+   seasonal-only subscriber must not receive the weekly letter. */
+function mailingList(db, options = {}) {
+  const wanted = options.list === 'seasonal' ? 'seasonal' : 'weekly';
+  return db.prepare(`
+    SELECT email, name, origin, confirmed_at
+    FROM subscribers
+    WHERE confirmed_at IS NOT NULL
+      AND unsubscribed_at IS NULL
+      AND ${wanted} = 1
+    ORDER BY confirmed_at ASC
+  `).all();
 }
 
 /* Messages carry their sender's address rather than only an id, because the
@@ -237,6 +356,10 @@ function stats(db) {
     SELECT
       (SELECT COUNT(*) FROM subscribers)                              AS subscribers,
       (SELECT COUNT(*) FROM subscribers WHERE unsubscribed_at IS NULL) AS active,
+      (SELECT COUNT(*) FROM subscribers
+        WHERE confirmed_at IS NOT NULL AND unsubscribed_at IS NULL)     AS confirmed,
+      (SELECT COUNT(*) FROM subscribers
+        WHERE confirmed_at IS NULL AND unsubscribed_at IS NULL)         AS awaiting,
       (SELECT COUNT(*) FROM messages)                                  AS messages
   `).get();
   return row;
@@ -245,11 +368,15 @@ function stats(db) {
 module.exports = {
   openDatabase,
   subscribe,
+  confirm,
+  mailingList,
   unsubscribe,
   listSubscribers,
   listMessages,
   stats,
   validateSubscription,
+  hashToken,
   SCHEMA,
   LIMITS,
+  CONFIRM_TTL_HOURS,
 };

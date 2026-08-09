@@ -722,3 +722,107 @@ describe('bot', () => {
         });
     });
 });
+
+/* ============================================================================
+ * The topics guests actually ask about: cooking, laundry, getting around,
+ * sightseeing, a guide, security, and arranging a gathering.
+ *
+ * Routing is asserted rather than answer text, because the answers change as
+ * facts get filled in but the question must always reach the right intent.
+ * Several of these were misrouting before: "can i rent a scooter" landed on
+ * parking, and "is extra staff available" on parties.
+ * ========================================================================= */
+describe('the topics guests ask about', () => {
+    const at = (q) => new Bot({ random: Bot.seeded(1) }).respond(q, NOW).intent;
+
+    it('routes cooking and the kitchen', () => {
+        expect(at('is breakfast included')).toBe('food');
+        expect(at('are there restaurants nearby')).toBe('food');
+        expect(at('are utensils provided')).toBe('kitchen');
+        expect(at('does the kitchen have a fridge')).toBe('kitchen');
+    });
+
+    it('routes laundry to housekeeping', () => {
+        expect(at('is laundry available')).toBe('housekeeping');
+        expect(at('is there a washing machine')).toBe('housekeeping');
+    });
+
+    it('separates getting around from where to park', () => {
+        // "can i rent a scooter" used to land on parking, and once 'rent' was
+        // made a keyword it landed on availability — renting the villa.
+        expect(at('can i rent a scooter')).toBe('transfer');
+        expect(at('can we hire a car')).toBe('transfer');
+        expect(at('how do we get around')).toBe('transfer');
+        expect(at('where do i park the car')).toBe('parking');
+        expect(at('is there parking')).toBe('parking');
+        expect(at('is the villa available in december')).toBe('availability');
+    });
+
+    it('routes sightseeing, and a guide separately from it', () => {
+        expect(at('what is there to do nearby')).toBe('activities');
+        expect(at('places to visit')).toBe('activities');
+        expect(at('can you arrange a tour guide')).toBe('tourguide');
+        expect(at('can someone show us around')).toBe('tourguide');
+        expect(at('do you organise excursions')).toBe('tourguide');
+    });
+
+    it('separates whether an event is allowed from whether one can be arranged', () => {
+        expect(at('can we throw a party')).toBe('parties');
+        expect(at('can we host a wedding')).toBe('parties');
+        expect(at('can you arrange catering for a get together')).toBe('gatherings');
+        expect(at('is extra staff available for a celebration')).toBe('gatherings');
+        expect(at('can a caterer come in')).toBe('gatherings');
+    });
+
+    it('routes security questions, including cameras and the perimeter', () => {
+        expect(at('is it safe')).toBe('safety');
+        expect(at('are there cameras in the bedrooms')).toBe('safety');
+        expect(at('are we being recorded')).toBe('safety');
+        expect(at('is there cctv inside')).toBe('safety');
+        expect(at('is the property gated')).toBe('safety');
+        expect(at('is there a night guard')).toBe('safety');
+    });
+});
+
+describe('the bot does not invent security facts', () => {
+    const say = (q) => new Bot({ random: Bot.seeded(1) }).respond(q, NOW).text;
+
+    /* The load-bearing one. This intent used to list "are there cameras" as an
+       example and answer "it is a quiet residential stretch" — which is not an
+       answer. A guest asking whether they are being recorded is asking a
+       privacy question, and a reassuring invented "no" is a lie with
+       consequences. While FACTS.cameras is null the only allowed reply is one
+       that defers to a human. */
+    it('refuses to say whether cameras exist while the fact is unset', () => {
+        const answer = say('are there cameras in the bedrooms');
+        expect(answer).toMatch(/not going to guess|ask directly|in writing/i);
+        expect(answer).toContain('nyaragoa@gmail.com');
+        // It must not assert either way.
+        expect(answer).not.toMatch(/\bthere are no cameras\b/i);
+        expect(answer).not.toMatch(/\bno cctv\b/i);
+        expect(answer).not.toMatch(/\byou are not being recorded\b/i);
+    });
+
+    it('defers on the perimeter rather than describing one', () => {
+        const answer = say('is the property gated');
+        expect(answer).toContain('nyaragoa@gmail.com');
+        expect(answer).not.toMatch(/\b(walled|fenced|gated) (compound|perimeter)\b/i);
+    });
+
+    it('defers on a guide and on catering, but still gives something useful', () => {
+        const guide = say('can you arrange a tour guide');
+        expect(guide).toContain('nyaragoa@gmail.com');
+        expect(guide).toMatch(/Loutolim|Chandor|spice farm/i);   // real, from the site
+
+        const catering = say('can a caterer come in');
+        expect(catering).toContain('nyaragoa@gmail.com');
+    });
+
+    it('every deferral opens with a capital letter', () => {
+        // fact() fallbacks are written as mid-sentence clauses; three of them
+        // landed sentence-initially and read as broken fragments.
+        for (const q of ['is the property gated', 'can you arrange a tour guide']) {
+            expect(say(q)).toMatch(/^[A-Z]/);
+        }
+    });
+});

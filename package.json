@@ -10,7 +10,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "eval": "node eval/run.js",
-    "token": "node -e \"console.log(require('crypto').randomBytes(32).toString('base64url'))\""
+    "token": "node -e \"console.log(require('crypto').randomBytes(32).toString('base64url'))\"",
+    "export": "node -e \"const s=require('./api/db'),e=require('./api/export');const db=s.openDatabase('data/ikshaa.db');const o=e.writeMailingList(db,s);console.log('wrote to '+o.dir);o.files.forEach(f=>console.log('  '+f.list+': '+f.count))\""
   },
   "devDependencies": {
     "jest": "^29.7.0"

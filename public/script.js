@@ -1328,3 +1328,127 @@ if (document.readyState === 'complete') {
     initNewsletterPrompt();
   }, { once: true });
 }
+
+//===============================================
+// Catching a mistyped address before it is submitted.
+//
+// A typo here is silent and total: the form succeeds, the confirmation email
+// goes to nobody, and the person waits for a letter that can never arrive.
+// Nothing downstream can detect it — an address is only proved real by mail
+// reaching it, which is exactly what a typo prevents.
+//
+// So this warns, and never blocks. It cannot know an address is wrong, only
+// that it looks like a common slip, and a real address that trips one of
+// these rules must still go through.
+
+const EMAIL_TYPOS = {
+  // The domains people actually mistype, and what they meant.
+  'gmial.com': 'gmail.com', 'gmai.com': 'gmail.com', 'gmail.co': 'gmail.com',
+  'gmail.con': 'gmail.com', 'gnail.com': 'gmail.com', 'gmaill.com': 'gmail.com',
+  'hotmial.com': 'hotmail.com', 'hotmai.com': 'hotmail.com', 'hotmail.co': 'hotmail.com',
+  'yahooo.com': 'yahoo.com', 'yaho.com': 'yahoo.com', 'yahoo.co': 'yahoo.com',
+  'outlok.com': 'outlook.com', 'outlook.co': 'outlook.com', 'outloo.com': 'outlook.com',
+  'iclod.com': 'icloud.com', 'icloud.co': 'icloud.com',
+  'rediffmial.com': 'rediffmail.com',
+};
+
+// .com is the ending people fumble, because m and n are neighbours.
+const TLD_TYPOS = { con: 'com', cim: 'com', clm: 'com', comm: 'com', cmo: 'com', ocm: 'com' };
+
+function emailConcern(raw) {
+  const value = String(raw || '').trim();
+  if (!value || value.indexOf('@') === -1) {
+    return null;                       // type="email" already covers this
+  }
+
+  const at = value.lastIndexOf('@');
+  const local = value.slice(0, at);
+  const domain = value.slice(at + 1).toLowerCase();
+
+  if (!local) {
+    return { message: 'There is nothing before the @.' };
+  }
+  if (value.split('@').length > 2) {
+    return { message: 'That address has more than one @.' };
+  }
+  if (domain.indexOf('.') === -1) {
+    return { message: 'That domain has no ending — did you mean ' + domain + '.com?',
+             suggestion: local + '@' + domain + '.com' };
+  }
+  if (/\.\.|^\.|\.$/.test(domain)) {
+    return { message: 'There is a stray dot in the domain.' };
+  }
+  if (/[,;]/.test(value)) {
+    return { message: 'That looks like it has a comma where a dot should be.',
+             suggestion: value.replace(/[,;]/g, '.') };
+  }
+
+  if (EMAIL_TYPOS[domain]) {
+    return { message: 'Did you mean ' + EMAIL_TYPOS[domain] + '?',
+             suggestion: local + '@' + EMAIL_TYPOS[domain] };
+  }
+
+  const bits = domain.split('.');
+  const tld = bits[bits.length - 1];
+  if (TLD_TYPOS[tld]) {
+    const fixed = bits.slice(0, -1).concat(TLD_TYPOS[tld]).join('.');
+    return { message: 'Did you mean .' + TLD_TYPOS[tld] + '?', suggestion: local + '@' + fixed };
+  }
+
+  return null;
+}
+
+function initEmailWarning() {
+  const field = document.getElementById('subEmail');
+  if (!field) {
+    return;
+  }
+
+  const note = document.createElement('p');
+  note.className = 'fieldWarn';
+  note.hidden = true;
+  // polite, not assertive: this is a suggestion, and it must not interrupt
+  // somebody midway through typing their own address.
+  note.setAttribute('aria-live', 'polite');
+  field.insertAdjacentElement('afterend', note);
+
+  function check() {
+    const concern = emailConcern(field.value);
+    if (!concern) {
+      note.hidden = true;
+      note.textContent = '';
+      return;
+    }
+
+    note.hidden = false;
+    note.textContent = concern.message + ' ';
+
+    if (concern.suggestion) {
+      const fix = document.createElement('button');
+      fix.type = 'button';               // never submits the form
+      fix.className = 'fieldWarnFix';
+      fix.textContent = 'Use ' + concern.suggestion;
+      fix.addEventListener('click', () => {
+        field.value = concern.suggestion;
+        note.hidden = true;
+        field.focus();
+      });
+      note.appendChild(fix);
+    }
+  }
+
+  // On blur, not on every keystroke: warning somebody their address is wrong
+  // while they are still halfway through typing it is just noise.
+  field.addEventListener('blur', check);
+  field.addEventListener('input', () => {
+    if (!note.hidden) {
+      check();                            // once shown, keep it honest live
+    }
+  });
+}
+
+if (document.readyState === 'complete') {
+  initEmailWarning();
+} else {
+  window.addEventListener('load', initEmailWarning, { once: true });
+}

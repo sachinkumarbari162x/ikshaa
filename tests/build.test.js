@@ -99,6 +99,24 @@ describeIfBuilt('production build', () => {
     expect(fs.existsSync(path.join(DIST, 'package.json'))).toBe(false);
   });
 
+  test('the chat brain ships, even though no page links to it', () => {
+    /* nlu.js, knowledge.js and bot.js used to be <script> tags on every page.
+       They are now fetched by chat.js at idle, so the only reference to them
+       in the whole site is a list of strings inside that file.
+
+       That is precisely the shape of the bug this suite was written for: the
+       villa tour once shipped silent because its audio was referenced by a
+       key the build did not walk. If a rename ever puts these outside the
+       build's reach, the launcher would appear and then do nothing. */
+    const chat = fs.readFileSync(path.join(DIST, 'chat/chat.js'), 'utf8');
+    const referenced = [...chat.matchAll(/'(chat\/[A-Za-z0-9_.-]+\.js)'/g)].map((m) => m[1]);
+
+    expect(referenced.length).toBeGreaterThanOrEqual(3);
+    referenced.forEach((rel) => {
+      expect(fs.existsSync(path.join(DIST, rel))).toBe(true);
+    });
+  });
+
   test('the newsletter posts somewhere real', () => {
     /* Four pages shipped with action="#", which silently discards whatever
        is typed into it. The address is now collected on one page, and that

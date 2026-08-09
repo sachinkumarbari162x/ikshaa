@@ -6,12 +6,14 @@
  *
  * Public, because a visitor has to be able to use it:
  *   POST /api/subscribe
+ *   GET  /api/confirm?token=…    the double opt-in link from the email
  *
  * Everything else is the owner's data and needs the token:
- *   GET  /api/subscribers
- *   GET  /api/messages          ?email= to filter to one person
+ *   GET  /api/subscribers        ?confirmed=1 for the sendable list only
+ *   GET  /api/messages           ?email= to filter to one person
  *   GET  /api/stats
  *   POST /api/unsubscribe
+ *   POST /api/export             writes the mailing list to data/exports/
  *
  * The token comes from IKSHAA_API_TOKEN and lives nowhere in this repo.
  * If it is unset, the protected routes refuse everyone rather than letting
@@ -151,6 +153,10 @@ function createApi(options) {
   const store = options.store;               // db.js, injectable for tests
   const token = options.token !== undefined ? options.token : process.env.IKSHAA_API_TOKEN;
   const allow = options.rateLimiter || createRateLimiter();
+  // Injected so a test can export to a temp directory instead of data/.
+  const exporter = options.exporter !== undefined
+    ? options.exporter
+    : require('./export').writeMailingList;
 
   function authorised(req, res) {
     if (!tokenMatches(presentedToken(req), token)) {
@@ -200,11 +206,48 @@ function createApi(options) {
           return true;
         }
 
-        sendJson(res, result.created ? 201 : 200, {
+        /* The raw confirmation token is returned ONLY when the caller proved
+           it is the owner. A public caller gets told an email is coming and
+           nothing else — handing the token back to whoever posted the form
+           would defeat double opt-in entirely, since the person typing an
+           address would be able to confirm it themselves. */
+        const trusted = tokenMatches(presentedToken(req), token);
+
+        sendJson(res, result.created ? 201 : 200, Object.assign({
           ok: true,
           created: result.created,
+          confirmed: result.confirmed,
           messageStored: result.messageStored,
-        });
+          // What the page should tell the visitor.
+          next: result.confirmed
+            ? 'already-subscribed'
+            : 'check-your-email',
+        }, trusted && result.confirmToken ? {
+          confirmToken: result.confirmToken,
+          confirmExpires: result.confirmExpires,
+        } : {}));
+        return true;
+      }
+
+      /* The link in the confirmation email. Public by necessity — the token
+         IS the authentication, and it is 256 bits of CSPRNG. Rate limited
+         all the same, so it cannot be used to probe. */
+      if (route === '/api/confirm' && method === 'GET') {
+        if (!allow(req.socket.remoteAddress || 'unknown')) {
+          sendJson(res, 429, { error: 'too many requests' });
+          return true;
+        }
+        const result = store.confirm(db, url.searchParams.get('token'));
+        if (!result.ok) {
+          // 410 for an expired link: it was valid once, and that is a
+          // different thing for the reader than "this was never real".
+          sendJson(res, result.reason === 'expired' ? 410 : 400, {
+            ok: false,
+            reason: result.reason,
+          });
+          return true;
+        }
+        sendJson(res, 200, { ok: true, already: result.already });
         return true;
       }
 
@@ -215,6 +258,7 @@ function createApi(options) {
           subscribers: store.listSubscribers(db, {
             limit: url.searchParams.get('limit'),
             offset: url.searchParams.get('offset'),
+            confirmedOnly: url.searchParams.get('confirmed') === '1',
           }),
         });
         return true;
@@ -252,6 +296,21 @@ function createApi(options) {
           return true;
         }
         sendJson(res, 200, { ok: true, changed: result.changed });
+        return true;
+      }
+
+      if (route === '/api/export' && method === 'POST') {
+        if (!authorised(req, res)) return true;
+        if (!exporter) {
+          sendJson(res, 501, { error: 'export not configured' });
+          return true;
+        }
+        const written = exporter(db, store);
+        sendJson(res, 200, {
+          ok: true,
+          dir: written.dir,
+          lists: written.files.map((f) => ({ list: f.list, count: f.count })),
+        });
         return true;
       }
 

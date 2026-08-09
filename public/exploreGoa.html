@@ -255,12 +255,10 @@
 
     <script src="script.js"></script>
 
-    <!-- Chat widget. Deferred and last: it builds its own DOM, so nothing
-         above depends on it, and none of it blocks the page. Load order
-         matters — bot.js reads NLU and KNOWLEDGE off window. -->
-    <script src="chat/nlu.js" defer></script>
-    <script src="chat/knowledge.js" defer></script>
-    <script src="chat/bot.js" defer></script>
+    <!-- Chat widget. One script, not five: chat.js fetches its own language
+         engine (nlu, knowledge, bot — 34KB) when the browser goes idle or the
+         visitor first moves, so first paint never waits on a panel most
+         people do not open. -->
     <script src="chat/chat.js" defer></script>
 </body>
 
