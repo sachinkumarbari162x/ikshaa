@@ -22,6 +22,21 @@ const SRC = path.join(ROOT, 'public');
 
 const built = fs.existsSync(DIST);
 
+/* Code is fingerprinted in dist — script.js is emitted as script.7f3a91c4.js.
+   Tests refer to files by the name they have in public/, so they need a way
+   to find the built one. */
+function builtName(rel) {
+  const dir = path.dirname(rel);
+  const ext = path.extname(rel);
+  const stem = path.basename(rel, ext);
+  const here = path.join(DIST, dir);
+  if (!fs.existsSync(here)) return null;
+  const hit = fs.readdirSync(here).find(
+    (f) => f === stem + ext || new RegExp('^' + stem + '\\.[0-9a-f]{8}' + ext.replace('.', '\\.') + '$').test(f)
+  );
+  return hit ? path.join(dir, hit).replace(/\\/g, '/') : null;
+}
+
 /* The build is not run here — it is slow, and CI runs it before the tests.
    Skipping loudly beats failing confusingly on a fresh clone. */
 const describeIfBuilt = built ? describe : describe.skip;
@@ -75,7 +90,7 @@ describeIfBuilt('production build', () => {
   test('the villa tour ships its photographs AND its audio', () => {
     // The specific regression. Both come from `file:` keys under different
     // base directories, and one silently went missing.
-    const tour = fs.readFileSync(path.join(DIST, 'exploreIkshaa.js'), 'utf8');
+    const tour = fs.readFileSync(path.join(DIST, builtName('exploreIkshaa.js')), 'utf8');
 
     const photos = [...tour.matchAll(/file: '([^']+\.(?:avif|webp))'/g)].map((m) => m[1]);
     expect(photos.length).toBeGreaterThan(30);
@@ -108,13 +123,69 @@ describeIfBuilt('production build', () => {
        villa tour once shipped silent because its audio was referenced by a
        key the build did not walk. If a rename ever puts these outside the
        build's reach, the launcher would appear and then do nothing. */
-    const chat = fs.readFileSync(path.join(DIST, 'chat/chat.js'), 'utf8');
+    const chat = fs.readFileSync(path.join(DIST, builtName('chat/chat.js')), 'utf8');
     const referenced = [...chat.matchAll(/'(chat\/[A-Za-z0-9_.-]+\.js)'/g)].map((m) => m[1]);
 
     expect(referenced.length).toBeGreaterThanOrEqual(3);
     referenced.forEach((rel) => {
       expect(fs.existsSync(path.join(DIST, rel))).toBe(true);
     });
+  });
+
+  test('code is fingerprinted, and served immutable', () => {
+    /* The point of the hash: a URL can never change meaning, so it is safe to
+       cache for a year. Before this, code was max-age=3600 — every page view
+       spent a conditional round-trip per file once the hour lapsed, and a
+       deploy did not reach an open browser for up to an hour. */
+    const code = [];
+    const walk = (dir) => {
+      for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, e.name);
+        if (e.isDirectory()) { walk(full); continue; }
+        if (/\.(js|css)$/.test(e.name)) code.push(e.name);
+      }
+    };
+    walk(DIST);
+
+    expect(code.length).toBeGreaterThan(0);
+    code.forEach((name) => {
+      expect(name).toMatch(/\.[0-9a-f]{8}\.(js|css)$/);
+    });
+
+    const headers = fs.readFileSync(path.join(DIST, '_headers'), 'utf8');
+    expect(headers).toMatch(/\/\*\.js[\s\S]*?max-age=31536000, immutable/);
+    expect(headers).toMatch(/\/\*\.css[\s\S]*?max-age=31536000, immutable/);
+    // HTML must still revalidate, or a new deploy is never discovered at all.
+    expect(headers).toMatch(/\/\*\.html[\s\S]*?no-cache/);
+  });
+
+  test('every reference in the built output resolves', () => {
+    /* Fingerprinting rewrites references across files, and chat.js names its
+       brain in a list of strings while bot.js requires its siblings
+       relatively. Either form left unrewritten points at a file that no
+       longer exists. */
+    const broken = [];
+    const walk = (dir) => {
+      for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, e.name);
+        if (e.isDirectory()) { walk(full); continue; }
+        if (!/\.(html|css|js)$/.test(e.name)) continue;
+
+        const text = fs.readFileSync(full, 'utf8');
+        const re = /["'(](?:\.\/)?((?:chat\/)?[A-Za-z0-9_.-]+\.(?:js|css))["')]/g;
+        let m;
+        while ((m = re.exec(text)) !== null) {
+          const fromRoot = path.join(DIST, m[1]);
+          const fromHere = path.join(path.dirname(full), m[1]);
+          if (!fs.existsSync(fromRoot) && !fs.existsSync(fromHere)) {
+            broken.push(path.relative(DIST, full) + ' -> ' + m[1]);
+          }
+        }
+      }
+    };
+    walk(DIST);
+
+    expect(broken).toEqual([]);
   });
 
   test('the newsletter posts somewhere real', () => {
@@ -155,6 +226,12 @@ describeIfBuilt('production build', () => {
     const GENERATED = new Set(['_headers']); // written by build.js, never copied
     const orphaned = [];
 
+    /* Code is emitted under a content-hashed name, so dist/script.7f3a91c4.js
+       has no counterpart in public/. Strip the hash back off before looking:
+       the invariant being tested is that build.js COPIES rather than moves,
+       and renaming the copy does not change that. */
+    const unhash = (rel) => rel.replace(/\.[0-9a-f]{8}(\.(?:js|css))$/, '$1');
+
     const walk = (dir) => {
       for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
         const full = path.join(dir, entry.name);
@@ -166,7 +243,7 @@ describeIfBuilt('production build', () => {
         if (GENERATED.has(rel)) {
           continue;
         }
-        if (!fs.existsSync(path.join(SRC, rel))) {
+        if (!fs.existsSync(path.join(SRC, unhash(rel)))) {
           orphaned.push(rel);
         }
       }

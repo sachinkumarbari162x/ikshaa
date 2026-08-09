@@ -21,6 +21,7 @@
  * Zero dependencies, like the server.
  * ========================================================================= */
 
+const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
@@ -112,6 +113,101 @@ function findAssets(codeFiles) {
   return used;
 }
 
+/* ---------------------------------------------------------------------
+ * Fingerprinting: script.js becomes script.7f3a91c4.js
+ *
+ * The problem this solves is that code changed without its name changing, so
+ * the only safe policy was "revalidate hourly". That cost a conditional
+ * round-trip per file on every page view once the hour lapsed, and — worse —
+ * meant a deploy did not reach an already-open browser for up to an hour.
+ *
+ * With the content in the name, the two failure modes disappear together:
+ * a file that has not changed keeps its URL and is served from disk cache
+ * with no request at all, and a file that HAS changed has a new URL, so it
+ * is fetched immediately however old the cache is. Both properties are what
+ * `_headers` already claims for media: "referenced by name; a new photo is a
+ * new filename". This makes it true of code as well.
+ *
+ * Order is the only subtlety. chat.js names nlu.js, knowledge.js and bot.js
+ * in a list of strings, so those have to be renamed before chat.js is
+ * hashed, or chat.js would be hashed over stale references and the browser
+ * would cache a file pointing at URLs that no longer exist. The loop below
+ * takes leaves first and works inward, which handles that without anyone
+ * having to declare the graph by hand.
+ * ------------------------------------------------------------------ */
+
+const HASH_EXT = new Set(['.css', '.js']);
+
+function digest(buffer) {
+  return crypto.createHash('sha256').update(buffer).digest('hex').slice(0, 8);
+}
+
+// Only rewrite a path that appears as a reference — quoted, or inside url().
+// A bare substring match would happily corrupt prose that mentions a filename.
+function rewriteRefs(text, from, to) {
+  const escaped = from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return text.replace(new RegExp('(["\'(])(\\./)?' + escaped + '(["\')])', 'g'),
+    (m, open, dot, close) => open + (dot || '') + to + close);
+}
+
+function fingerprint(codeFiles) {
+  const pending = new Set(codeFiles.filter((f) => HASH_EXT.has(path.extname(f))));
+  const all = () => codeFiles.map((f) => path.join(OUT, f));
+  const renamed = new Map();
+
+  while (pending.size > 0) {
+    // A leaf is a file that no longer names any file still waiting to be
+    // renamed. There is always at least one unless the graph has a cycle.
+    const leaf = [...pending].find((rel) => {
+      const text = fs.readFileSync(path.join(OUT, rel), 'utf8');
+      return ![...pending].some((other) => other !== rel && text.includes(other));
+    });
+
+    if (!leaf) {
+      // A cycle between two stylesheets or scripts. Bail loudly rather than
+      // ship half-rewritten references.
+      throw new Error('circular references among: ' + [...pending].join(', '));
+    }
+    pending.delete(leaf);
+
+    const full = path.join(OUT, leaf);
+    const ext = path.extname(leaf);
+    const hashed = leaf.slice(0, -ext.length) + '.' + digest(fs.readFileSync(full)) + ext;
+
+    fs.renameSync(full, path.join(OUT, hashed));
+    renamed.set(leaf, hashed);
+
+    // Point every other file at the new name. Basename too, because HTML
+    // refers to chat/chat.js as "chat/chat.js" but chat.js refers to its
+    // siblings the same way — the paths are already root-relative, so one
+    // pass over the full rel covers both.
+    for (const file of all()) {
+      const here = renamed.get(path.relative(OUT, file).replace(/\\/g, '/'));
+      const onDisk = here ? path.join(OUT, here) : file;
+      if (!fs.existsSync(onDisk)) continue;
+      if (!CODE_EXT.has(path.extname(onDisk))) continue;
+
+      const before = fs.readFileSync(onDisk, 'utf8');
+      let after = rewriteRefs(before, leaf, hashed);
+
+      /* The same file gets referred to two ways. chat.js names its siblings
+         root-relatively ("chat/nlu.js") because the page is at the root; but
+         bot.js, sitting beside them, uses require('./nlu.js'). Only the first
+         form matches `leaf`, so the second is rewritten here — otherwise dist
+         ends up with a require pointing at a name that no longer exists.
+         Harmless in a browser, which never takes that branch, but it is the
+         kind of loose end that reads as a bug later. */
+      if (path.dirname(leaf) === path.dirname(path.relative(OUT, onDisk).replace(/\\/g, '/'))) {
+        after = rewriteRefs(after, path.basename(leaf), path.basename(hashed));
+      }
+
+      if (after !== before) fs.writeFileSync(onDisk, after);
+    }
+  }
+
+  return renamed;
+}
+
 function copy(rel) {
   const from = path.join(SRC, rel);
   const to = path.join(OUT, rel);
@@ -138,12 +234,16 @@ const HEADERS = `# Generated by build.js — edit there, not here.
 /
   Cache-Control: no-cache
 
-# Code changes without changing its name, so it revalidates hourly
+# Code carries its content hash in its name (script.7f3a91c4.js), so a given
+# URL can never change meaning. Unchanged files cost no request at all, and a
+# changed file arrives immediately however stale the cache is — which is the
+# whole reason the hash exists. This used to be max-age=3600, which meant a
+# deploy took up to an hour to reach an open browser.
 /*.css
-  Cache-Control: public, max-age=3600, must-revalidate
+  Cache-Control: public, max-age=31536000, immutable
 
 /*.js
-  Cache-Control: public, max-age=3600, must-revalidate
+  Cache-Control: public, max-age=31536000, immutable
 
 # Media is referenced by name; a new photo is a new filename
 /media/*
@@ -207,6 +307,10 @@ function main() {
     assetBytes += copy(rel);
   }
 
+  /* After copying, before writing headers: the header file describes what
+     the fingerprinted output looks like. */
+  const fingerprinted = fingerprint(code);
+
   fs.writeFileSync(path.join(OUT, '_headers'), HEADERS);
   fs.writeFileSync(path.join(ROOT, 'netlify.toml'), NETLIFY);
 
@@ -257,4 +361,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { listCode, findAssets, SRC, OUT };
+module.exports = { listCode, findAssets, fingerprint, rewriteRefs, SRC, OUT };

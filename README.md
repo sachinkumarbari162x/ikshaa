@@ -42,8 +42,11 @@ behaviours in its own CDN. It exists because:
   works without HTTP.
 - **The tests are a specification.** They describe what correct delivery looks
   like — HTML revalidates, media is immutable, `bytes=-500` means the *last*
-  500 bytes, JPEGs are never compressed. `dist/_headers` expresses the same
-  policy to the host, so local and production agree.
+  500 bytes, JPEGs are never compressed. `dist/_headers` expresses the
+  production policy, which for code deliberately differs: `build.js`
+  fingerprints CSS and JS (`script.7f3a91c4.js`) and serves them immutable
+  for a year, while the dev server sees the unhashed originals in `public/`
+  and revalidates them instead.
 
 What it implements: conditional requests (ETag → 304), cache tiers, range
 requests (206 / 416), Brotli and gzip for text only, and `Save-Data` adaptation
