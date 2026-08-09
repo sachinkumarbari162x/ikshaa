@@ -110,6 +110,31 @@ function findAssets(codeFiles) {
     }
   }
 
+  /* The AVIF siblings nothing references in writing.
+   *
+   * `bestFormat()` in script.js swaps `.webp` for `.avif` at runtime once a
+   * 2x2 probe confirms the browser can decode it. That URL is assembled in
+   * the browser, so it appears in no file for the walk above to find — and
+   * the walk is an allow-list, so what it does not find does not ship.
+   *
+   * The result was invisible photographs on exactly the browsers that
+   * support the better format: Chrome and Edge asked for the AVIF, got a
+   * 404, and rendered nothing, while Safari 15 kept the WebP and looked
+   * fine. Twenty images, including ten of the twelve in the nav dropdown.
+   *
+   * Pairing them here keeps the rewrite rule and the build in step: ship the
+   * AVIF wherever a shipped WebP has one, and the runtime swap can never
+   * reach for a file that is not there. */
+  for (const rel of [...used]) {
+    if (!/\.webp$/i.test(rel)) {
+      continue;
+    }
+    const sibling = rel.replace(/\.webp$/i, '.avif');
+    if (fs.existsSync(path.join(SRC, sibling))) {
+      used.add(sibling);
+    }
+  }
+
   return used;
 }
 

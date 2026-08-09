@@ -22,8 +22,8 @@ not planned.
 | Email | Resend, sending as `Carman at Ikshaa <carman@brownodin.com>` |
 | Timer | Cloudflare cron, `*/15 * * * *` |
 | Repository | https://github.com/sachinkumarbari162x/ikshaa |
-| Tests | 276, all passing |
-| Build | 14.35 MB, 174 files |
+| Tests | 277, all passing |
+| Build | 15.25 MB, 194 files |
 | Node | **22.13+** — `node:sqlite` is flagged below that. CI runs 24. |
 
 Ten pages, a 35-room villa tour, an offline chat assistant, and a newsletter
@@ -66,23 +66,58 @@ year. Unchanged files cost no request at all; changed ones arrive immediately.
 across three files) now loads on idle or first interaction rather than on
 every page.
 
-**Chat routes 100% of the eval corpus**, with 0.0% false confidence. A Groq
-model (`qwen/qwen3.6-27b`) resolves conversations that miss twice — it returns
-only a topic id, never words, so an injection can reach the wrong topic and
-nothing worse.
+**Chat is fully deterministic. The LLM is switched off.** It routes 100% of
+the eval corpus with 0.0% false confidence *on that corpus* — read the caveat
+under "Chat" below, because the corpus flatters it.
+
+The Groq router was built, benchmarked across five models, and then not
+deployed: it would bill per call, forever, to satisfy a requirement the client
+has not yet stated. Nothing was removed — `api/llm.js`, the route in
+`api/index.js`, `npm run chat:bench` and `tests/llm.test.js` are all intact and
+passing. One line in `public/chat/chat.js` turns it back on.
+
+---
+
+## Chat, and why the eval number is not the real number
+
+`npm run eval` reports 100% accuracy and 0.0% false confidence. Both are true
+and neither is representative: the corpus was written alongside the fixes, so
+it measures the questions we thought of.
+
+Twenty realistic questions the villa has *no* fact for were tried separately.
+**Eight came back confidently wrong.** "Is there a gym" returned the
+perimeter-security answer, "can I hire a boat" returned airport transfers,
+"is there a sauna" returned the monsoon forecast — each stated as fact.
+
+The fix is in `bot.js` as `unknownThing()`, and the rule is about knowledge
+rather than scoring: **if the thing asked about appears nowhere in the
+knowledge base, no answer drawn from it can be about that thing.** The
+vocabulary is harvested from `FACTS`, `CONCEPTS` and `INTENTS` *including
+answer-function source* — `generator` and `inverter` exist only inside the
+power answer, and missing them would decline a question the villa can answer.
+The test is deliberately hard to fail: one recognised word anywhere in the
+phrase lets the matcher proceed, because a wrong decline turns a guest away.
+
+That took the eight down to three, with no regression on the corpus. What is
+left needs facts, not code:
+
+- "can I charge an electric car" → the power-cut answer. `car` is in the
+  vocabulary, so the guard cannot fire. EV charging is a real question now.
+- "can I get a haircut nearby" → the things-to-do answer.
+- "is there hot water" → **the weather forecast.** `water` is in the
+  vocabulary. This one is worth fixing first; it is a normal question.
+- "are there mosquito nets" → **the pet policy.**
+
+Also visible while probing, and worth an hour: several answers splice a
+`fact()` fallback clause mid-sentence and come out ungrammatical — *"Air
+conditioning air-conditioned bedrooms and living room."*, *"Housekeeping comes
+something the owner can confirm"*. Those read as broken software to a guest.
 
 ---
 
 ## Do these next
 
-### 1. A CLI for writing the week's letter
-
-Right now composing one means calling `createCampaign` and `queueCampaign`
-from a Node one-liner. That is fine for me and wrong for anybody else.
-`npm run letter` should prompt for subject and body, show the recipient count,
-and ask before queueing. Nothing else about the system is hard to use; this is.
-
-### 2. Ikshaa needs its own sending domain
+### 1. Ikshaa needs its own sending domain
 
 Mail currently goes out as `@brownodin.com` — a test domain. A guest who
 subscribed at *Ikshaa* and receives mail from *brownodin.com* has no reason to
@@ -91,7 +126,7 @@ trust it, and Gmail agrees: unfamiliar sender domain is a strong spam signal.
 Reputation does **not** transfer between domains. Whatever is built on
 `brownodin.com` starts again on the real one.
 
-### 3. The `.html` redirect on every internal link
+### 2. The `.html` redirect on every internal link
 
 Both hosts strip `.html` and 301/308 to the extensionless URL. Every internal
 link on the site is `.html` — 22 on the home page alone — so every internal
@@ -239,6 +274,14 @@ cd /path/to/sim && node build.js && ./node_modules/.bin/jest
   reassuring guess.
 - **Do not add JPEGs.** AVIF plus a WebP fallback, and measure dimensions before
   using an image as a hero — everything in `imagesIkshaa/` is ≤0.73 MP.
+- **A runtime-built URL is invisible to the build.** The reference walk is an
+  allow-list, so anything assembled in the browser does not ship. `bestFormat()`
+  swaps `.webp` for `.avif` after a decode probe, and for twenty images the AVIF
+  had never been copied — Chrome and Edge 404'd and rendered nothing while
+  Safari 15 kept the WebP and looked perfect. Ten of the twelve nav-dropdown
+  photographs were blank on the better browsers. `findAssets()` now pairs them,
+  and a test asserts it. **Test image work on a browser that supports AVIF**, or
+  the failure is invisible to you.
 - **`public/skeletons&Protos/`** (131 MB) and **`public/_archive/`** are gitignored
   but still on disk. Nothing may delete them.
 - **The build walks references, it is not an ignore list.** A file nothing links

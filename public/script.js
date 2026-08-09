@@ -1592,9 +1592,14 @@ if (document.readyState === 'complete') {
 // does double opt-in: Netlify Forms records an address, it does not prove
 // anybody asked for it.
 
-// Set to the Worker's hostname once deployed. Empty means "not configured",
-// and the native form post is left alone.
-const NEWSLETTER_API = '';
+/* The Worker that actually stores subscriptions.
+ *
+ * This was empty while the site lived on Netlify, where `data-netlify` on the
+ * form meant the host captured submissions itself. On Cloudflare Pages that
+ * attribute means nothing and a POST to a static file is a 405 — so for a
+ * while the live form accepted an address, showed "check your inbox", and
+ * threw it away. Worse than an error, because it lied. */
+const NEWSLETTER_API = 'https://ikshaa-api.sachinkumarbari162x.workers.dev';
 
 function initSubscribeApi() {
   const form = document.querySelector('.subscribeFormFull');
@@ -1643,11 +1648,13 @@ function initSubscribeApi() {
         'That did not go through. Try again, or write to nyaragoa@gmail.com.';
       button.disabled = false;
     } catch (e) {
-      /* Offline, blocked, or the API is down. Fall back to the native submit
-         rather than losing the address: Netlify still captures it, and a
-         record that needs confirming later beats no record at all. */
-      status.textContent = 'Sending the usual way…';
-      form.submit();
+      /* Offline, blocked, or the API is down.
+         There is no host-side form handler to fall back to any more, so
+         submitting natively would 405 and lose the address. Say so instead
+         and leave the form filled in, so nothing typed is thrown away. */
+      status.textContent = 'That did not reach us — check your connection and try again, ' +
+        'or write to nyaragoa@gmail.com.';
+      button.disabled = false;
     }
   });
 }

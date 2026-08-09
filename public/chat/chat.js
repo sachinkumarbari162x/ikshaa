@@ -18,13 +18,34 @@
     var MAX_INPUT = 600;
     var ROLES = { me: true, bot: true };
 
-    /* Where the stuck-conversation router lives, and how hard it may be
-       leaned on from this browser. The server has its own per-address limit
-       and a hard daily cap; this is only here so one tab cannot spam it by
-       accident, e.g. someone leaning on a chip. */
-    var ROUTER_URL = '/api/understand';
+    /* THE STUCK-CONVERSATION ROUTER IS OFF. This empty string is the switch.
+     *
+     * A hosted model would bill per call for as long as the site is up, on a
+     * portfolio project whose owner has not yet said what kind of assistant
+     * they want. That is a recurring cost against an undecided requirement,
+     * which is the wrong order to spend money in. The decision is deferred,
+     * not reversed.
+     *
+     * Nothing was removed. `api/llm.js`, the Groq route in `api/index.js`,
+     * the model bench and the tests are all still here and still pass. To
+     * switch it back on: deploy the route to the Worker, put GROQ_API_KEY in
+     * with `wrangler secret put`, and set this to
+     *
+     *     https://ikshaa-api.<subdomain>.workers.dev/api/understand
+     *
+     * Everything below already handles both states, so that one line is the
+     * whole change. Empty means the ladder ends at a person instead — which
+     * is what it did before the model existed, and it is honest.
+     *
+     * ROUTER_MAX_PER_SESSION stays because it belongs to the router: the
+     * server had its own per-address limit and daily cap, and this stopped a
+     * single tab leaning on a chip from spending them. */
+    var ROUTER_URL = '';
     var ROUTER_MAX_PER_SESSION = 6;
     var ASSISTANT_CHIP = 'Let the assistant read this';
+    /* Must match the wording bot.js already uses in its fallback chips, or
+       the stuck rung below will add a second one beside it. */
+    var HUMAN_CHIP = 'Talk to a human';
 
     var ICON_CHAT = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.9-.9L3 20.5l1.6-4.4A8.4 8.4 0 0 1 3.6 11.5a8.4 8.4 0 0 1 9-8.4 8.4 8.4 0 0 1 8.4 8.4z"/></svg>';
     var ICON_SEND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg>';
@@ -327,6 +348,11 @@
         }
 
         function askAssistant(lastText, shortlist) {
+            // Not configured. Null is the same answer this gives when the
+            // call fails, so every caller already knows what to do with it.
+            if (!ROUTER_URL) {
+                return Promise.resolve(null);
+            }
             if (routerCalls >= ROUTER_MAX_PER_SESSION) {
                 return Promise.resolve(null);
             }
@@ -407,6 +433,16 @@
                 (F.phone ? F.phone : F.email) + ' reaches a person who will know.';
         }
 
+        /* The same handoff, phrased to be appended rather than to stand
+           alone. The two cannot share a string: after the matcher has just
+           offered a guess, "I still cannot place that one" contradicts the
+           sentence directly above it. */
+        function handoffLine() {
+            var F = KNOWLEDGE.FACTS || {};
+            return 'If I am still not getting it, ' + (F.phone ? F.phone : F.email) +
+                ' reaches a person who will know.';
+        }
+
         function say(text, chips) {
             var wait = Math.min(1400, 380 + String(text).length * 7);
             var dots = typing();
@@ -448,6 +484,26 @@
                This is the rung below the human handoff, so the assistant gets
                exactly one attempt before we stop guessing and hand over. */
             var stuck = bot.context.unknownStreak === 2;
+
+            /* Two misses running, and nothing to escalate to.
+             *
+             * Guessing a third time is how a chatbot earns its reputation, so
+             * this does not. It keeps whatever the matcher did manage — often
+             * a named near-miss with chips, which is genuinely useful — and
+             * puts a real person at the end of it. Instant, free, and true:
+             * nothing here knows the answer, so it says so and points at
+             * someone who does. */
+            if (stuck && !ROUTER_URL) {
+                // The generic fallback already ends with this chip; the
+                // near-miss branch does not. Add it only if it is missing.
+                var chips = (reply.chips || []).slice();
+                if (chips.indexOf(HUMAN_CHIP) === -1) { chips.push(HUMAN_CHIP); }
+
+                saveState();
+                say(reply.text + '\n\n' + handoffLine(), chips);
+                return;
+            }
+
             if (stuck) {
                 var shortlist = (reply.alternatives || []).map(function (a) {
                     return a.intent && a.intent.id;

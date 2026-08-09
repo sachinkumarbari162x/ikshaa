@@ -319,6 +319,126 @@
     };
 
     /* --------------------------------------------------------------
+     * "Is there a gym?" — asking about things that are not here
+     *
+     * The matcher's job is to find the closest topic, and it always finds
+     * one. Asked whether there was a gym it returned the perimeter-security
+     * answer; asked about hiring a boat, airport transfers; asked about a
+     * sauna, the monsoon forecast. Every one of those was stated as fact.
+     * Measured over twenty realistic "do you have X" questions the villa has
+     * no answer for, eight came back confidently wrong.
+     *
+     * That is the worst thing this assistant can do. A guest who is told the
+     * wrong thing plans around it, and finds out on arrival.
+     *
+     * The rule below is about knowledge rather than scoring: if the thing
+     * being asked about appears NOWHERE in the knowledge base, no answer
+     * drawn from that knowledge base can be about it. That is arithmetic,
+     * not a heuristic, and it lets the bot say the one true thing it has —
+     * I do not know, and here is who does.
+     * ------------------------------------------------------------ */
+
+    /* Every word the knowledge base contains, answer prose included.
+     *
+     * Answers are functions, so their words are only reachable through
+     * toString(). Skipping it would cost real vocabulary: `generator` and
+     * `inverter` appear nowhere but inside the power answer, so "is there a
+     * generator" would be declined as a thing we have never heard of —
+     * exactly the false decline this must not produce. */
+    var vocabularies = typeof WeakMap === 'function' ? new WeakMap() : null;
+
+    function vocabularyOf(knowledge) {
+        var cached = vocabularies && vocabularies.get(knowledge);
+        if (cached) { return cached; }
+
+        var raw = [];
+        (function harvest(value, depth) {
+            if (value === null || value === undefined || depth > 6) { return; }
+            var type = typeof value;
+            if (type === 'string') { raw.push(value); return; }
+            if (type === 'function') { raw.push(Function.prototype.toString.call(value)); return; }
+            if (type !== 'object') { return; }
+            Object.keys(value).forEach(function (key) {
+                raw.push(key);                       // ids and concept names count as words
+                harvest(value[key], depth + 1);
+            });
+        }([knowledge.FACTS, knowledge.CONCEPTS, knowledge.INTENTS], 0));
+
+        var vocab = {};
+        raw.join(' ').toLowerCase().replace(/[^a-z]+/g, ' ').split(' ').forEach(function (word) {
+            if (word.length > 2) { vocab[word] = true; }
+        });
+        if (vocabularies) { vocabularies.set(knowledge, vocab); }
+        return vocab;
+    }
+
+    /* Only questions about whether a thing EXISTS. "How do I get to the
+       beach" is not one and must not be caught here — it is a question the
+       villa can answer, and declining it would be the new failure. */
+    var EXISTENTIAL = [
+        /\b(?:is|are)\s+there\s+(?:a|an|any|some)?\s*([a-z][a-z\s-]{1,28})/i,
+        /\bdo(?:es)?\s+(?:you|the\s+villa|the\s+house|they)\s+(?:have|offer|provide|rent|hire)\s+(?:a|an|any|some)?\s*([a-z][a-z\s-]{1,28})/i,
+        /\bcan\s+i\s+(?:hire|rent|borrow)\s+(?:a|an|any|some)?\s*([a-z][a-z\s-]{1,28})/i
+    ];
+
+    /* Words that carry no topic of their own.
+     *
+     * They have to be stripped rather than merely ignored, because the test
+     * below passes on ANY known word: "is there a gym on site" kept returning
+     * the perimeter answer purely because `site` appears in the knowledge
+     * base, which rescued a phrase whose only real noun was `gym`. Location
+     * and availability words do this constantly — they are common, they are
+     * always in vocabulary, and they never name the thing being asked about. */
+    var FILLER = {
+        the: 1, and: 1, any: 1, some: 1, for: 1, with: 1, that: 1, this: 1,
+        you: 1, your: 1, our: 1, there: 1, here: 1, villa: 1, house: 1,
+        please: 1, also: 1, would: 1, could: 1, are: 1, was: 1, does: 1,
+        site: 1, onsite: 1, nearby: 1, near: 1, close: 1, around: 1,
+        anywhere: 1, available: 1, place: 1, area: 1, property: 1, premises: 1
+    };
+
+    /* The phrase asked about, when nothing in it is known. Null otherwise —
+       and null is the common case, because the test is deliberately hard to
+       fail: ONE recognised word anywhere in the phrase lets the matcher
+       proceed as normal. A wrong decline turns a guest away from a question
+       the villa could have answered, so certainty is required to decline. */
+    Bot.prototype.unknownThing = function (text) {
+        var vocab = vocabularyOf(this.knowledge);
+
+        for (var i = 0; i < EXISTENTIAL.length; i++) {
+            var found = EXISTENTIAL[i].exec(String(text));
+            if (!found) { continue; }
+
+            var words = found[1].toLowerCase().split(/[^a-z]+/).filter(function (word) {
+                return word.length > 2 && !FILLER[word];
+            });
+            if (!words.length) { continue; }
+
+            var known = words.some(function (word) {
+                // "weddings" is "wedding"; the vocabulary stores what it found.
+                return vocab[word] || (word.slice(-1) === 's' && vocab[word.slice(0, -1)]);
+            });
+            if (known) { return null; }
+
+            return words.join(' ');
+        }
+        return null;
+    };
+
+    /* Says what is missing by name. "I have nothing on file about a gym" is
+       worth far more to a guest than the generic shrug — it confirms the
+       question was understood, and that the answer simply is not here. */
+    Bot.prototype.notOnFile = function (phrase) {
+        var F = this.knowledge.FACTS;
+        return {
+            text: 'I have nothing on file about "' + phrase + '" at the villa, and I would rather ' +
+                'say that than answer with something close but wrong. ' +
+                (F.phone ? F.phone : F.email) + ' will know for certain.',
+            chips: ['What are the rates?', 'Is there a pool?', 'Talk to a human']
+        };
+    };
+
+    /* --------------------------------------------------------------
      * Fallbacks
      * ------------------------------------------------------------ */
     Bot.prototype.fallback = function (result) {
@@ -494,6 +614,24 @@
 
             var result = self.engine.match(seg, self.context, now);
             self.remember(result.analysis.entities);
+
+            /* Checked before `best` is set, so a coincidental match on a
+               thing we have never heard of cannot become the reported
+               intent. Reporting `safety` for "is there a gym" would be the
+               same confident wrongness in the return value that the reply
+               has just refused to print. */
+            var absent = self.unknownThing(seg);
+            if (absent) {
+                self.logMiss(result, 'absent');       // the owner's list of facts to add
+                var missing = self.notOnFile(absent);
+                replies.push(missing.text);
+                chips = chips.concat(missing.chips);
+                /* unknownStreak is deliberately untouched. This reply already
+                   hands over to a person, and incrementing would stack the
+                   widget's own handoff on top of it — the same phone number
+                   twice in one message. */
+                return;
+            }
 
             // A bare date/party-size with no clear intent is a booking enquiry.
             if (result.status === 'unknown') {

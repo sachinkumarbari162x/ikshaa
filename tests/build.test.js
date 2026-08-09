@@ -189,13 +189,26 @@ describeIfBuilt('production build', () => {
   });
 
   test('the newsletter posts somewhere real', () => {
-    /* Four pages shipped with action="#", which silently discards whatever
-       is typed into it. The address is now collected on one page, and that
-       page has to be wired to the host's form handling for it to land. */
-    const page = fs.readFileSync(path.join(DIST, 'subscribe.html'), 'utf8');
-    expect(page).toMatch(/data-netlify="true"/);
-    // Without the hidden form-name the host cannot tell which form posted.
-    expect(page).toMatch(/name="form-name"/);
+    /* Four pages once shipped with action="#", which silently discards
+       whatever is typed into it. The address is now collected on one page,
+       and that page has to reach something that stores it.
+
+       This test used to assert `data-netlify="true"`, and that is precisely
+       how the bug it was written to catch came back. The attribute is a
+       Netlify instruction; the site moved to Cloudflare Pages, where a POST
+       to a static file is a 405. The form kept the attribute, the test kept
+       passing, and the live page told people to check their inbox while
+       throwing the address away.
+
+       So the assertion is now on the thing that actually does the work: the
+       script has an API origin to post to. */
+    const scripts = fs.readdirSync(DIST).filter((f) => /^script\.[a-z0-9]+\.js$/.test(f));
+    expect(scripts).toHaveLength(1);
+
+    const code = fs.readFileSync(path.join(DIST, scripts[0]), 'utf8');
+    const api = /NEWSLETTER_API\s*=\s*'([^']*)'/.exec(code);
+    expect(api).not.toBeNull();
+    expect(api[1]).toMatch(/^https:\/\/\S+$/);   // empty means the form goes nowhere
 
     // And nothing anywhere still submits into the void.
     const dead = fs.readdirSync(DIST)
@@ -204,6 +217,40 @@ describeIfBuilt('production build', () => {
         fs.readFileSync(path.join(DIST, f), 'utf8')
       ));
     expect(dead).toEqual([]);
+  });
+
+  test('every shipped webp ships its avif sibling too', () => {
+    /* script.js rewrites `.webp` to `.avif` at runtime whenever the browser
+       passes a decode probe. That URL is built in the browser, so the build's
+       reference walk — an allow-list — could not see it, and shipped the WebP
+       alone. Chrome and Edge then requested an AVIF that was not there and
+       rendered nothing, while Safari 15 kept the WebP and looked correct.
+
+       Twenty images were affected, ten of them in the nav dropdown, and the
+       failure was invisible to anyone testing on the older browser. */
+    const orphans = [];
+
+    const walk = (dir) => {
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          walk(full);
+          continue;
+        }
+        if (!/\.webp$/i.test(entry.name)) {
+          continue;
+        }
+        const rel = path.relative(DIST, full);
+        // Only where a sibling exists to ship — nothing here converts images.
+        if (fs.existsSync(path.join(SRC, rel).replace(/\.webp$/i, '.avif')) &&
+            !fs.existsSync(full.replace(/\.webp$/i, '.avif'))) {
+          orphans.push(rel.split(path.sep).join('/'));
+        }
+      }
+    };
+    walk(DIST);
+
+    expect(orphans).toEqual([]);
   });
 
   test('the build carries cache headers for the host', () => {

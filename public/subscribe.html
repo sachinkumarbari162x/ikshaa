@@ -172,12 +172,15 @@
                 something worth your time.
             </p>
 
-            <!-- data-netlify: the host detects this at deploy time and captures
-                 submissions itself. No function, no API key, no server. The
-                 hidden form-name is what tells it which form this is, and the
-                 honeypot is a field only a bot will fill in. -->
-            <form class="subscribeFormFull" name="newsletter" method="POST" data-netlify="true"
-                data-netlify-honeypot="bot-field" action="subscribe.html?subscribed=1">
+            <!-- Submitted by script.js to the Worker, which stores the address
+                 and sends the confirmation.
+
+                 data-netlify is gone: it captured submissions while the site
+                 was on Netlify, and on Cloudflare Pages it means nothing —
+                 a POST to a static file is a 405. The action below is a
+                 last-resort target only; the real path is the fetch. -->
+            <form class="subscribeFormFull" name="newsletter" method="POST"
+                action="subscribe.html?subscribed=1">
 
                 <input type="hidden" name="form-name" value="newsletter">
                 <p class="honeypot">
