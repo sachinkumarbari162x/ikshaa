@@ -653,7 +653,12 @@ describe('bot', () => {
         it('treats "n" as "and" when splitting', () => {
             const res = bot.respond('do u hv wifi n ac in all rooms?', NOW);
             expect(res.text.toLowerCase()).toMatch(/wifi|complimentary/i);
-            expect(res.text.toLowerCase()).toMatch(/air conditioning/);
+            /* Matches the fact, not the sentence around it. This used to
+               assert the words "air conditioning", which were only present
+               because the answer read "Air conditioning air-conditioned
+               bedrooms" — so fixing that duplication failed a test whose
+               real subject is the SPLIT, not the wording of either half. */
+            expect(res.text.toLowerCase()).toMatch(/air-conditioned/);
         });
 
         it('does not read "available" as a booking enquiry on its own', () => {
@@ -824,5 +829,89 @@ describe('the bot does not invent security facts', () => {
         for (const q of ['is the property gated', 'can you arrange a tour guide']) {
             expect(say(q)).toMatch(/^[A-Z]/);
         }
+    });
+});
+
+/* ---------------------------------------------------------------------
+ * Questions the villa has no answer for.
+ *
+ * Three of these were answered confidently and wrongly: hot water got the
+ * monsoon forecast, mosquito nets got the pet policy, and charging an
+ * electric car got the power-cut answer. Each was stated as fact, which is
+ * worse than silence — a guest plans around it and finds out on arrival.
+ *
+ * They now route to intents of their own that defer to the owner. The facts
+ * behind them are still null, so what these assert is the ROUTING and the
+ * deferral, not any particular wording.
+ * ------------------------------------------------------------------ */
+describe('routing questions with no answer yet', () => {
+    const KNOWLEDGE = require('../public/chat/knowledge.js');
+    const intentOf = (q) => new Bot().respond(q).intent;
+    const textOf = (q) => new Bot().respond(q).text;
+
+    it.each([
+        ['is there hot water', 'hotwater'],
+        ['do the showers have hot water', 'hotwater'],
+        ['are there mosquito nets', 'mosquitoes'],
+        ['do i need mosquito repellent', 'mosquitoes'],
+        ['can i charge an electric car', 'evcharging'],
+        ['is there an ev charger', 'evcharging'],
+    ])('%s -> %s', (question, intent) => {
+        expect(intentOf(question)).toBe(intent);
+        // Deferral, not invention: the underlying facts are still null.
+        expect(textOf(question)).toMatch(/owner can confirm/);
+    });
+
+    /* The neighbours these were stolen from, and nearly stole back.
+       @parking owns "car", and power's pattern owned "electric". */
+    it.each([
+        ['are there power cuts', 'power'],
+        ['is there a generator', 'power'],
+        ['is the electricity reliable', 'power'],
+        ['is there parking', 'parking'],
+        ['can i park a car', 'parking'],
+        ['can you arrange a car', 'transfer'],
+        ['can i rent a scooter', 'transfer'],
+        ['how deep is the water', 'pool'],
+        ['what is the weather like', 'weather'],
+    ])('%s still routes to %s', (question, intent) => {
+        expect(intentOf(question)).toBe(intent);
+    });
+
+    it('declines things the knowledge base has never heard of', () => {
+        for (const q of ['do you have a helipad', 'is there a sauna', 'is there a gym on site']) {
+            expect(textOf(q)).toMatch(/nothing on file/);
+        }
+    });
+
+    it('does not decline things it does know about', () => {
+        for (const q of ['is there a pool', 'is there wifi', 'is there a generator', 'is there a kitchen']) {
+            expect(textOf(q)).not.toMatch(/nothing on file/);
+        }
+    });
+
+    /* The class of bug behind "Air conditioning air-conditioned bedrooms and
+       living room." and "Housekeeping comes something the owner can confirm":
+       a fact spliced into a frame it does not fit. Checking every intent is
+       cheap, and it catches the next one without anybody noticing it. */
+    describe('every answer reads as a sentence', () => {
+        const bot = new Bot();
+        const rendered = KNOWLEDGE.INTENTS
+            .map((i) => [i.id, bot.render(i, { entities: {} })]);
+
+        it.each(rendered)('%s opens with a capital', (id, text) => {
+            // A numeral is a fine way to start a sentence — "3 bedrooms and
+            // 3 bathrooms, sleeping 6 comfortably." What this rejects is a
+            // lower-case fact used where a sentence was expected.
+            expect(text).toMatch(/^[A-Z0-9(“"']/);
+        });
+
+        it.each(rendered)('%s starts every sentence with a capital', (id, text) => {
+            // An email address may legitimately open one: "nyaragoa@… gets you
+            // a person". Anything else lower-case after a full stop is a fact
+            // spliced where a sentence was expected.
+            const bad = text.match(/\.\s+[a-z][^\s]*/g) || [];
+            expect(bad.filter((s) => !/@/.test(s))).toEqual([]);
+        });
     });
 });

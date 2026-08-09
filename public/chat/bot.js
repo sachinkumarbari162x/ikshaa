@@ -495,6 +495,9 @@
            the raw id — "bot identity" reads oddly in "I think you are asking
            about…", and the router prompt needs a real description for every
            id it is allowed to choose. */
+        hotwater: 'hot water in the bathrooms',
+        mosquitoes: 'mosquitoes, nets and repellent',
+        evcharging: 'charging an electric car',
         tourguide: 'arranging a guide or a day trip',
         gatherings: 'arranging catering or staff for a get-together',
         bot_identity: 'whether this is a person or software',

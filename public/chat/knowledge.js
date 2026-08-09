@@ -81,6 +81,10 @@
         parking: null,
         payments: null,
         power: null,
+        // Asked often enough to route, never yet answered by the owner.
+        hotWater: null,
+        mosquito: null,
+        evCharging: null,
         staff: null,
         pets: null,
         smoking: null,
@@ -472,7 +476,7 @@
             examples: ['is there ac', 'do the rooms have air conditioning', 'is it air conditioned',
                 'any fans', 'does the living room have ac'],
             patterns: [/\b(a\/?c|air ?con|air conditioning|air conditioner)\b/],
-            answer: function () { return 'Air conditioning ' + FACTS.ac + '.'; }
+            answer: function () { return 'Yes — ' + FACTS.ac + '.'; }
         },
         {
             id: 'kitchen',
@@ -514,8 +518,9 @@
                 'is it far from the city'],
             patterns: [/\bwhere (is|are) (it|the villa|you|this)\b/, /\b(exact )?(address|location)\b/],
             answer: function () {
-                return FACTS.name + ' is in ' + FACTS.area + '. ' + FACTS.beachName + ' is ' + FACTS.beachDistance +
-                    ', and ' + FACTS.railway + '. The exact pin is shared once a booking is confirmed.';
+                return FACTS.name + ' is in ' + FACTS.area + '. It is ' + FACTS.beachDistance +
+                    ' to ' + FACTS.beachName + ', and ' + FACTS.railway +
+                    '. The exact pin is shared once a booking is confirmed.';
             },
             chips: ['How far is the airport?', 'How far is the beach?']
         },
@@ -529,7 +534,8 @@
                 'is it beachfront', 'distance to the beach', 'which beach is closest'],
             patterns: [/\bbeach\b/, /\bhow far.*(sea|ocean)\b/],
             answer: function () {
-                return FACTS.beachName + ' is ' + FACTS.beachDistance + '. Not beachfront, but easily walkable.';
+                return 'It is ' + FACTS.beachDistance + ' to ' + FACTS.beachName +
+                    '. Not beachfront, but easily walkable.';
             }
         },
         {
@@ -558,6 +564,10 @@
                 'can i rent a scooter', 'how do we get around', 'do you have a driver'],
             patterns: [/\b(pick ?up|drop off|taxi|cab|driver|chauffeur)\b/,
                 /\b(rent|hire)\w*\s+(a\s+|an\s+)?(scooter|bike|moped|motorbike|car|vehicle)\b/,
+                /* "can you arrange a car" was answered with parking, because
+                   @parking owns the word "car". Arranging one is a transport
+                   question; parking one is not. */
+                /\b(arrange|organi[sz]e|book|get|sort)\w*\s+(us\s+|me\s+)?(a\s+|an\s+)?(car|vehicle|driver|ride|lift)\b/,
                 /\b(collect|meet|fetch) (us|me|you)\b/,
                 /\b(car|ride|lift) (from|to) the airport\b/],
             negativeExamples: ['what time can we arrive', 'can we leave luggage before check in',
@@ -669,7 +679,7 @@
                 'do you have a cot', 'travelling with a baby', 'is it good for families'],
             patterns: [/\b(kid|child|children|baby|toddler|infant)s?\b/],
             answer: function () {
-                return 'Children are ' + fact(FACTS.children) + ' A cot can usually be arranged with a bit of notice.';
+                return 'Children are ' + fact(FACTS.children) + '. A cot can usually be arranged with a bit of notice.';
             }
         },
         {
@@ -680,7 +690,8 @@
                 'can i change my dates', 'is my deposit refundable', 'what happens if my flight is cancelled'],
             patterns: [/\bcancel(lation)?\b/, /\brefund\b/],
             answer: function () {
-                return fact(FACTS.cancellation) + '. Date changes are usually easier than cancelling — ask early and they will normally accommodate you.';
+                return fact(FACTS.cancellation, 'The cancellation policy is something the owner can confirm — ' + contact()) +
+                    '. Date changes are usually easier than cancelling — ask early and they will normally accommodate you.';
             }
         },
         {
@@ -706,7 +717,8 @@
                 'is laundry available', 'is there a washing machine', 'do you change the linen'],
             patterns: [/\b(clean|housekeep|laundry|towel|linen)/],
             answer: function () {
-                return 'Housekeeping comes ' + fact(FACTS.housekeeping) + '. Linen and towels are provided and changed during your stay. Laundry: ' + FACTS.laundry + '.';
+                return 'Housekeeping comes ' + fact(FACTS.housekeeping, 'on a schedule the owner can confirm — ' + contact()) +
+                    '. Linen and towels are provided and changed during your stay. Laundry: ' + FACTS.laundry + '.';
             }
         },
         {
@@ -810,10 +822,72 @@
             keywords: ['power', 'electricity', 'generator', 'backup'],
             examples: ['is there a power backup', 'do you have a generator', 'are there power cuts',
                 'what about load shedding'],
-            patterns: [/\b(power|electric|generator|inverter|outage)/],
+            /* The bare /electric/ swallowed "electric car", so EV charging
+               could never reach its own intent and the answer came back about
+               power cuts. The lookahead hands those two phrasings over and
+               leaves "electricity" and "electric supply" where they were. */
+            negativeExamples: ['can i charge an electric car', 'is there an ev charging point'],
+            patterns: [/\b(power|electric(?!\s+(car|vehicle))|generator|inverter|outage)/],
             answer: function () {
-                return 'There is ' + fact(FACTS.power) + '. Cuts happen occasionally in Goa but are usually short.';
+                return 'Power backup is ' + fact(FACTS.power) + '. Cuts happen occasionally in Goa but are usually short.';
             }
+        },
+
+        /* The next three exist because the matcher was answering them with
+           whatever scored closest, and the closest was absurd: hot water got
+           the monsoon forecast, mosquito nets got the pet policy, and EV
+           charging got the power-cut answer. Each was stated as fact.
+
+           They carry no facts yet — the owner has not been asked. Routing
+           them to an honest deferral is still strictly better than routing
+           them confidently somewhere else, and it puts the three questions on
+           the list of things to find out. */
+        {
+            id: 'hotwater',
+            keywords: ['hot water', 'geyser', 'water heater', 'immersion'],
+            examples: ['is there hot water', 'do the showers have hot water',
+                'is there a geyser', 'hot water in the bathrooms', 'water heater'],
+            // "water" alone belongs to the pool; only the heated kind is this.
+            patterns: [/\b(hot|warm)\s+water\b/, /\bgeyser\b/, /\bwater\s+heater\b/],
+            answer: function () {
+                return 'Whether every bathroom runs hot water around the clock is ' +
+                    fact(FACTS.hotWater, 'something the owner can confirm — ' + contact()) +
+                    '. The showers themselves are ' + FACTS.shower + '.';
+            },
+            chips: ['What is in the bathrooms?', 'Talk to a human']
+        },
+        {
+            id: 'mosquitoes',
+            keywords: ['mosquito', 'mosquitoes', 'mosquito net', 'repellent', 'insects', 'bugs'],
+            examples: ['are there mosquito nets', 'is it mosquito free', 'do i need repellent',
+                'are there a lot of mosquitoes', 'any insect problem'],
+            patterns: [/\bmosquito(es|s)?\b/, /\brepellent\b/, /\binsect(s)?\b/],
+            answer: function () {
+                return 'Nets and repellent are ' +
+                    fact(FACTS.mosquito, 'something the owner can confirm — ' + contact()) +
+                    '. Goa has mosquitoes, more so through the monsoon, so it is a fair thing to ask before you come.';
+            },
+            chips: ['Talk to a human']
+        },
+        {
+            id: 'evcharging',
+            keywords: ['ev charging', 'electric car', 'electric vehicle', 'charging point', 'car charger'],
+            examples: ['can i charge an electric car', 'is there an ev charger',
+                'do you have a charging point', 'can i plug in my ev'],
+            /* Both orders, because @parking already owns "car" and would
+               otherwise take this — that is exactly how it used to answer with
+               scooter parking. */
+            patterns: [
+                /\b(ev|electric)\s+(car|vehicle|charg)/,
+                /\bcharg(e|ing|er)\b.*\b(car|vehicle|ev)\b/,
+                /\b(car|vehicle|ev)\b.*\bcharg(e|ing|er)\b/
+            ],
+            answer: function () {
+                return 'A charging point for an electric car is ' +
+                    fact(FACTS.evCharging, 'something the owner can confirm — ' + contact()) +
+                    '. Worth settling before you drive down rather than after.';
+            },
+            chips: ['Is there parking?', 'Talk to a human']
         },
         {
             id: 'tv',
