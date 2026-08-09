@@ -7,8 +7,8 @@ caught someone.
 chat assistant. This file covers *where it currently is*. Read that one first
 if you have not.
 
-**Last updated:** 7 August 2026, at commit `7203664`. Everything below is
-pushed and, apart from the API, live.
+**Last updated:** 9 August 2026. Everything below is deployed and verified,
+not planned.
 
 ---
 
@@ -16,165 +16,163 @@ pushed and, apart from the API, live.
 
 | | |
 |---|---|
-| Live | https://ikshaa.netlify.app |
+| Site | https://ikshaa.pages.dev — Cloudflare Pages |
+| API | https://ikshaa-api.sachinkumarbari162x.workers.dev — Cloudflare Worker |
+| Database | Neon Postgres, `ap-southeast-1` (Singapore) |
+| Email | Resend, sending as `Carman at Ikshaa <carman@brownodin.com>` |
+| Timer | Cloudflare cron, `*/15 * * * *` |
 | Repository | https://github.com/sachinkumarbari162x/ikshaa |
-| Hosting | Netlify, connected to GitHub — every push to `main` deploys |
-| CI | GitHub Actions: `npm ci` → `npm run build` → `npm test` |
-| Tests | 226, all passing |
-| Build | 16.74 MB, 131 files, from 146 tracked source files |
-| Node | **22.13+ required** — `node:sqlite` is flagged below that. CI runs 24. |
+| Tests | 276, all passing |
+| Build | 14.35 MB, 174 files |
+| Node | **22.13+** — `node:sqlite` is flagged below that. CI runs 24. |
 
-Ten pages, a 35-room scroll-driven villa tour, an offline chat assistant, a
-newsletter, and a local database behind a token-protected API. No framework,
-no runtime dependencies, one dev dependency (Jest).
+Ten pages, a 35-room villa tour, an offline chat assistant, and a newsletter
+with double opt-in that actually delivers mail.
 
-### Where the weight is
-
-```
-page images   7.92 MB   JPEG    <- the outstanding item
-video         2.84 MB
-audio         2.54 MB   mono 96kbps
-tour images   2.46 MB   AVIF/WebP already
-code + chat   0.45 MB
-```
+**Netlify still holds an old deployment at `ikshaa.netlify.app`.** Nothing was
+deleted there; it is simply no longer the target. See the hosting comparison
+below for why the move happened, and why it was closer than expected.
 
 ---
 
-## Watch this first
+## Done, and verified end to end
 
-The push at `7203664` is the **first CI run on Node 24** — the bump from 20 was
-forced, because `node:sqlite` was flagged before 22.13 and the old pin could
-not have run the API at all. If a failure email arrives, start there. It passed
-locally against a tree built from `git ls-files` alone, which is as close to
-CI as this machine gets.
+**The newsletter works.** A stranger subscribes on the site, Neon stores them
+unconfirmed, Resend sends a designed confirmation from a DKIM-signed domain,
+clicking it flips `confirmed_at`, and the cron delivers the weekly letter.
+Every step of that has been run against production, not mocked.
 
----
+| | |
+|---|---|
+| Double opt-in | single-use token, only its SHA-256 is stored, 72h expiry |
+| Case-insensitive addresses | `citext` — `Maria@` and `maria@` are one person |
+| Idempotent confirm | a second click says "already", never "invalid" |
+| Outbox | `UNIQUE (campaign_id, subscriber_id)` — re-running sends nobody twice |
+| Concurrency | `FOR UPDATE SKIP LOCKED` — two senders never collide |
+| Retries | backoff moves `visible_at`; a crash mid-backoff loses nothing |
+| One reminder | `reminded_at`, so a 15-minute cron cannot nudge 96×/day |
+| Unsubscribe | per-recipient link, plus `List-Unsubscribe` headers |
 
-## Do these next, in this order
+**Images are AVIF with a WebP fallback.** 8.96 MB of JPEG became 3.39 MB of
+AVIF, or 5.19 MB of WebP for Safari 15 and older. Zero JPEGs ship. Two
+mechanisms, because counting showed 76 static `<img>` against 122 whose `src`
+JavaScript sets: `<picture>` for the first, a decoded 2×2 AVIF probe for the
+second.
 
-### 1. Convert the page JPEGs to AVIF — biggest win, nothing else close
+**Code is fingerprinted and immutable.** `script.7f3a91c4.js`, cached for a
+year. Unchanged files cost no request at all; changed ones arrive immediately.
 
-`imagesIkshaa/`, `galleryImages/`, `heritagePageImages/` and
-`hamBurgerDropImages/` are all still JPEG: **7.92 MB of a 16.74 MB build.**
-Only the tour's `media/images/` was ever converted.
+**First paint carries 65% less JavaScript.** The chat's language engine (34 KB
+across three files) now loads on idle or first interaction rather than on
+every page.
 
-The case, measured on this repo:
-
-```
-theCourtyard.avif    1440x956   1.38 MP    76 KB   <- tour
-IkshaaSitting2.jpg   1024x680   0.70 MP   145 KB   <- page hero
-```
-
-Twice the pixels for half the bytes. Expect 50–60% off that 7.92 MB.
-
-`ffmpeg` here has `libaom-av1` and `libwebp`, so no new tooling is needed.
-AV1 encoding is slow — budget real time for ~100 images, and use
-`-cpu-used 6`. Nothing in `imagesIkshaa/` exceeds 0.73 MP, so do **not**
-upscale on the way through; these are small originals and always were.
-
-### 2. Lazy-load the chat brain — 34 KB off every page
-
-Five scripts load on all eight content pages. Three of them are never needed
-until somebody opens the chat:
-
-```
-chat/chat.js         4,824 B   keep — draws the launcher and the timed prompts
-chat/nlu.js         14,628 B   defer to first open
-chat/knowledge.js   12,658 B   defer to first open
-chat/bot.js          7,198 B   defer to first open
-```
-
-The split is already clean: `chat.js` owns the UI, the other three are the
-brain. Load them on first launcher click. Per-page JavaScript goes from
-51,354 B across 5 requests to 16,870 B across 2.
-
-### 3. Content-hash the assets — and stop the stale-cache confusion
-
-`script.js` and `style.css` ship as `max-age=3600, must-revalidate`, because
-their names do not change when their contents do. Consequences:
-
-- after an hour, every page view spends a conditional round-trip per file
-- **a deploy does not reach an open browser for up to an hour**
-
-That second one wasted real time during this session — four separate
-"it isn't working" moments were a cached `script.js`. Hash the filenames
-(`script.7f3a91.js`), rewrite the references, move them to the `immutable`
-tier. `build.js` already walks references, so that is where it belongs.
-
-`_headers` already states the principle for media: *"referenced by name; a new
-photo is a new filename."* Code just does not follow it yet.
+**Chat routes 100% of the eval corpus**, with 0.0% false confidence. A Groq
+model (`qwen/qwen3.6-27b`) resolves conversations that miss twice — it returns
+only a topic id, never words, so an injection can reach the wrong topic and
+nothing worse.
 
 ---
 
-## The newsletter database (localhost)
+## Do these next
 
-`api/` — a real relational store behind a token-protected API, mounted into
-`server.js` at `/api/`. It runs on localhost only; **nothing about it is
-deployed.** The live site still posts to Netlify Forms.
+### 1. A CLI for writing the week's letter
 
-**Why SQLite via `node:sqlite`:** it is built into Node, so the project stays
-zero-dependency. Real constraints, real SQL, one file, no server to run and
-nothing to install. If it ever needs hosting, the same SQL runs on Turso or
-any libSQL host without changing a line.
+Right now composing one means calling `createCampaign` and `queueCampaign`
+from a Node one-liner. That is fine for me and wrong for anybody else.
+`npm run letter` should prompt for subject and body, show the recipient count,
+and ask before queueing. Nothing else about the system is hard to use; this is.
 
-### The two properties it exists to guarantee
+### 2. Ikshaa needs its own sending domain
 
-```
-subscribers   one row per address, ever    UNIQUE COLLATE NOCASE
-messages      many rows per address        FK -> subscribers, ON DELETE CASCADE
-```
+Mail currently goes out as `@brownodin.com` — a test domain. A guest who
+subscribed at *Ikshaa* and receives mail from *brownodin.com* has no reason to
+trust it, and Gmail agrees: unfamiliar sender domain is a strong spam signal.
 
-`COLLATE NOCASE` is the load-bearing part. `Maria@Example.com` and
-`maria@example.com` are one person; without it the table stores both happily
-and they each get a letter. The address is kept as first seen — later casing
-does not rewrite it.
+Reputation does **not** transfer between domains. Whatever is built on
+`brownodin.com` starts again on the real one.
 
-Unsubscribing sets `unsubscribed_at` rather than deleting. The row is the
-record that consent was given and later withdrawn; deleting it loses the proof
-along with the preference. Subscribing again clears the flag.
+### 3. The `.html` redirect on every internal link
 
-### Running it
+Both hosts strip `.html` and 301/308 to the extensionless URL. Every internal
+link on the site is `.html` — 22 on the home page alone — so every internal
+navigation costs a redirect round-trip, and always has. Rewrite the links
+extensionless at build time.
 
-```bash
-npm run token                 # generate a strong token
-IKSHAA_API_TOKEN=<token> npm start
-```
+---
+
+## Hosting: why Cloudflare, and the honest caveat
+
+Measured with Lighthouse, three runs each, identical preset:
 
 ```
-POST /api/subscribe      public   JSON or urlencoded, rate limited 10/min/IP
-GET  /api/subscribers    token
-GET  /api/messages       token    ?email= filters to one person
-GET  /api/stats          token
-POST /api/unsubscribe    token
+host        LCP     FCP     TTFB    CLS     score
+Cloudflare  6.9 s   1.7 s   44 ms   0.005   70
+Netlify     3.3 s   1.9 s   69 ms   0.005   84
+
+spread  Cloudflare  LCP 3.2–9.2 s   TTFB 30–56 ms
+        Netlify     LCP 3.2–6.8 s   TTFB 67–74 ms
 ```
 
-The database lands at `data/ikshaa.db`, which is **gitignored** — real
-addresses and messages must never reach a public repository. Back it up
-separately; nothing else is holding a copy.
+**Cloudflare wins TTFB decisively and consistently.** On LCP the two are
+indistinguishable — both bimodal at ~3.2 s or ~6.9 s, and *both hosts hit both
+values*, so that variance is the measuring network, not the host.
 
-### Security decisions worth not undoing
+CLS was 0.005 on every run of both. That was the control: identical HTML must
+produce identical CLS, and it did, so the numbers are trustworthy.
 
-- **An unset `IKSHAA_API_TOKEN` locks the protected routes rather than opening
-  them.** An unconfigured server is a locked one.
-- **Tokens are compared with `timingSafeEqual` over SHA-256 digests**, not
-  `===`. A plain compare leaks the token's length and first differing byte
-  through timing, which is enough to recover it one character at a time.
-  Hashing first is what makes the lengths always match, since
-  `timingSafeEqual` throws when they differ.
-- **401 says nothing about why.** Which of "no token", "wrong token" and
-  "server has no token set" applies is not the caller's business.
-- **Oversized bodies are drained, not destroyed.** Killing the socket resets
-  the connection before the 413 can be written, and the caller sees a network
-  error instead of the reason.
-- The rate limiter is in-memory and per-process. Fine for localhost; a real
-  deployment needs shared state.
+The honest reading: **Cloudflare answers faster; neither renders faster.** The
+move was justified by TTFB, the free tier, and having Workers/D1/Hyperdrive
+beside the site — not by a rendering win, which did not materialise.
 
-### Wiring the live form to it
+---
 
-Currently `subscribe.html` posts to Netlify Forms. To use this instead, change
-the form's `action` to `/api/subscribe` and drop `data-netlify`. Do not do
-that until the API is actually hosted somewhere — the endpoint does not exist
-in production today, and the change would silently break a working form.
+## The newsletter, operationally
+
+### Composing and sending
+
+```js
+createCampaign(pool, { slug: 'weekly-2026-08-16', list: 'weekly',
+                       subject: '…', body: 'paragraphs\n\nseparated by blank lines' })
+queueCampaign(pool, id)
+// the cron drains it within 15 minutes
+```
+
+`body` is prose. `api/emails/messages.js` wraps it in the house layout.
+
+### Why the emails look twenty years out of date
+
+They have to. Tables rather than flex, because Outlook renders through Word's
+engine. Inline styles, because Gmail strips `<style>` on forward. Georgia
+rather than Cormorant, which no client will load. Nothing depends on an image,
+because most clients block them until asked. 600px, because it still survives
+everything.
+
+Every letter ships `html` **and** `text`. Not a courtesy: some people read in
+plain text, watches and preview panes render it, and HTML-only is a mild spam
+signal.
+
+### The cron never writes anything
+
+It drains the outbox and sends reminders. Composing a letter is a human act,
+and a cron that invented content and mailed it would be the worst thing this
+system could do.
+
+Fifteen minutes rather than weekly *because* it only drains — a weekly cron
+would leave a letter queued on Tuesday sitting until Sunday.
+
+### Secrets
+
+Set with `wrangler secret put`, never in `wrangler.toml`:
+
+```
+DATABASE_URL       Neon
+IKSHAA_API_TOKEN   npm run token
+MAIL_API_KEY       Resend (send-only key)
+```
+
+`.env` mirrors them for local work and is gitignored. **`essentials.txt` in the
+repo root holds live credentials and is gitignored** — it was once picked up by
+`git add -A` and caught before the commit. Never `git add -f` it.
 
 ---
 
@@ -182,21 +180,31 @@ in production today, and the change would silently break a working form.
 
 ### The newsletter modal
 
-Do not clear `localStorage` by hand. Two URLs:
+Do not clear `localStorage` by hand:
 
 ```
 ?newsletter=now      shows it in 400ms, stores nothing — repeatable
 ?newsletter=reset    forgets stored state, then behaves as a real first visit
 ```
 
-Real behaviour: 3s after load or 30% scroll, whichever first. Dismissing
-stores a 30-day quiet period under `ikshaa.newsletter`; subscribing silences
-it permanently. It never shows on `subscribe.html`.
+### The confirmation page
+
+```
+/subscribe.html?confirmed=yes | already | expired | unknown
+```
+
+### Chat routing
+
+```
+npm run eval          the 121-question corpus, offline and free
+npm run chat:probe    one real Groq call per awkward question
+npm run chat:bench    compares candidate models; costs tokens
+```
 
 ### Reproducing CI locally — do this before every push
 
 **Passing locally proves nothing.** Two tests once asserted files that are
-gitignored, so they passed here and could never pass on CI. Build a tree from
+gitignored, so they passed here and could never pass in CI. Build a tree from
 tracked files only:
 
 ```bash
@@ -211,85 +219,78 @@ cp -r node_modules /path/to/sim/
 cd /path/to/sim && node build.js && ./node_modules/.bin/jest
 ```
 
-Locally `public/` is ~244 MB; in a fresh clone it is ~16.6 MB. Any test that
-reasons about that difference is testing a hard drive.
-
 ---
 
 ## Traps
 
-- **Stale cache.** Hard-refresh (Ctrl+Shift+R) after every deploy, or you are
-  looking at up to an hour-old `script.js`. Fixed permanently by item 3.
-- **`public/skeletons&Protos/`** (131 MB) and **`public/_archive/`** are
-  gitignored but still on disk. Nothing may delete them.
-- **The build is by reference-walking, not an ignore list.** A file nothing
-  links to cannot ship; a file something links to cannot be forgotten. This
-  already caught a tour shipping silent — photographs and audio use the same
-  `file:` key under two different base directories.
-- **`knowledge.js` nulls are load-bearing.** 21 facts are `null` on purpose;
-  the bot defers to a human rather than inventing a number, and a test asserts
-  it emits no figure while rates are unset. Set a value and the answer turns
-  on by itself. Do not "fill them in" with guesses.
-- **Do not add JPEGs.** New imagery comes from `media/images/` or gets
-  converted first.
-- **`data/` is real people's data.** Gitignored, never committed, backed up by
-  nobody but you.
-- **Node 22.13+.** Below that `node:sqlite` needs `--experimental-sqlite` and
-  the API will not start.
+- **Cloudflare caches at the edge even with `no-store`.** A 400 from `/api/confirm`
+  was served from cache after the bug behind it was fixed. Add a cache-buster
+  when testing an API response you have just changed, or you will debug a
+  problem that no longer exists.
+- **Neon sleeps.** Free tier scales to zero after ~5 minutes. The first request
+  can take ~2 s and may surface as Cloudflare error `1042`. Not a fault.
+- **Never send to made-up addresses.** `maria@example.com` is a hard bounce, and
+  a young sending domain has no reputation to absorb it. Use
+  `delivered@resend.dev` and `bounced@resend.dev`.
+- **`knowledge.js` nulls are load-bearing.** 21 facts are `null` on purpose. The
+  bot defers rather than inventing a number, and a test asserts it emits no
+  figure while rates are unset. `cameras` and `perimeter` matter most: a guest
+  asking whether they are recorded deserves the truth or a human, never a
+  reassuring guess.
+- **Do not add JPEGs.** AVIF plus a WebP fallback, and measure dimensions before
+  using an image as a hero — everything in `imagesIkshaa/` is ≤0.73 MP.
+- **`public/skeletons&Protos/`** (131 MB) and **`public/_archive/`** are gitignored
+  but still on disk. Nothing may delete them.
+- **The build walks references, it is not an ignore list.** A file nothing links
+  to cannot ship; a file something links to cannot be forgotten.
+- **Adding a duplicate key to an intent silently does nothing.** A second
+  `patterns:` in the same object literal is dead code — the later key wins. That
+  cost nine accuracy points before it was spotted.
 
 ---
 
-## Open, needing information nobody has yet
+## Open
 
-- **Netlify Forms** — the form is wired (`data-netlify`), but nobody has
-  confirmed a submission lands. Check Site configuration → Forms, submit once,
-  set a notification email.
-- **The API is localhost-only.** Hosting it means choosing somewhere that can
-  run Node and keep a file — Fly.io, Railway, or a small VPS — or moving the
-  store to Turso (same SQL) and putting the routes in Netlify Functions. Until
-  then the live form stays on Netlify Forms.
-- **Nothing sends the letters.** The page promises one a week; Netlify only
-  collects addresses. Needs a sender (Buttondown, Beehiiv). That is the first
-  point where an API key exists, and therefore the first honest reason to add
-  `netlify/functions/`.
+- **Ikshaa has no domain of its own.** Everything runs on `brownodin.com` and
+  `*.pages.dev`.
+- **`carman@brownodin.com` cannot receive.** `Reply-To` points at
+  `nyaragoa@gmail.com`. Cloudflare Email Routing would fix it free.
 - `knowledge.js` has 21 null facts awaiting real values.
 - Instagram, Facebook, Privacy and Terms are placeholder links.
 - `findingUs.html` has no journey time for Mopa airport; the map pin marks the
   village, not the gate.
-- `subscribe.html` is reached from the four newsletter sections and the modal,
-  but is not in the nav.
+- The four JPEG folders still hold the originals. They no longer ship — nothing
+  references them — but they were never moved to an archive.
+- `subscribe.html` is reached from the newsletter sections and the modal, but is
+  not in the nav.
 
 ---
 
 ## What changed most recently
 
 ```
-7203664  Add a newsletter database and a token-protected API
-eb2e02b  Add HANDOVER.md
-acd7f2c  Stop the newsletter preview from writing to what it previews
-cdbd779  Show the newsletter modal after 3s
-582b444  Make the newsletter modal testable, and lower its thresholds
-d2a1a75  Make the newsletter prompt a centred modal, half photograph
-2e36136  Move the newsletter to its own page, and prompt people toward it
-8afa70f  Fix two build tests that asserted the developer's disk, not the build
-ea06d2e  Run the hero crossfade only while it can be seen
-506ca16  Fetch photographs when they are due, and re-encode the audio
+6ba81ad  Designed emails, the weekly sender, and the cron that drains it
+4258449  Prepare the newsletter for Cloudflare + Neon
+cfabe86  Add campaigns, the outbox and the sender; add a Cloudflare test deploy
+f24a1f4  Port the newsletter store to Postgres, and decouple the shared rules
+46dc157  Convert the photographs to AVIF with a WebP fallback
+44b31b9  Fix the chat misroutes: 86.8% -> 100% on the eval corpus
+bf6175f  Add a Groq router for stuck conversations, and .env for the keys
+7912419  Fingerprint code so caches update on deploy, not an hour later
 ```
 
-Two performance problems were diagnosed and fixed. Deferred images were all
-hydrated at once on window load — 24 requests and 2.88 MB on the home page, of
-which one image was visible, and 1.65 MB of it was menu previews behind a shut
-panel. Site-wide first-load image cost went from 14.46 MB to 0.20 MB. Audio
-was 224/256 kbps stereo for ambience played at volume 0.24; mono 96 kbps saved
-3.89 MB, and the pool track's fade was longer than the pause it accompanied.
+Two decisions in that run are worth remembering, because both were about
+refusing to share infrastructure.
 
-The newsletter moved off the four content pages, which were taking an address
-under one line of copy and posting it to `action="#"` — silently discarding it.
-It now has its own page that states what arrives before asking, and a centred
-modal that leads there. Then a local database was added behind a token-checked
-API, so addresses and replies can be kept rather than handed to a form service.
+The API was nearly put on the existing Lightsail box to save $5/month. That box
+is 1 GB running a **live client system** with consent and DSAR modules —
+personal data under a compliance obligation. The OOM killer does not check
+whose process matters more.
 
-The hero crossfade also ran forever, including off-screen and in background
-tabs, with a fixed `backdrop-filter` element over it — a backdrop-filter above
-animating content re-blurs every frame. That was the Windows-slower-than-iPad
-report: cheap on Apple's compositor, expensive elsewhere.
+The same trap appeared again in Resend: the only verified domain on that
+account was the client's. Sending this newsletter from it would have put a
+portfolio project's mail on their sending reputation.
+
+Both were avoided. Isolation cost nothing in the end — Cloudflare, Neon and
+Resend all sit inside free tiers, and current database usage is 8 MB against a
+500 MB allowance.
