@@ -452,7 +452,11 @@
                     ? (ctx.negated ? 'Actually it is heated.' : 'It is heated.')
                     : (ctx.negated ? 'Correct — it is not heated, though Goa rarely makes you want that.'
                         : 'It is not heated, though Goa rarely makes you want that.');
-                return 'Yes — a ' + FACTS.pool + '. ' + heat + ' It is yours alone, not shared.';
+                /* "Yes — a private, for the use of your party alone." The fact
+                   is a description, not a noun the article can attach to.
+                   The closing "It is yours alone, not shared" also went: the
+                   fact already says exactly that, one sentence earlier. */
+                return 'Yes — the pool is ' + FACTS.pool + '. ' + heat;
             },
             chips: ['Is it safe for kids?', 'How far is the beach?']
         },
@@ -549,7 +553,7 @@
             patterns: [/\bairport\b/],
             answer: function () {
                 return 'The nearest airport is ' + FACTS.airport + ' — ' + FACTS.airportDistance +
-                    '. A transfer ' + FACTS.airportTransfer + '.';
+                    '. The transfer is ' + FACTS.airportTransfer + '.';
             }
         },
         {
@@ -573,7 +577,7 @@
             negativeExamples: ['what time can we arrive', 'can we leave luggage before check in',
                 'where do i park the car'],
             answer: function () {
-                return 'Airport transfers ' + FACTS.airportTransfer + '. Scooters and cars are easy to rent locally and the caretaker can set that up — ' +
+                return 'Airport transfers are ' + FACTS.airportTransfer + '. Scooters and cars are easy to rent locally and the caretaker can set that up — ' +
                     'having your own wheels makes a big difference in Goa.';
             }
         },
@@ -592,7 +596,7 @@
                 'somewhere to keep the scooter'],
             patterns: [/\b(leave|keep|put|store)\s+(the\s+|our\s+|a\s+)?(car|vehicle|scooter|bike)\b/,
                 /\bpark(ing)?\b/],
-            answer: function () { return 'Yes — ' + fact(FACTS.parking) + '. Scooters park inside too.'; }
+            answer: function () { return 'Parking is ' + fact(FACTS.parking) + '. Scooters park inside too.'; }
         },
         {
             id: 'checkin',
@@ -604,8 +608,10 @@
                 'is late arrival ok', 'what time can i get in'],
             patterns: [/\bcheck ?-?in\b/, /\bwhat time.*(arrive|arrival)\b/],
             answer: function () {
-                return 'Check-in is ' + fact(FACTS.checkIn, 'flexible — ' + contact()) + ', check-out ' + fact(FACTS.checkOut, 'flexible') +
-                    '. Late arrivals are fine; ' + fact(FACTS.earlyCheckIn, 'early check-in depends on the day before') + '.';
+                return 'Check-in is ' + fact(FACTS.checkIn, 'flexible') + ' and check-out is ' +
+                    fact(FACTS.checkOut, 'flexible') + ' — ' + contact() + ' can give you exact times. ' +
+                    // No Cap() here — a semicolon carries on the sentence.
+                    'Late arrivals are fine; ' + fact(FACTS.earlyCheckIn, 'early check-in depends on the day before') + '.';
             }
         },
         {
@@ -705,8 +711,10 @@
             patterns: [/\bhow.*(do i|to) pay\b/, /\b(upi|deposit|advance)\b/,
                 /\b(up ?front|in advance|send (the |you )?(money|payment)|how do i pay|make the payment)\b/],
             answer: function () {
-                return 'Payment is by ' + fact(FACTS.payments) + '. Terms are ' + FACTS.deposit +
-                    ', plus a refundable security deposit of ' + fact(FACTS.securityDeposit) + '.';
+                return 'Which payment methods are accepted is ' +
+                    fact(FACTS.payments, 'something the owner can confirm — ' + contact()) +
+                    '. Terms are ' + FACTS.deposit + ', plus a refundable security deposit, the amount of which is ' +
+                    fact(FACTS.securityDeposit, 'set by the owner') + '.';
             }
         },
         {
@@ -896,7 +904,9 @@
             examples: ['is there a tv', 'do you have netflix', 'what is there to watch',
                 'is there a sound system'],
             patterns: [/\b(tv|television|netflix)\b/],
-            answer: function () { return 'There is a ' + FACTS.tv + '.'; }
+            // "There is a satellite TV and DVD, and iPod docking" — the fact
+            // is a list, so the article cannot lead it.
+            answer: function () { return 'There is ' + FACTS.tv + '.'; }
         },
         {
             id: 'accessibility',
@@ -922,7 +932,7 @@
             examples: ['what is the weather like', 'when is the best time to visit', 'does it rain a lot',
                 'how hot does it get', 'is monsoon a bad time', 'best season to come'],
             patterns: [/\b(weather|monsoon|climate|season|rain)/],
-            answer: function () { return 'Best window is ' + FACTS.bestTime + '.'; }
+            answer: function () { return FACTS.bestTime + '.'; }
         },
         {
             id: 'activities',
@@ -936,7 +946,7 @@
                 /\bwhat.*(to do|is there to see)\b/, /\b(attraction|sightsee|nightlife|watersport)/],
             answer: function () {
                 return 'Plenty within reach — ' + FACTS.beachName + ' and the shacks along it, the Saturday night market, ' +
-                    'old Portuguese houses around Loutulim and Chandor, spice farms inland, and Palolem a bit further south. ' +
+                    'old Portuguese houses around Loutolim and Chandor, spice farms inland, and Palolem a bit further south. ' +
                     'The caretaker knows the good, non-touristy versions of all of it.';
             }
         },
