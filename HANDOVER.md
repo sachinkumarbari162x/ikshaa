@@ -7,8 +7,8 @@ caught someone.
 chat assistant. This file covers *where it currently is*. Read that one first
 if you have not.
 
-**Last updated:** 9 August 2026. Everything below is deployed and verified,
-not planned.
+**Last updated:** 9 August 2026. Everything below is deployed and verified
+against production, not planned. Where a number is optimistic, it says so.
 
 ---
 
@@ -232,8 +232,20 @@ Do not clear `localStorage` by hand:
 
 ```
 npm run eval          the 121-question corpus, offline and free
-npm run chat:probe    one real Groq call per awkward question
+npm run chat:probe    one real Groq call per awkward question; needs GROQ_API_KEY
 npm run chat:bench    compares candidate models; costs tokens
+```
+
+The last two still work and still cost money. They talk to Groq directly and
+do not care that the live widget no longer does — useful for evaluating the
+router before any decision to switch it on, and no reason to run otherwise.
+
+**Probe out-of-domain questions by hand as well.** The corpus only contains
+questions somebody thought to write down, and every gap found so far was found
+by asking the bot something nobody had:
+
+```js
+new (require('./public/chat/bot.js'))().respond('is there a gym on site')
 ```
 
 ### Reproducing CI locally — do this before every push
@@ -304,6 +316,18 @@ cd /path/to/sim && node build.js && ./node_modules/.bin/jest
   village, not the gate.
 - The four JPEG folders still hold the originals. They no longer ship — nothing
   references them — but they were never moved to an archive.
+- **Three chat misroutes need facts, not code.** `unknownThing()` cannot fire on
+  them because a common word in the phrase is already in the vocabulary:
+  "is there hot water" answers with the weather (`water`), "are there mosquito
+  nets" with the pet policy, "can I charge an electric car" with power cuts
+  (`car`). Hot water is an ordinary question and should go first.
+- **Some answers are ungrammatical.** A `fact()` fallback spliced mid-sentence
+  produces *"Air conditioning air-conditioned bedrooms and living room."* and
+  *"Housekeeping comes something the owner can confirm"*. Roughly an hour, and
+  it reads as broken software to a guest.
+- **No-JS visitors cannot subscribe.** The form's `action` is a static page, so
+  a native POST is a 405. Academic while the whole site needs JS to show its
+  photographs, but it is a real edge.
 - `subscribe.html` is reached from the newsletter sections and the modal, but is
   not in the nav.
 
@@ -312,6 +336,8 @@ cd /path/to/sim && node build.js && ./node_modules/.bin/jest
 ## What changed most recently
 
 ```
+c962c63  Trim build-history chatter out of the shipped page
+a073477  Stop the live site failing silently in three places
 6ba81ad  Designed emails, the weekly sender, and the cron that drains it
 4258449  Prepare the newsletter for Cloudflare + Neon
 cfabe86  Add campaigns, the outbox and the sender; add a Cloudflare test deploy
@@ -322,8 +348,27 @@ bf6175f  Add a Groq router for stuck conversations, and .env for the keys
 7912419  Fingerprint code so caches update on deploy, not an hour later
 ```
 
-Two decisions in that run are worth remembering, because both were about
-refusing to share infrastructure.
+The most recent session is worth its own note, because all three bugs it fixed
+shared a shape: **the site carried on as if it had worked.**
+
+The subscribe form told people to check their inbox and threw the address away.
+Twenty photographs 404'd on Chrome and Edge while looking perfect on Safari 15.
+The chat answered "is there a gym" with the perimeter-security blurb, stated as
+fact. Nothing logged an error. Nothing failed a test — one test actively
+asserted the broken behaviour, because it had been written against the Netlify
+attribute that later became meaningless.
+
+Two habits came out of it, and both are cheap:
+
+- **Test on a browser that supports what you optimised for.** The AVIF bug was
+  invisible on the older browser and total on the newer one. Testing on the
+  forgiving device proves nothing about the strict one.
+- **Assert the mechanism, not the marker.** `data-netlify="true"` was evidence
+  of an intention, not of a working form. The test now reads the built script
+  for a real API origin, which cannot be true while the form is broken.
+
+Two earlier decisions in this run are also worth remembering, because both were
+about refusing to share infrastructure.
 
 The API was nearly put on the existing Lightsail box to save $5/month. That box
 is 1 GB running a **live client system** with consent and DSAR modules —
