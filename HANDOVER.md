@@ -7,7 +7,7 @@ caught someone.
 chat assistant. This file covers *where it currently is*. Read that one first
 if you have not.
 
-**Last updated:** 9 August 2026. Everything below is deployed and verified
+**Last updated:** 10 August 2026. Everything below is deployed and verified
 against production, not planned. Where a number is optimistic, it says so.
 
 ---
@@ -22,7 +22,7 @@ against production, not planned. Where a number is optimistic, it says so.
 | Email | Resend, sending as `Carman at Ikshaa <carman@brownodin.com>` |
 | Timer | Cloudflare cron, `*/15 * * * *` |
 | Repository | https://github.com/sachinkumarbari162x/ikshaa |
-| Tests | 277, all passing |
+| Tests | 378, all passing |
 | Build | 15.25 MB, 194 files |
 | Node | **22.13+** — `node:sqlite` is flagged below that. CI runs 24. |
 
@@ -98,20 +98,63 @@ power answer, and missing them would decline a question the villa can answer.
 The test is deliberately hard to fail: one recognised word anywhere in the
 phrase lets the matcher proceed, because a wrong decline turns a guest away.
 
-That took the eight down to three, with no regression on the corpus. What is
-left needs facts, not code:
+That took the eight down to three. Three more got their own intents —
+`hotwater`, `mosquitoes`, `evcharging` — because the guard could never fire on
+them: `water` and `car` are both in the vocabulary, so the phrase always looked
+familiar. They carry no facts; they defer to Carman. Routing honestly beats
+routing confidently to the monsoon forecast, and it puts the three questions on
+the list of things to ask.
 
-- "can I charge an electric car" → the power-cut answer. `car` is in the
-  vocabulary, so the guard cannot fire. EV charging is a real question now.
-- "can I get a haircut nearby" → the things-to-do answer.
-- "is there hot water" → **the weather forecast.** `water` is in the
-  vocabulary. This one is worth fixing first; it is a normal question.
-- "are there mosquito nets" → **the pet policy.**
+**Out-of-domain probe: 8 of 20 wrong → 1.** The survivor is "can I get a
+haircut nearby", answered with things-to-do — the least harmful of the set,
+and catching it would need `can I get …` in the existential patterns, which
+would also catch "can I get breakfast". Left alone deliberately.
 
-Also visible while probing, and worth an hour: several answers splice a
-`fact()` fallback clause mid-sentence and come out ungrammatical — *"Air
-conditioning air-conditioned bedrooms and living room."*, *"Housekeeping comes
-something the owner can confirm"*. Those read as broken software to a guest.
+Two routing collisions had to be settled for the new intents to work, and one
+predates them:
+
+- power's `/electric/` swallowed "electric car" — a lookahead hands over
+  `electric car|vehicle` and leaves "electricity" alone.
+- `@parking` owns the word "car", so **"can you arrange a car" was answered
+  with parking.** Arranging one is transport; parking one is not.
+
+### The answers now read as English
+
+Fifteen did not. All one shape of mistake: `fact()` fallbacks are written as
+mid-sentence clauses, so they only fit frames like "There is ___", and most
+call sites had a frame of their own.
+
+```
+"Air conditioning air-conditioned bedrooms and living room."
+"Housekeeping comes something the owner can confirm."
+"the virgin beaches of South Goa is a 15 minute drive."
+"A transfer complimentary — tell us your flight."
+"Yes — a private, for the use of your party alone."
+"Best window is November to February is dry and warm."
+"Check-in is flexible — nyaragoa@gmail.com, check-out flexible."
+```
+
+`fact()` already took a per-site fallback; the call sites now use it.
+
+**One was not merely ungrammatical.** Parking answered *"Yes — something the
+owner can confirm"*: it said yes, then admitted it did not know. The entire
+design is that the bot never claims a fact it does not have, and that answer
+broke the rule in its first word. Worth remembering that a grammar sweep found
+a correctness bug.
+
+Also fixed: the village is **Loutolim**, spelled `Loutulim` in the things-to-do
+answer and correctly everywhere else.
+
+Rather than fix fifteen and wait for the sixteenth, **every intent is now
+rendered in the test suite and checked for a capital at each sentence start** —
+101 assertions that cost nothing to run. Reading all forty-two answers end to
+end in one pass is what made them findable; do that after touching
+`knowledge.js`:
+
+```bash
+node -e "const K=require('./public/chat/knowledge.js'),B=require('./public/chat/bot.js'),b=new B();
+K.INTENTS.forEach(i=>console.log('['+i.id+'] '+b.render(i,{entities:{}})))"
+```
 
 ---
 
@@ -316,15 +359,9 @@ cd /path/to/sim && node build.js && ./node_modules/.bin/jest
   village, not the gate.
 - The four JPEG folders still hold the originals. They no longer ship — nothing
   references them — but they were never moved to an archive.
-- **Three chat misroutes need facts, not code.** `unknownThing()` cannot fire on
-  them because a common word in the phrase is already in the vocabulary:
-  "is there hot water" answers with the weather (`water`), "are there mosquito
-  nets" with the pet policy, "can I charge an electric car" with power cuts
-  (`car`). Hot water is an ordinary question and should go first.
-- **Some answers are ungrammatical.** A `fact()` fallback spliced mid-sentence
-  produces *"Air conditioning air-conditioned bedrooms and living room."* and
-  *"Housekeeping comes something the owner can confirm"*. Roughly an hour, and
-  it reads as broken software to a guest.
+- **24 facts are null**, three of them new: `hotWater`, `mosquito`,
+  `evCharging`. Each has a working intent that defers to Carman, so filling the
+  value in `FACTS` is all that is needed — the answers turn on by themselves.
 - **No-JS visitors cannot subscribe.** The form's `action` is a static page, so
   a native POST is a 405. Academic while the whole site needs JS to show its
   photographs, but it is a real edge.
@@ -336,6 +373,9 @@ cd /path/to/sim && node build.js && ./node_modules/.bin/jest
 ## What changed most recently
 
 ```
+4ab93d2  Fix the rest of the answers that did not read as English
+4202ce2  Stop the chat answering questions it has no answer for
+b2d6572  Update HANDOVER for the deterministic chat and the two silent failures
 c962c63  Trim build-history chatter out of the shipped page
 a073477  Stop the live site failing silently in three places
 6ba81ad  Designed emails, the weekly sender, and the cron that drains it
