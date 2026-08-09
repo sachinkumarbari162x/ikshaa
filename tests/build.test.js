@@ -219,6 +219,35 @@ describeIfBuilt('production build', () => {
     expect(dead).toEqual([]);
   });
 
+  test('every page carries the footer and the subscribe card', () => {
+    /* Four of the eight pages shipped without either. A visitor who landed on
+       the gallery or the guest book had no contact details, no links onward
+       and no way to subscribe — the page simply stopped.
+
+       Two exemptions, both deliberate:
+
+       subscribe.html IS the form, and a card linking to the page you are
+       already on is noise.
+
+       exploreIkshaa.html is the full-screen villa tour. It carries no navbar
+       either — its own comment says a full one "would undo the point of a
+       full-screen walk" — and it has no <main> to put a footer in. The way
+       out is the single back-link in the corner, which is the design. */
+    const exempt = new Set(['subscribe.html', 'exploreIkshaa.html']);
+    const missing = [];
+
+    for (const file of fs.readdirSync(DIST).filter((f) => f.endsWith('.html'))) {
+      if (exempt.has(file)) { continue; }
+      const page = fs.readFileSync(path.join(DIST, file), 'utf8');
+      const gaps = [];
+      if (!/<footer class="footer"/.test(page)) { gaps.push('footer'); }
+      if (!/id="subscribe"/.test(page)) { gaps.push('subscribe card'); }
+      if (gaps.length) { missing.push(file + ' (' + gaps.join(', ') + ')'); }
+    }
+
+    expect(missing).toEqual([]);
+  });
+
   test('every shipped webp ships its avif sibling too', () => {
     /* script.js rewrites `.webp` to `.avif` at runtime whenever the browser
        passes a decode probe. That URL is built in the browser, so the build's
