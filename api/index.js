@@ -7,6 +7,7 @@
  * Public, because a visitor has to be able to use it:
  *   POST /api/subscribe
  *   GET  /api/confirm?token=…    the double opt-in link from the email
+ *   POST /api/understand         routes a stuck conversation to a topic id
  *
  * Everything else is the owner's data and needs the token:
  *   GET  /api/subscribers        ?confirmed=1 for the sendable list only
@@ -158,6 +159,37 @@ function createApi(options) {
     ? options.exporter
     : require('./export').writeMailingList;
 
+  /* The router. Injected so tests can drive it without a network, and so a
+     deployment can leave it off entirely by not setting a key. */
+  const router = options.router !== undefined ? options.router : require('./llm').understand;
+  const groqKey = options.groqKey !== undefined ? options.groqKey : process.env.GROQ_API_KEY;
+  const catalogue = options.catalogue || null;
+
+  /* Two limits, because they stop different things.
+
+     Per-address, per-minute stops one caller hammering it. It does nothing
+     about a thousand callers doing it once each, which is what actually
+     empties a prepaid balance overnight — so there is a hard ceiling on the
+     whole day as well. Both are in memory and per-process, which is honest
+     for a single server and would need shared state behind more than one. */
+  const allowThink = options.thinkLimiter || createRateLimiter({ WINDOW_MS: 60000, MAX: 4 });
+  const dailyCap = options.dailyCap !== undefined ? options.dailyCap : Number(process.env.GROQ_DAILY_CAP || 300);
+  let spentToday = 0;
+  let spendingSince = new Date().toDateString();
+
+  function withinBudget() {
+    const today = new Date().toDateString();
+    if (today !== spendingSince) {
+      spendingSince = today;
+      spentToday = 0;
+    }
+    if (spentToday >= dailyCap) {
+      return false;
+    }
+    spentToday++;
+    return true;
+  }
+
   function authorised(req, res) {
     if (!tokenMatches(presentedToken(req), token)) {
       // 401 with no detail: which of "no token", "wrong token" and "server
@@ -248,6 +280,49 @@ function createApi(options) {
           return true;
         }
         sendJson(res, 200, { ok: true, already: result.already });
+        return true;
+      }
+
+      /* Called by the widget when the local matcher has missed twice running.
+         Returns a topic id and nothing else — never prose. The words the
+         guest reads are still rendered from knowledge.js by the browser. */
+      if (route === '/api/understand' && method === 'POST') {
+        if (!allowThink(req.socket.remoteAddress || 'unknown')) {
+          sendJson(res, 429, { intent: null, reason: 'rate-limited' });
+          return true;
+        }
+        if (!catalogue) {
+          sendJson(res, 200, { intent: null, reason: 'not-configured' });
+          return true;
+        }
+        if (!withinBudget()) {
+          // 200, not an error: the widget's job is to fall through to the
+          // human handoff, and it does that on any null intent.
+          sendJson(res, 200, { intent: null, reason: 'daily-cap' });
+          return true;
+        }
+
+        const raw = await readBody(req);
+        const body = parseBody(raw, req.headers['content-type']);
+        if (body === null) {
+          sendJson(res, 400, { intent: null, reason: 'malformed' });
+          return true;
+        }
+
+        const result = await router({
+          apiKey: groqKey,
+          catalogue: catalogue,
+          transcript: Array.isArray(body.transcript) ? body.transcript : [],
+          shortlist: Array.isArray(body.shortlist) ? body.shortlist.slice(0, 3) : [],
+        });
+
+        /* Belt and braces. llm.js already checks membership, but this is the
+           boundary where an id crosses into the browser, and the browser will
+           render whatever intent it is handed. */
+        const ids = catalogue.map((c) => c.id);
+        const safe = result && ids.indexOf(result.intent) >= 0 ? result.intent : null;
+
+        sendJson(res, 200, { intent: safe, reason: result ? result.reason : 'no-result' });
         return true;
       }
 

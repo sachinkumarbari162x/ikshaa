@@ -369,7 +369,19 @@
         cancellation: 'cancellations', payment: 'how to pay', housekeeping: 'cleaning and laundry',
         safety: 'safety', power: 'power backup', tv: 'the TV', accessibility: 'accessibility',
         weather: 'the weather', activities: 'things to do nearby', photos: 'photos',
-        contact: 'contacting the owner'
+        contact: 'contacting the owner',
+
+        /* Completing the set. These were missing, so describe() fell back to
+           the raw id — "bot identity" reads oddly in "I think you are asking
+           about…", and the router prompt needs a real description for every
+           id it is allowed to choose. */
+        tourguide: 'arranging a guide or a day trip',
+        gatherings: 'arranging catering or staff for a get-together',
+        bot_identity: 'whether this is a person or software',
+        capabilities: 'what this assistant can help with',
+        complaint: 'the guest being unhappy with the answers',
+        compliment: 'the guest being complimentary',
+        greeting: 'saying hello', goodbye: 'saying goodbye', thanks: 'saying thank you'
     };
 
     var CHIPS = {
@@ -379,6 +391,29 @@
         checkin: 'Check-in time?', pets: 'Are pets allowed?', payment: 'How do I pay?',
         cancellation: 'Cancellation policy?', children: 'Is it kid friendly?',
         activities: 'What is nearby?', contact: 'Talk to a human'
+    };
+
+    /* Render a named intent, as though the matcher had chosen it.
+     *
+     * This is what lets the remote router return a topic id and have the
+     * ANSWER still come from knowledge.js. The id is checked against the
+     * intent list first, so an id from anywhere — including a model — can
+     * only ever select an existing answer, never introduce text.
+     */
+    Bot.prototype.answerAs = function (id, text, now) {
+        var intent = this.intentById(id);
+        if (!intent) { return null; }
+
+        var result = this.engine.match(String(text || ''), {}, now);
+        var reply = this.render(intent, result.analysis);
+
+        // Treat it as a real answer: the streak resets, and the topic sticks
+        // so the next "is it heated?" resolves against it.
+        this.context.unknownStreak = 0;
+        this.setTopic(intent);
+        this.remember(result.analysis.entities);
+
+        return { text: reply, intent: intent.id, chips: [], status: 'routed' };
     };
 
     Bot.prototype.describe = function (id) { return LABELS[id] || id.replace(/_/g, ' '); };

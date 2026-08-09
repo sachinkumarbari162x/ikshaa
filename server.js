@@ -349,12 +349,29 @@ if (require.main === module) {
   const { createApi } = require('./api');
   const db = store.openDatabase(path.join(__dirname, 'data', 'ikshaa.db'));
 
-  createServer({ api: createApi({ db, store }) }).listen(port, () => {
+  /* The topic catalogue the router is allowed to choose from, built from the
+     bot's own intents so the two can never drift apart. Social turns are left
+     out: the local matcher never misses "hello", and every id in the prompt
+     is a chance for the model to pick the wrong one. */
+  const SOCIAL = ['greeting', 'goodbye', 'thanks', 'compliment'];
+  const KNOWLEDGE = require('./public/chat/knowledge.js');
+  const Bot = require('./public/chat/bot.js');
+  const describer = new Bot();
+  const catalogue = (KNOWLEDGE.INTENTS || [])
+    .filter((i) => SOCIAL.indexOf(i.id) === -1)
+    .map((i) => ({ id: i.id, describes: describer.describe(i.id) }));
+
+  createServer({ api: createApi({ db, store, catalogue }) }).listen(port, () => {
     process.stdout.write('Ikshaa running at http://localhost:' + port + '\n');
     process.stdout.write(
       process.env.IKSHAA_API_TOKEN
         ? '  API at /api — read routes need the bearer token\n'
         : '  API at /api — IKSHAA_API_TOKEN is unset, so read routes refuse everyone\n'
+    );
+    process.stdout.write(
+      process.env.GROQ_API_KEY
+        ? '  chat router on — Groq resolves a conversation stuck twice\n'
+        : '  chat router off — set GROQ_API_KEY to enable it\n'
     );
   });
 }

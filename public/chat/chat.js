@@ -18,6 +18,14 @@
     var MAX_INPUT = 600;
     var ROLES = { me: true, bot: true };
 
+    /* Where the stuck-conversation router lives, and how hard it may be
+       leaned on from this browser. The server has its own per-address limit
+       and a hard daily cap; this is only here so one tab cannot spam it by
+       accident, e.g. someone leaning on a chip. */
+    var ROUTER_URL = '/api/understand';
+    var ROUTER_MAX_PER_SESSION = 6;
+    var ASSISTANT_CHIP = 'Let the assistant read this';
+
     var ICON_CHAT = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.9-.9L3 20.5l1.6-4.4A8.4 8.4 0 0 1 3.6 11.5a8.4 8.4 0 0 1 9-8.4 8.4 8.4 0 0 1 8.4 8.4z"/></svg>';
     var ICON_SEND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg>';
 
@@ -187,7 +195,25 @@
                 var chip = el('button', 'chat__chip');
                 chip.type = 'button';
                 chip.textContent = label;
-                chip.addEventListener('click', function () { submit(label); });
+                chip.addEventListener('click', function () {
+                    /* Most chips are just a question typed for you. This one
+                       is an action: sending its label as a message would ask
+                       the bot "let the assistant read this", which is exactly
+                       the kind of thing it cannot answer. */
+                    if (label === ASSISTANT_CHIP) {
+                        renderChips([]);
+                        var dots = typing();
+                        busy = true;
+                        askAssistant(lastGuestText, []).then(function (routed) {
+                            dots.remove();
+                            busy = false;
+                            saveState();
+                            say(routed ? routed.text : handoffText(), routed ? [] : ['Start over']);
+                        });
+                        return;
+                    }
+                    submit(label);
+                });
                 ui.chips.appendChild(chip);
             });
         }
@@ -198,6 +224,59 @@
             ui.log.appendChild(node);
             scroll();
             return node;
+        }
+
+        /* ---------------- the assistant ----------------
+         *
+         * When the local matcher has missed twice, or the guest asks for it,
+         * the recent conversation goes to the server, which asks a model to
+         * name ONE topic id from a closed list.
+         *
+         * What comes back is an id, never prose. The reply the guest reads is
+         * rendered from knowledge.js by bot.answerAs(), exactly as if the
+         * local matcher had chosen it. So the worst a compromised or confused
+         * model can do is pick the wrong topic — it cannot invent a rate, a
+         * policy, or an answer about cameras. The 21 null facts stay
+         * load-bearing because they are enforced in the answer functions,
+         * which none of this touches.
+         */
+        var routerCalls = 0;
+        var lastGuestText = '';
+
+        function routerTranscript() {
+            var out = [];
+            var nodes = ui.log.querySelectorAll('.chat__msg');
+            for (var i = Math.max(0, nodes.length - 6); i < nodes.length; i++) {
+                out.push({
+                    role: nodes[i].className.indexOf('chat__msg--me') >= 0 ? 'me' : 'bot',
+                    text: nodes[i].textContent
+                });
+            }
+            return out;
+        }
+
+        function askAssistant(lastText, shortlist) {
+            if (routerCalls >= ROUTER_MAX_PER_SESSION) {
+                return Promise.resolve(null);
+            }
+            routerCalls++;
+
+            return fetch(ROUTER_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    transcript: routerTranscript(),
+                    shortlist: shortlist || []
+                })
+            })
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (body) {
+                    if (!body || !body.intent) { return null; }
+                    // answerAs returns null for an id it does not recognise,
+                    // so an unknown id degrades to the normal handoff.
+                    return bot.answerAs(body.intent, lastText);
+                })
+                .catch(function () { return null; });   // offline, blocked, slow: fall through
         }
 
         /* ---------------- persistence ---------------- */
@@ -251,6 +330,12 @@
 
         /* ---------------- conversation ---------------- */
 
+        function handoffText() {
+            var F = KNOWLEDGE.FACTS || {};
+            return 'I still cannot place that one, and I would rather say so than guess. ' +
+                (F.phone ? F.phone : F.email) + ' reaches a person who will know.';
+        }
+
         function say(text, chips) {
             var wait = Math.min(1400, 380 + String(text).length * 7);
             var dots = typing();
@@ -271,6 +356,7 @@
             text = String(text || '').trim().slice(0, MAX_INPUT);
             if (!text || busy) return;
 
+            lastGuestText = text;
             bubble('me', text);
             save('me', text);
             renderChips([]);
@@ -285,6 +371,35 @@
             }
 
             var reply = bot.respond(text);
+
+            /* Two misses running is real evidence that the local matcher is
+               not going to get there — the guest has already rephrased once.
+               This is the rung below the human handoff, so the assistant gets
+               exactly one attempt before we stop guessing and hand over. */
+            var stuck = bot.context.unknownStreak === 2;
+            if (stuck) {
+                var shortlist = (reply.alternatives || []).map(function (a) {
+                    return a.intent && a.intent.id;
+                }).filter(Boolean);
+
+                var dots = typing();
+                busy = true;
+                askAssistant(text, shortlist).then(function (routed) {
+                    dots.remove();
+                    busy = false;
+                    saveState();
+                    if (routed) {
+                        say(routed.text, routed.chips);
+                    } else {
+                        // Offer the option rather than only trying silently —
+                        // and keep the original reply, which already says
+                        // something useful about having missed.
+                        say(reply.text, (reply.chips || []).concat([ASSISTANT_CHIP]));
+                    }
+                });
+                return;
+            }
+
             saveState();
             say(reply.text, reply.chips);
         }

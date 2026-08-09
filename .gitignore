@@ -65,3 +65,7 @@ public/media/music/musicForKitchen.mp3
 public/media/music/musicTown.mp3
 public/media/music/sleepMusic.mp3
 public/media/videos/mainPageVideo.mov
+
+# A key pasted into a loose file in the repo root. Ignored so it cannot be
+# committed by 'git add -A'. Put secrets in .env instead.
+essentials.txt
