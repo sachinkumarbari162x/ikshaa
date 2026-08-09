@@ -14,7 +14,8 @@
     "export": "node --env-file-if-exists=.env -e \"const s=require('./api/db'),e=require('./api/export');const db=s.openDatabase('data/ikshaa.db');const o=e.writeMailingList(db,s);console.log('wrote to '+o.dir);o.files.forEach(f=>console.log('  '+f.list+': '+f.count))\"",
     "chat:probe": "node --env-file-if-exists=.env eval/probe.js",
     "chat:bench": "node --env-file-if-exists=.env eval/bench.js",
-    "deploy:cf": "npm run build && npx --yes wrangler@latest pages deploy dist --project-name=ikshaa --commit-dirty=true"
+    "deploy:cf": "npm run build && npx --yes wrangler@latest pages deploy dist --project-name=ikshaa --commit-dirty=true",
+    "db:migrate": "node --env-file-if-exists=.env api/pg/migrate.js"
   },
   "devDependencies": {
     "jest": "^29.7.0"
@@ -29,6 +30,7 @@
     "node": ">=22.13"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
     "pg": "^8.23.0"
   }
 }

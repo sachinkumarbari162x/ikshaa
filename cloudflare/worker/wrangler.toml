@@ -1,0 +1,47 @@
+# The newsletter API, as a Worker.
+#
+# Separate from the Pages project: the site is static and cached at the edge,
+# this is dynamic and talks to a database. Deploying them together would mean
+# a code change to the API invalidating the whole site.
+#
+#   npx wrangler deploy            (from this directory)
+
+name = "ikshaa-api"
+main = "index.js"
+compatibility_date = "2026-01-01"
+
+# node:crypto and friends. The store is shared with the Node server, so it
+# expects a slice of the Node API to exist.
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true                      # logs, without which a 500 is a mystery
+
+# ---------------------------------------------------------------------------
+# Public settings. Safe to commit — none of these is a secret.
+# ---------------------------------------------------------------------------
+[vars]
+# Which origins may call this from a browser. NOT "*": a wildcard lets any
+# page on the internet post subscriptions in your visitors' names.
+ALLOWED_ORIGINS = "https://ikshaa.pages.dev,https://ikshaa.netlify.app"
+
+# Where the confirmation link points. Must be THIS worker's public hostname,
+# because that is what serves /api/confirm.
+PUBLIC_BASE_URL = "https://ikshaa-api.<your-subdomain>.workers.dev"
+
+# Who the confirmation email is from. Must be a domain verified with the mail
+# provider — sending as an address you do not control is the fastest way to
+# be filtered everywhere.
+MAIL_FROM = "Carman <carman@brownodin.com>"
+
+# ---------------------------------------------------------------------------
+# Secrets. NOT here. Set them with wrangler, which stores them on Cloudflare:
+#
+#   npx wrangler secret put DATABASE_URL       # the Neon connection string
+#   npx wrangler secret put IKSHAA_API_TOKEN   # from: npm run token
+#   npx wrangler secret put MAIL_API_KEY       # from the mail provider
+#
+# Without DATABASE_URL the API answers 503.
+# Without MAIL_API_KEY a subscription is still recorded, but stays
+# unconfirmed and therefore unmailable — the safe end of the failure.
+# ---------------------------------------------------------------------------

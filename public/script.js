@@ -1489,3 +1489,91 @@ if (document.readyState === 'complete') {
 } else {
   window.addEventListener('load', initEmailWarning, { once: true });
 }
+
+//===============================================
+// Posting the subscription to the API, when there is one.
+//
+// The form still carries data-netlify and a real action, so with JavaScript
+// off — or before the API exists — it submits the ordinary way and Netlify
+// captures it. Nothing here is required for the page to work.
+//
+// When the API IS configured, this intercepts instead, because only the API
+// does double opt-in: Netlify Forms records an address, it does not prove
+// anybody asked for it.
+
+// Set to the Worker's hostname once deployed. Empty means "not configured",
+// and the native form post is left alone.
+const NEWSLETTER_API = '';
+
+function initSubscribeApi() {
+  const form = document.querySelector('.subscribeFormFull');
+  if (!form || !NEWSLETTER_API) {
+    return;                       // no form here, or no API yet
+  }
+
+  const status = document.createElement('p');
+  status.className = 'formStatus';
+  status.setAttribute('aria-live', 'polite');
+  status.hidden = true;
+  form.appendChild(status);
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const button = form.querySelector('button[type="submit"]');
+    const data = Object.fromEntries(new FormData(form).entries());
+
+    // Checkboxes are absent when unticked; the API reads absent as yes, so
+    // send an explicit 0 rather than letting a deliberate opt-out vanish.
+    data.weekly = form.querySelector('[name="weekly"]').checked ? 1 : 0;
+    data.seasonal = form.querySelector('[name="seasonal"]').checked ? 1 : 0;
+
+    button.disabled = true;
+    status.hidden = false;
+    status.textContent = 'Sending…';
+
+    try {
+      const res = await fetch(NEWSLETTER_API.replace(/\/$/, '') + '/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const body = await res.json().catch(() => ({}));
+
+      if (res.ok && body.ok) {
+        // Deliberately not "you are subscribed". They are not, until they
+        // click the link — saying otherwise would be the lie double opt-in
+        // exists to avoid.
+        form.hidden = true;
+        const thanks = document.getElementById('subscribeThanks');
+        if (thanks) {
+          const line = thanks.querySelector('.bodyText');
+          if (line && body.next === 'check-your-email') {
+            line.textContent = 'Almost — check your inbox and click the link to confirm. ' +
+              'Nothing is sent until you do. If it does not arrive, look in spam once, ' +
+              'then write to nyaragoa@gmail.com.';
+          }
+          thanks.hidden = false;
+          thanks.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+      }
+
+      status.textContent = (body.details && body.details[0]) ||
+        'That did not go through. Try again, or write to nyaragoa@gmail.com.';
+      button.disabled = false;
+    } catch (e) {
+      /* Offline, blocked, or the API is down. Fall back to the native submit
+         rather than losing the address: Netlify still captures it, and a
+         record that needs confirming later beats no record at all. */
+      status.textContent = 'Sending the usual way…';
+      form.submit();
+    }
+  });
+}
+
+if (document.readyState === 'complete') {
+  initSubscribeApi();
+} else {
+  window.addEventListener('load', initSubscribeApi, { once: true });
+}

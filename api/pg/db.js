@@ -17,9 +17,17 @@
  * ========================================================================= */
 
 const crypto = require('crypto');
-const fs = require('fs');
-const path = require('path');
-const { Pool } = require('pg');
+
+/* pg, fs and path are NOT imported here.
+ *
+ * This file has to load inside a Cloudflare Worker, which has no filesystem
+ * and cannot open a raw TCP socket the way node-postgres expects. Requiring
+ * them at the top would make the module throw on import, before any of the
+ * logic below could be reached — and the logic is identical on both
+ * runtimes; only the connection differs.
+ *
+ * So the driver is injected (createPool takes one) and the filesystem is
+ * required lazily, inside the one function that needs it. */
 
 /* Rules from the shared module, NOT from the SQLite store. Importing that
    store to borrow its validation pulled node:sqlite into this file, which
@@ -36,17 +44,33 @@ function hashToken(token) {
   return crypto.createHash('sha256').update(String(token)).digest('hex');
 }
 
+/* Hand in a Pool and it is used as-is. That is how the Worker supplies
+   @neondatabase/serverless, whose Pool is API-compatible with node-postgres
+   but speaks HTTP instead of TCP.
+
+   With nothing handed in, node-postgres is required lazily — so a Worker
+   that always injects never touches it. */
 function createPool(options = {}) {
-  const pool = new Pool(
-    options.connectionString || process.env.DATABASE_URL
-      ? { connectionString: options.connectionString || process.env.DATABASE_URL }
-      : options
-  );
-  /* An idle client erroring takes the process down by default. A database
-     restart underneath a long-lived pool is normal operations, not a crash. */
-  pool.on('error', (e) => {
-    process.stderr.write('[pg] idle client error: ' + (e && e.message) + '\n');
-  });
+  if (options.pool) {
+    return options.pool;
+  }
+
+  const connectionString = options.connectionString ||
+    (typeof process !== 'undefined' && process.env && process.env.DATABASE_URL);
+
+  const PoolClass = options.Pool || require('pg').Pool;
+  const pool = new PoolClass(connectionString ? { connectionString } : options);
+
+  /* An idle client erroring takes a Node process down by default, and a
+     database restarting under a long-lived pool is ordinary operations
+     rather than a crash. Serverless pools have no such event. */
+  if (typeof pool.on === 'function') {
+    pool.on('error', (e) => {
+      var write = (typeof process !== 'undefined' && process.stderr)
+        ? (m) => process.stderr.write(m) : (m) => console.warn(m);
+      write('[pg] idle client error: ' + (e && e.message) + '\n');
+    });
+  }
   return pool;
 }
 
@@ -55,6 +79,10 @@ function createPool(options = {}) {
    migrations are a deliberate step (`npm run db:migrate`), not a side effect
    of the first request after a deploy. */
 async function migrate(pool) {
+  // Required here, not at the top: a Worker has no filesystem, and importing
+  // fs at module load would break the file for a caller that never migrates.
+  const fs = require('fs');
+  const path = require('path');
   const sql = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
   await pool.query(sql);
   return pool;
