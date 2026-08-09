@@ -304,9 +304,11 @@
         },
         {
             id: 'bot_identity',
+            keywords: ['robot', 'bot', 'human', 'software', 'ai', 'machine', 'real'],
             examples: ['who are you', 'what are you', 'are you a bot', 'are you human', 'are you real',
                 'what is your name', 'are you an ai', 'am i talking to a robot'],
-            patterns: [/\b(are you (an? )?(bot|robot|human|real|ai|person|machine|software))\b/,
+            patterns: [/\b(are you|is this) (a |an )?(real|actual|human|person|bot|robot|machine|program|software|ai)\b/,
+                /\b(are you (an? )?(bot|robot|human|real|ai|person|machine|software))\b/,
                 /\bwhat('s| is) your name\b/,
                 /\b(chatting|talking|speaking) (to|with) (a )?(bot|robot|machine|computer|human|person)\b/],
             answer: function () {
@@ -330,15 +332,18 @@
         },
         {
             id: 'price',
-            negativeExamples: ['which payment methods do you take', 'how do i send the money', 'is a deposit needed'],
+            negativeExamples: ['is the deposit paid by card or transfer', 'what payment methods do you take', 'which payment methods do you take', 'how do i send the money', 'is a deposit needed'],
             concepts: ['@price'],
             keywords: ['price', 'cost', 'rate', 'charge', 'expensive', 'budget'],
+            /* "what would a week come to" is a price question phrased without
+               any of the words above. */
             questionTypes: ['how_much', 'what'],
             examples: ['how much does it cost', 'what are your rates', 'price per night', 'how much per night',
                 'what is the tariff', 'is it expensive', 'cost for 3 nights', 'what does a weekend cost',
                 'rates for december', 'how much for the whole villa', 'give me a quote', 'nightly price',
                 'what is the charge', 'how much money for two nights', 'daily rent'],
-            patterns: [/\bhow much\b.*\b(night|stay|cost|villa|it)\b/, /\bwhat.*(price|rate|tariff|cost)\b/],
+            patterns: [/\b(come to|work out at|set (us|me) back)\b/,
+                /\bhow much\b.*\b(night|stay|cost|villa|it)\b/, /\bwhat.*(price|rate|tariff|cost)\b/],
             answer: function (ctx) {
                 var e = ctx.entities || {};
 
@@ -371,12 +376,17 @@
             id: 'availability',
             negativeExamples: ['how many bedrooms are there', 'how many people does it fit', 'number of bathrooms'],
             concepts: ['@book'],
-            keywords: ['available', 'book', 'reserve', 'vacancy', 'free'],
+            keywords: ['available', 'book', 'reserve', 'vacancy'],
+            /* 'free' alone is ambiguous — free of charge, or unoccupied. Only
+               the second sense belongs here, and a date word is what tells
+               them apart. */
             examples: ['is it available', 'do you have availability', 'can i book for next weekend',
                 'i want to book', 'is the villa free in december', 'any vacancy', 'can we reserve it',
                 'i would like to make a reservation', 'is it open on the 20th', 'book it for me',
                 'are you free next friday', 'want to stay for 3 nights'],
-            patterns: [/\b(is|are) (it|the villa|you) (available|free|open|booked)\b/, /\bi (want|would like|wanna|need) to (book|reserve|stay)\b/],
+            patterns: [/\bfree\b[^.?]{0,20}\b(week|weekend|night|date|month|day|then)\b/,
+                /\b(get|have|take) (it|the (place|villa|house))\b/,
+                /\b(is|are) (it|the villa|you) (available|free|open|booked)\b/, /\bi (want|would like|wanna|need) to (book|reserve|stay)\b/],
             answer: function (ctx) {
                 var e = ctx.entities || {};
                 var bits = [];
@@ -398,14 +408,16 @@
             id: 'capacity',
             negativeExamples: ['is the villa free in december', 'can i book those dates', 'any vacancy'],
             concepts: ['@bedroom'],
-            keywords: ['bedroom', 'sleep', 'capacity', 'people', 'accommodate'],
+            keywords: ['bedroom', 'sleep', 'capacity', 'people', 'accommodate',
+                'fit', 'big', 'group', 'family', 'families'],
             questionTypes: ['how_many'],
             examples: ['how many bedrooms', 'how many people can stay', 'does it sleep 6', 'how many can it accommodate',
                 'is there room for 8', 'how many beds', 'we are 5 people will it fit', 'number of rooms',
                 'can 7 of us stay', 'is it a 2 bhk', 'how many bathrooms', 'will 8 of us fit',
                 'is it big enough for 10 of us'],
             patterns: [/\bhow many (bedroom|room|bed|people|guest|bathroom)/, /\b(sleep|accommodate|fit)s? (\d+|us)\b/,
-                /\b(can|will|would|does it|is it big enough for)\b[^?]{0,20}\b\d{1,2} of us\b/],
+                /\b(can|will|would|does it|is it big enough for)\b[^?]{0,20}\b\d{1,2} of us\b/,
+                /\b(fit|big enough|large enough|room for|space for|enough (room|space|beds))\b/],
             answer: function (ctx) {
                 var e = ctx.entities || {};
                 var base = FACTS.bedrooms + ' bedrooms and ' + FACTS.bathrooms + ' bathrooms, sleeping ' +
@@ -464,9 +476,10 @@
             negativeExamples: ['can you provide a chef', 'is breakfast served', 'where can we eat out',
                 'can you arrange a cook', 'is there a chef available'],
             concepts: ['@kitchen'],
-            keywords: ['kitchen', 'cook', 'stove', 'fridge'],
+            keywords: ['kitchen', 'cook', 'stove', 'fridge', 'utensils', 'selfcater'],
             examples: ['is there a kitchen', 'can we cook', 'does the kitchen have a fridge',
-                'are utensils provided', 'is there a stove', 'can i make my own food'],
+                'are utensils provided', 'is there a stove', 'can i make my own food',
+                'are we self catering', 'is it self catered', 'do we feed ourselves'],
             patterns: [/\bkitchen\b/, /\bcan (we|i) cook\b/],
             answer: function () {
                 return 'There is a kitchen — ' + FACTS.kitchen + '. ' + 'And ' + FACTS.cook + '.';
@@ -476,11 +489,12 @@
             id: 'food',
             negativeExamples: ['is there a fridge', 'are utensils provided', 'is there a gas stove'],
             concepts: ['@food'],
-            keywords: ['food', 'breakfast', 'meal', 'restaurant', 'chef'],
+            keywords: ['food', 'breakfast', 'meal', 'restaurant', 'chef', 'dinner', 'lunch'],
             examples: ['is breakfast included', 'do you serve food', 'are there restaurants nearby',
                 'can you arrange a cook', 'where do we eat', 'is there a chef', 'food options',
                 'can we order in'],
-            patterns: [/\bbreakfast\b/, /\b(serve|provide|include).*(food|meal)/],
+            patterns: [/\b(can|could|will) (someone|somebody|anyone) cook\b/,
+                /\bbreakfast\b/, /\b(serve|provide|include).*(food|meal)/],
             answer: function () {
                 return 'Breakfast is ' + FACTS.breakfast + '. ' + FACTS.cook.charAt(0).toUpperCase() + FACTS.cook.slice(1) +
                     '. There are also plenty of shacks and restaurants around ' + FACTS.beachName + ', and delivery apps cover the area.';
@@ -517,6 +531,7 @@
         },
         {
             id: 'airport',
+            negativeExamples: ['can you organise a car from the airport', 'will you send a vehicle to meet the flight'],
             concepts: ['@airport'],
             keywords: ['airport', 'flight', 'dabolim'],
             questionTypes: ['how_far'],
@@ -539,7 +554,9 @@
             examples: ['can you arrange a pickup', 'do you provide transport', 'is a taxi available',
                 'can i rent a scooter', 'how do we get around', 'do you have a driver'],
             patterns: [/\b(pick ?up|drop off|taxi|cab|driver|chauffeur)\b/,
-                /\b(rent|hire)\w*\s+(a\s+|an\s+)?(scooter|bike|moped|motorbike|car|vehicle)\b/],
+                /\b(rent|hire)\w*\s+(a\s+|an\s+)?(scooter|bike|moped|motorbike|car|vehicle)\b/,
+                /\b(collect|meet|fetch) (us|me|you)\b/,
+                /\b(car|ride|lift) (from|to) the airport\b/],
             negativeExamples: ['what time can we arrive', 'can we leave luggage before check in',
                 'where do i park the car'],
             answer: function () {
@@ -554,11 +571,14 @@
                Renting one is transport; this intent is only about where to
                leave it once you have it. */
             keywords: ['parking', 'park', 'vehicle'],
+            /* 'car' cannot be a bare keyword here or it steals vehicle hire,
+               but leaving one somewhere is unambiguously parking. */
             negativeExamples: ['can i rent a scooter', 'can we hire a car', 'do you have a driver',
                 'how do we get around'],
             examples: ['is there parking', 'where do i park', 'can i park two cars', 'is parking free',
                 'somewhere to keep the scooter'],
-            patterns: [/\bpark(ing)?\b/],
+            patterns: [/\b(leave|keep|put|store)\s+(the\s+|our\s+|a\s+)?(car|vehicle|scooter|bike)\b/,
+                /\bpark(ing)?\b/],
             answer: function () { return 'Yes — ' + fact(FACTS.parking) + '. Scooters park inside too.'; }
         },
         {
@@ -624,12 +644,13 @@
         {
             id: 'parties',
             concepts: ['@party'],
-            keywords: ['party', 'event', 'celebration', 'music'],
+            keywords: ['party', 'event', 'celebration', 'music', 'birthday', 'wedding', 'guests'],
             negativeExamples: ['is extra staff available for a celebration',
                 'can you arrange catering for a get together', 'can a caterer come in'],
             examples: ['can we throw a party', 'are events allowed', 'can we play loud music',
                 'is it ok for a birthday celebration', 'can we host a wedding', 'bachelor party'],
-            patterns: [/\b(part(y|ies)|event|celebration|wedding|dj)\b/],
+            patterns: [/\b(hold|throw|host|have) (a|an|our) [a-z ]{0,18}(party|do|bash|event|wedding|birthday)\b/,
+                /\b(part(y|ies)|event|celebration|wedding|dj)\b/],
             answer: function (ctx) {
                 return (ctx.negated ? 'Correct — ' : 'House policy: ') + fact(FACTS.parties) +
                     '. A quiet family celebration is fine — a full event is not. ' +
@@ -663,10 +684,12 @@
             id: 'payment',
             negativeExamples: ['what is the nightly rate', 'how much for a week', 'is it expensive'],
             concepts: ['@pay'],
-            keywords: ['pay', 'payment', 'upi', 'card', 'deposit'],
+            keywords: ['pay', 'payment', 'upi', 'card', 'deposit', 'upfront', 'advance',
+                'transfer', 'send'],
             examples: ['how do i pay', 'do you take cards', 'is upi accepted', 'can i pay cash',
                 'how much advance is needed', 'is there a security deposit', 'when do i pay the balance'],
-            patterns: [/\bhow.*(do i|to) pay\b/, /\b(upi|deposit|advance)\b/],
+            patterns: [/\bhow.*(do i|to) pay\b/, /\b(upi|deposit|advance)\b/,
+                /\b(up ?front|in advance|send (the |you )?(money|payment)|how do i pay|make the payment)\b/],
             answer: function () {
                 return 'Payment is by ' + fact(FACTS.payments) + '. Terms are ' + FACTS.deposit +
                     ', plus a refundable security deposit of ' + fact(FACTS.securityDeposit) + '.';
@@ -763,7 +786,10 @@
                 'can you organise a birthday dinner', 'is extra staff available for a celebration',
                 'can you set up decorations', 'we want to host a lunch for twelve',
                 'can a caterer come in', 'can you arrange a special dinner'],
-            patterns: [/\b(cater|gathering|get.?together|celebrat|decoration)\b/],
+            /* Negative lookbehind on "self": self-catering means cooking for
+               yourself, which is the kitchen's business and very nearly the
+               opposite of hiring a caterer. */
+            patterns: [/\b(?<!self.)(cater|gathering|get.?together|celebrat|decoration)\b/],
             negativeExamples: ['can we throw a party', 'is loud music allowed', 'can we host a wedding'],
             answer: function () {
                 return 'For something small and private the house is well set up: the kitchen is ' +
@@ -825,10 +851,12 @@
             id: 'activities',
             negativeExamples: ['what does it cost', 'how much per night'],
             concepts: ['@activity'],
-            keywords: ['activities', 'nearby', 'attractions', 'nightlife'],
+            keywords: ['activities', 'nearby', 'attractions', 'nightlife', 'around', 'area', 'visit'],
             examples: ['what is there to do nearby', 'any attractions around', 'what can we do',
                 'is there nightlife', 'places to visit', 'things to see', 'any water sports'],
-            patterns: [/\bwhat.*(to do|is there to see)\b/, /\b(attraction|sightsee|nightlife|watersport)/],
+            patterns: [/\bwhat (is|are) there to (do|see)\b/,
+                /\bwhat do (people|you|visitors) do\b/,
+                /\bwhat.*(to do|is there to see)\b/, /\b(attraction|sightsee|nightlife|watersport)/],
             answer: function () {
                 return 'Plenty within reach — ' + FACTS.beachName + ' and the shacks along it, the Saturday night market, ' +
                     'old Portuguese houses around Loutulim and Chandor, spice farms inland, and Palolem a bit further south. ' +
@@ -871,9 +899,11 @@
         },
         {
             id: 'complaint',
+            keywords: ['useless', 'rubbish', 'terrible', 'awful', 'hopeless', 'annoying'],
             examples: ['this is useless', 'you are not helping', 'you are stupid', 'terrible bot',
                 'you do not understand anything', 'this is frustrating', 'worst chat ever'],
-            patterns: [/\b(useless|stupid|dumb|terrible|worst|rubbish|not helping|waste of time)\b/],
+            patterns: [/\b(not (much|very) (use|good|helpful)|no help|waste of time)\b/,
+                /\b(useless|stupid|dumb|terrible|worst|rubbish|not helping|waste of time)\b/],
             weight: 0.95,
             answer: function () {
                 return 'Fair enough — I only know what I have been told about the villa, and I am clearly missing what you need. ' +
