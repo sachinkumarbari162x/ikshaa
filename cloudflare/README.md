@@ -5,8 +5,9 @@ is `dist/`, the same directory Netlify publishes, produced by the same
 `npm run build`. Two copies of a site are two sites, and the one nobody is
 looking at is always the one that is wrong.
 
-Nothing in the existing setup is removed by any of this. Netlify keeps
-serving `ikshaa.netlify.app` throughout.
+Cloudflare is now where this site is published. Netlify served it during the
+comparison and still holds the old deployment; nothing there was deleted, it
+is simply no longer the target.
 
 ---
 

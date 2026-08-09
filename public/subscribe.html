@@ -124,15 +124,45 @@
         <!-- The confirmation. Hidden until the form has actually been posted;
              script.js reveals it when it sees ?subscribed=1 on the URL, which
              is where the host sends the visitor after a successful submit. -->
+        <!-- Shown after the form is submitted, and again after the link in the
+             email is clicked. script.js rewrites the words per outcome; the
+             photograph and the two ways onward stay the same.
+
+             The Airbnb link is here on purpose. Somebody who has just handed
+             over their address is the most interested they will ever be, and
+             a page that only says "thank you" wastes that. It is offered, not
+             forced — the quieter link back to the house sits beside it. -->
         <div class="subscribeCard subscribeThanks" id="subscribeThanks" hidden>
-            <p class="eyebrow">Thank you</p>
-            <h2 class="sectionTitle">You are on the list</h2>
-            <p class="bodyText">
-                The first letter will reach you within the week. If it does not, look in your
-                spam folder once — and if it is not there either, write to us directly at
-                <a href="mailto:nyaragoa@gmail.com">nyaragoa@gmail.com</a>.
-            </p>
-            <a class="ctaButton" href="index.html">Back to the villa</a>
+            <div class="thanksFigure">
+                <img src="./media/images/machilaChairInCourtyard.avif" alt=""
+                     width="1200" height="1804" loading="lazy" decoding="async">
+            </div>
+
+            <div class="thanksBody">
+                <p class="eyebrow" id="thanksEyebrow">Thank you</p>
+                <h2 class="sectionTitle" id="thanksTitle">Check your inbox</h2>
+                <p class="bodyText" id="thanksText">
+                    One more step: we have sent you a note with a link in it. Clicking that link
+                    is what puts you on the list — nothing is sent until you do.
+                </p>
+
+                <!-- Only shown while a confirmation is outstanding. Naming the
+                     sender and the subject is the difference between somebody
+                     finding the email and giving up on it. -->
+                <ul class="thanksHints" id="thanksHints">
+                    <li>It comes from <strong>Carman</strong>, subject
+                        <em>&ldquo;Confirm your letters from Ikshaa&rdquo;</em>.</li>
+                    <li>If it is not there in a minute, look in spam or promotions once.</li>
+                    <li>Still nothing? Write to
+                        <a href="mailto:nyaragoa@gmail.com">nyaragoa@gmail.com</a> and we will sort it.</li>
+                </ul>
+
+                <div class="thanksActions">
+                    <a class="ctaButton" href="https://www.airbnb.co.in/rooms/17852391"
+                       target="_blank" rel="noopener noreferrer">See dates on Airbnb</a>
+                    <a class="thanksQuiet" href="index.html">Back to the villa</a>
+                </div>
+            </div>
         </div>
 
         <div class="subscribeCard" id="subscribeCard">

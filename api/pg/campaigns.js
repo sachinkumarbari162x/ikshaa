@@ -20,6 +20,7 @@
  * ========================================================================= */
 
 const { LIMITS } = require('../validate');
+const { letter } = require('../emails/messages');
 
 /* Attempts before a row is given up on. Five with the backoff below spans
    about half an hour, which covers a provider blip without hammering one
@@ -175,16 +176,34 @@ async function sendBatch(pool, transport, options = {}) {
   let retrying = 0;
 
   for (const row of rows) {
-    const letter = byId.get(String(row.campaign_id));
+    const found = byId.get(String(row.campaign_id));
     try {
-      if (!letter) {
+      if (!found) {
         throw new Error('campaign disappeared between claim and send');
       }
+      /* Composed here rather than in the transport, so every provider gets
+         the same letter and the HTML cannot drift from the plain text.
+
+         The unsubscribe link is per-recipient: one shared link would either
+         need them to type their address, or would let anyone remove anyone. */
+      const unsubscribe = options.unsubscribeBase
+        ? options.unsubscribeBase.replace(/\/$/, '') +
+          '/unsubscribe?email=' + encodeURIComponent(row.email)
+        : '';
+
+      const composed = letter({
+        subject: found.subject,
+        body: found.body,
+        unsubscribe: unsubscribe,
+        bookingUrl: options.bookingUrl,
+      });
+
       await transport.send({
         to: row.email,
-        subject: letter.subject,
-        body: letter.body,
-        campaign: letter.slug,
+        subject: composed.subject,
+        body: composed.text,
+        html: composed.html,
+        campaign: found.slug,
       });
       await markSent(pool, row.id);
       sent++;

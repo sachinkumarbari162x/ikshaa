@@ -14,6 +14,13 @@ compatibility_date = "2026-01-01"
 # expects a slice of the Node API to exist.
 compatibility_flags = ["nodejs_compat"]
 
+# Every fifteen minutes. Not "weekly" — the timer only DRAINS what somebody
+# has already written and queued, so a frequent, small tick sends a campaign
+# promptly and keeps each run well inside the wall-clock limit. A weekly cron
+# would mean a letter queued on Tuesday waited until Sunday.
+[triggers]
+crons = ["*/15 * * * *"]
+
 [observability]
 enabled = true                      # logs, without which a 500 is a mystery
 
@@ -23,16 +30,37 @@ enabled = true                      # logs, without which a 500 is a mystery
 [vars]
 # Which origins may call this from a browser. NOT "*": a wildcard lets any
 # page on the internet post subscriptions in your visitors' names.
-ALLOWED_ORIGINS = "https://ikshaa.pages.dev,https://ikshaa.netlify.app"
+# Cloudflare Pages only. Netlify was here while both hosts were live during
+# the comparison; leaving it would keep granting a host we no longer publish
+# to the right to post subscriptions in a visitor's name.
+ALLOWED_ORIGINS = "https://ikshaa.pages.dev"
 
 # Where the confirmation link points. Must be THIS worker's public hostname,
 # because that is what serves /api/confirm.
-PUBLIC_BASE_URL = "https://ikshaa-api.<your-subdomain>.workers.dev"
+PUBLIC_BASE_URL = "https://ikshaa-api.sachinkumarbari162x.workers.dev"
+
+# Where a guest is sent AFTER confirming. Different from the line above: that
+# one is this API, this one is the site. Unset means /api/confirm answers
+# JSON to everybody, which is correct for a Worker with no site in front.
+PUBLIC_SITE_URL = "https://ikshaa.pages.dev"
 
 # Who the confirmation email is from. Must be a domain verified with the mail
 # provider — sending as an address you do not control is the fastest way to
 # be filtered everywhere.
-MAIL_FROM = "Carman <carman@brownodin.com>"
+# brownodin.com is verified with Resend: DKIM at resend._domainkey, SPF and
+# the bounce path on send.brownodin.com, DMARC at p=none.
+#
+# NOT the client domain that was already on the other Resend account. This
+# newsletter builds its own sending reputation and cannot damage theirs.
+#
+# When Ikshaa gets a domain of its own, change this and verify that one --
+# reputation does not transfer between domains.
+MAIL_FROM = "Carman at Ikshaa <carman@brownodin.com>"
+
+# Where a reply goes. The From address can send but not receive, and the
+# form tells guests a person reads what they write -- so this has to be a
+# mailbox somebody actually opens.
+MAIL_REPLY_TO = "nyaragoa@gmail.com"
 
 # ---------------------------------------------------------------------------
 # Secrets. NOT here. Set them with wrangler, which stores them on Cloudflare:

@@ -2869,3 +2869,87 @@ body.newsletterOpen {
 .fieldWarnFix:hover {
   opacity: 0.85;
 }
+
+/* The page somebody lands on after subscribing, and again after confirming.
+   Split like the newsletter modal — photograph one side, words the other —
+   so the two read as the same family. */
+.subscribeThanks {
+  display: grid;
+  gap: clamp(24px, 4vw, 44px);
+  text-align: left;
+  padding: 0;
+  overflow: hidden;
+}
+@media (min-width: 760px) {
+  .subscribeThanks {
+    grid-template-columns: 5fr 7fr;
+    align-items: stretch;
+  }
+}
+
+.thanksFigure {
+  min-height: 220px;
+  background-color: #d9cdb8;
+}
+.thanksFigure img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thanksBody {
+  padding: clamp(28px, 4vw, 52px);
+  padding-left: clamp(28px, 4vw, 20px);
+}
+@media (min-width: 760px) {
+  .thanksBody { padding-left: 0; }
+}
+.subscribeThanks .sectionTitle,
+.subscribeThanks .bodyText {
+  text-align: left;
+  margin-left: 0;
+}
+.subscribeThanks .bodyText { max-width: 42ch; }
+
+.thanksHints {
+  list-style: none;
+  margin: 0 0 2em;
+  padding: 0;
+  font-size: var(--text-sm);
+  line-height: 1.65;
+  opacity: 0.78;
+}
+.thanksHints li {
+  position: relative;
+  padding-left: 1.4em;
+  margin-bottom: 0.5em;
+}
+.thanksHints li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--accent);
+}
+.thanksHints[hidden] { display: none; }
+
+.thanksActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.4em;
+}
+/* The secondary way onward. A link, not a second button — two buttons of
+   equal weight make somebody choose instead of act. */
+.thanksQuiet {
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  color: inherit;
+  opacity: 0.6;
+  text-underline-offset: 3px;
+}
+.thanksQuiet:hover { opacity: 0.95; }

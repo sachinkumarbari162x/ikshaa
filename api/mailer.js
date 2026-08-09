@@ -14,8 +14,12 @@
  * schedules, or the outbox at all.
  * ========================================================================= */
 
-const fs = require('fs');
-const path = require('path');
+/* fs and path are required lazily, inside fileTransport alone.
+ *
+ * httpTransport is nothing but fetch, so it runs unchanged in a Cloudflare
+ * Worker — but only if importing this module does not drag the filesystem in
+ * with it. A Worker has no fs, and the import would throw before any
+ * transport could be chosen. */
 
 /* ---------------------------------------------------------------------
  * Development
@@ -27,6 +31,8 @@ const path = require('path');
  * confirmations needs a real provider to develop against, and an accidental
  * send to a real list is not something you can take back. */
 function fileTransport(options = {}) {
+  const fs = require('fs');
+  const path = require('path');
   const dir = options.dir || path.join(__dirname, '..', 'data', 'outbox-preview');
   fs.mkdirSync(dir, { recursive: true });
 
@@ -34,13 +40,14 @@ function fileTransport(options = {}) {
     name: 'file',
     async send(letter) {
       const safe = String(letter.to).replace(/[^a-z0-9._@-]/gi, '_');
+      const path = require('path');
       const file = path.join(dir, Date.now() + '-' + safe + '.txt');
-      fs.writeFileSync(file,
+      require('fs').writeFileSync(file,
         'To: ' + letter.to + '\n' +
         'Subject: ' + letter.subject + '\n' +
         'Campaign: ' + letter.campaign + '\n' +
         '\n' + letter.body + '\n', 'utf8');
-      return { id: path.basename(file) };
+      return { id: file.split(/[\\/]/).pop() };
     },
   };
 }
@@ -88,8 +95,13 @@ function httpTransport(options = {}) {
         body: JSON.stringify({
           from: from,
           to: [letter.to],
+          reply_to: options.replyTo || process.env.MAIL_REPLY_TO || undefined,
           subject: letter.subject,
+          /* Both parts when the caller composed both. Text alone would throw
+             away the design; HTML alone is a mild spam signal and unreadable
+             on anything that does not render it. */
           text: letter.body,
+          html: letter.html || undefined,
           headers: headers,
         }),
       });

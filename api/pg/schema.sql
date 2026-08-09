@@ -47,7 +47,13 @@ CREATE TABLE IF NOT EXISTS subscribers (
 
     -- Null means subscribed. Unsubscribing is not a delete: the row is the
     -- record that consent was given and later withdrawn.
-    unsubscribed_at TIMESTAMPTZ
+    unsubscribed_at TIMESTAMPTZ,
+
+    -- When the single confirmation reminder went out. Its whole purpose is
+    -- to be set once: without it a nightly job would nudge the same person
+    -- every night, which is the behaviour that earns spam complaints and is
+    -- exactly what somebody who has not confirmed did not agree to.
+    reminded_at     TIMESTAMPTZ
 );
 
 -- ---------------------------------------------------------------------------
@@ -126,3 +132,12 @@ CREATE TABLE IF NOT EXISTS outbox (
 CREATE INDEX IF NOT EXISTS outbox_due
     ON outbox (status, visible_at)
     WHERE status IN ('queued', 'sending');
+
+-- Additive migration for databases created before the reminder existed.
+ALTER TABLE subscribers ADD COLUMN IF NOT EXISTS reminded_at TIMESTAMPTZ;
+
+-- Who is due a nudge: subscribed, never confirmed, never reminded, and old
+-- enough that the first email has had a fair chance to be seen.
+CREATE INDEX IF NOT EXISTS subscribers_awaiting_reminder
+    ON subscribers (created_at)
+    WHERE confirmed_at IS NULL AND reminded_at IS NULL AND unsubscribed_at IS NULL;

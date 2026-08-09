@@ -19,6 +19,10 @@
 
 import { Pool } from '@neondatabase/serverless';
 import * as store from '../../api/pg/db.js';
+import { confirmation } from '../../api/emails/messages.js';
+import * as campaigns from '../../api/pg/campaigns.js';
+import { httpTransport } from '../../api/mailer.js';
+import { drainOutbox, sendReminders } from './scheduled.js';
 
 /* Only these origins may call the API from a browser.
  *
@@ -150,7 +154,7 @@ export default {
            the browser. Returning it would let whoever typed an address
            confirm it themselves, which is the whole thing opt-in prevents. */
         if (result.confirmToken) {
-          ctx.waitUntil(sendConfirmation(env, body.email, result.confirmToken));
+          ctx.waitUntil(sendConfirmation(env, body.email, result.confirmToken, body.name));
         }
 
         return json(request, env, result.created ? 201 : 200, {
@@ -161,13 +165,38 @@ export default {
         });
       }
 
+      /* The link people actually click, from an email client.
+       *
+       * A browser gets sent back to the site; anything asking for JSON gets
+       * JSON. The difference matters: a guest who clicks a confirmation link
+       * and is shown {"ok":true} has been handed a debugging artefact, not a
+       * confirmation, and has no idea whether it worked. Tests and scripts
+       * still want the object, so this negotiates rather than picking one. */
       if (route === '/api/confirm' && request.method === 'GET') {
         const result = await store.confirm(pool, url.searchParams.get('token'));
-        if (!result.ok) {
-          const status = result.reason === 'expired' ? 410 : 400;
-          return json(request, env, status, { ok: false, reason: result.reason });
+
+        const wantsJson = (request.headers.get('Accept') || '').includes('application/json');
+        if (wantsJson || !env.PUBLIC_SITE_URL) {
+          const status = result.ok ? 200 : (result.reason === 'expired' ? 410 : 400);
+          return new Response(JSON.stringify(result), {
+            status,
+            headers: {
+              'Content-Type': 'application/json; charset=utf-8',
+              'Cache-Control': 'no-store',
+              ...corsHeaders(request, env),
+            },
+          });
         }
-        return json(request, env, 200, { ok: true, already: result.already });
+
+        const outcome = result.ok
+          ? (result.already ? 'already' : 'yes')
+          : result.reason;                       // unknown | expired | missing
+
+        return Response.redirect(
+          env.PUBLIC_SITE_URL.replace(/\/$/, '') +
+            '/subscribe.html?confirmed=' + encodeURIComponent(outcome),
+          302
+        );
       }
 
       /* ---- owner only ---- */
@@ -214,6 +243,39 @@ export default {
       return json(request, env, 500, { error: 'server error' });
     }
   },
+
+  /* ---------------------------------------------------------------------
+   * The timer.
+   *
+   * Sends what is queued and nudges the unconfirmed. It never composes a
+   * letter: writing the week is a human act, and a cron that invented
+   * content and mailed it would be the worst thing this system could do.
+   * ------------------------------------------------------------------ */
+  async scheduled(event, env, ctx) {
+    if (!env.DATABASE_URL) {
+      console.warn('[cron] no database configured');
+      return;
+    }
+
+    const pool = store.createPool({ pool: new Pool({ connectionString: env.DATABASE_URL }) });
+    const log = (...args) => console.log('[cron]', ...args);
+
+    try {
+      const transport = httpTransport({
+        apiKey: env.MAIL_API_KEY,
+        from: env.MAIL_FROM,
+        endpoint: env.MAIL_ENDPOINT,
+        unsubscribeBase: env.PUBLIC_BASE_URL,
+      });
+
+      /* Sequential, not parallel. Both talk to the same provider, and a young
+         sending domain should not open two bursts at once. */
+      await drainOutbox(pool, campaigns, transport, log);
+      await sendReminders(pool, env, log);
+    } catch (e) {
+      console.error('[cron]', e && e.stack);
+    }
+  },
 };
 
 /* ---------------------------------------------------------------------
@@ -226,7 +288,18 @@ export default {
  * unconfirmed, and therefore unmailable, which is the safe end of the
  * failure. Nothing here silently promotes an unconfirmed address.
  * ------------------------------------------------------------------ */
-async function sendConfirmation(env, email, token) {
+
+/* ---------------------------------------------------------------------
+ * The confirmation email
+ *
+ * Sent with ctx.waitUntil so the visitor is not kept waiting on a mail
+ * provider — the response goes back as soon as the row is written.
+ *
+ * With no MAIL_API_KEY the subscription is still recorded; it simply stays
+ * unconfirmed, and therefore unmailable, which is the safe end of the
+ * failure. Nothing here silently promotes an unconfirmed address.
+ * ------------------------------------------------------------------ */
+async function sendConfirmation(env, email, token, name) {
   if (!env.MAIL_API_KEY || !env.MAIL_FROM || !env.PUBLIC_BASE_URL) {
     console.warn('[mail] not configured — %s stays unconfirmed', email);
     return;
@@ -234,6 +307,11 @@ async function sendConfirmation(env, email, token) {
 
   const link = env.PUBLIC_BASE_URL.replace(/\/$/, '') +
     '/api/confirm?token=' + encodeURIComponent(token);
+
+  /* Composed in api/emails/, shared with the Node sender. One definition of
+     what a letter from Ikshaa looks like, rather than one here and a
+     different one wherever the weekly send runs. */
+  const letter = confirmation({ link: link, name: name });
 
   const res = await fetch(env.MAIL_ENDPOINT || 'https://api.resend.com/emails', {
     method: 'POST',
@@ -244,13 +322,17 @@ async function sendConfirmation(env, email, token) {
     body: JSON.stringify({
       from: env.MAIL_FROM,
       to: [email],
-      subject: 'Confirm your letters from Ikshaa',
-      text:
-        'Someone asked for letters from Ikshaa using this address.\n\n' +
-        'If that was you, confirm here:\n' + link + '\n\n' +
-        'The link works for three days. If it was not you, ignore this — ' +
-        'nothing is sent until somebody clicks it.\n\n' +
-        'Carman\nIkshaa, Loutolim\n',
+      /* The From address sends but cannot receive — no inbound MX, on
+         purpose. The subscribe form promises "this goes to a person, not an
+         autoresponder", so replies have to land somewhere real, or that is a
+         lie the guest discovers by being bounced. */
+      reply_to: env.MAIL_REPLY_TO || undefined,
+      subject: letter.subject,
+      /* Both parts, always. Plain text is not a courtesy: some people read
+         that way, a watch or preview pane often renders it, and an
+         HTML-only message is a mild negative signal to spam filters. */
+      html: letter.html,
+      text: letter.text,
     }),
   });
 

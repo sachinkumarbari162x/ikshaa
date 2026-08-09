@@ -1176,6 +1176,93 @@ function rememberNewsletter(patch) {
   }
 }
 
+/* What the page says after somebody clicks the link in their email.
+ *
+ * The Worker redirects here with ?confirmed=… rather than showing its own
+ * JSON. Each outcome gets a different sentence, because "your link expired"
+ * and "you are already on the list" need different things from the reader —
+ * one is an action, the other is reassurance. */
+/* What the landing card says, per state.
+ *
+ * Five moments, and they need different things from the reader. "Check your
+ * inbox" is an instruction and needs the hints; "you are on the list" is
+ * reassurance and does not. "Your link expired" is a problem and must leave
+ * the form reachable, because telling somebody to try again while hiding the
+ * way to do it is a dead end.
+ *
+ * The Airbnb link is on every one of them. Somebody who has just handed over
+ * their address is the most interested they will ever be, and a page that
+ * only says thank you wastes that moment. Offered, never forced.
+ */
+const LANDING = {
+  pending: {
+    eyebrow: 'Almost there',
+    title: 'Check your inbox',
+    text: 'One more step: we have sent you a note with a link in it. Clicking that link ' +
+      'is what puts you on the list — nothing is sent until you do.',
+    hints: true,
+    formStaysUp: false,
+  },
+  yes: {
+    eyebrow: 'Confirmed',
+    title: 'You are on the list',
+    text: 'That is you. The first letter will reach you within the week — short, from the ' +
+      'house, and never more than one a week. While you are here, the dates are on Airbnb.',
+    hints: false,
+    formStaysUp: false,
+  },
+  already: {
+    eyebrow: 'Confirmed',
+    title: 'You were already on the list',
+    text: 'You confirmed this address before, and you still are. Nothing changed, and ' +
+      'nothing has been sent twice.',
+    hints: false,
+    formStaysUp: false,
+  },
+  expired: {
+    eyebrow: 'That link has expired',
+    title: 'Links last three days',
+    text: 'Yours has run out — nothing went wrong, it simply stopped working. Put your ' +
+      'address in again below and a fresh link will arrive in a moment.',
+    hints: false,
+    formStaysUp: true,
+  },
+  unknown: {
+    eyebrow: 'That link did not work',
+    title: 'Something got lost on the way',
+    text: 'Email clients sometimes cut long links in half, and a newer link replaces any ' +
+      'older one. Subscribing again below will send a fresh one.',
+    hints: false,
+    formStaysUp: true,
+  },
+};
+
+function showLanding(state) {
+  const card = document.getElementById('subscribeCard');
+  const thanks = document.getElementById('subscribeThanks');
+  const said = LANDING[state] || LANDING.unknown;
+  if (!thanks) {
+    return;
+  }
+
+  const set = (id, text) => {
+    const node = document.getElementById(id);
+    if (node) { node.textContent = text; }
+  };
+  set('thanksEyebrow', said.eyebrow);
+  set('thanksTitle', said.title);
+  set('thanksText', said.text);
+
+  const hints = document.getElementById('thanksHints');
+  if (hints) { hints.hidden = !said.hints; }
+
+  thanks.hidden = false;
+  if (card) { card.hidden = !said.formStaysUp; }
+  if (state === 'yes' || state === 'already') { rememberNewsletter({ subscribed: true }); }
+
+  thanks.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
 function initSubscribeConfirmation() {
   const card = document.getElementById('subscribeCard');
   const thanks = document.getElementById('subscribeThanks');
@@ -1183,18 +1270,22 @@ function initSubscribeConfirmation() {
     return;
   }
 
-  // The host redirects here with ?subscribed=1 after it has accepted the
-  // post, so this only ever shows for a submission that actually landed.
   const params = new URLSearchParams(window.location.search);
-  if (params.get('subscribed') !== '1') {
+
+  // Back from the link in the email.
+  const confirmed = params.get('confirmed');
+  if (confirmed) {
+    showLanding(confirmed);
     return;
   }
 
-  card.hidden = true;
-  thanks.hidden = false;
-  // Someone who has just subscribed should never be asked again.
-  rememberNewsletter({ subscribed: true });
-  thanks.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  /* Back from a native form post (no JavaScript, or the API was unreachable).
+     They are recorded but NOT confirmed, so this says "check your inbox" —
+     claiming they are subscribed would be the one lie double opt-in exists
+     to prevent. */
+  if (params.get('subscribed') === '1') {
+    showLanding('pending');
+  }
 }
 
 function initNewsletterPrompt() {
@@ -1541,21 +1632,10 @@ function initSubscribeApi() {
       const body = await res.json().catch(() => ({}));
 
       if (res.ok && body.ok) {
-        // Deliberately not "you are subscribed". They are not, until they
-        // click the link — saying otherwise would be the lie double opt-in
-        // exists to avoid.
-        form.hidden = true;
-        const thanks = document.getElementById('subscribeThanks');
-        if (thanks) {
-          const line = thanks.querySelector('.bodyText');
-          if (line && body.next === 'check-your-email') {
-            line.textContent = 'Almost — check your inbox and click the link to confirm. ' +
-              'Nothing is sent until you do. If it does not arrive, look in spam once, ' +
-              'then write to nyaragoa@gmail.com.';
-          }
-          thanks.hidden = false;
-          thanks.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+        /* Deliberately not "you are subscribed". They are not, until they
+           click. One wording table for every state, so this cannot drift
+           from what the confirmation page says. */
+        showLanding(body.next === 'already-subscribed' ? 'already' : 'pending');
         return;
       }
 
