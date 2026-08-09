@@ -1,21 +1,23 @@
 =============================================================================
- Ikshaa chat assistant — 100 questions and the answers given
+ Ikshaa chat assistant — every question, and the answer it gave
 =============================================================================
 
  Source     : https://ikshaa.pages.dev
- Run at     : 2026-08-09 23:27 UTC
- Questions  : 120, none of them from eval/corpus.js
+ Run at     : 2026-08-09 23:28 UTC
+ Turns      : 120 guest messages, none of them from eval/corpus.js
+              107 opening questions, 13 follow-ups (marked with an arrow)
 
- Each question was asked to a FRESH assistant, so no answer here depends
- on the one before it.
+ A plain question was asked to a FRESH assistant, so nothing carries over.
+ A follow-up shares its assistant with the line above it — that is the only
+ way memory and repetition can be tested at all.
 
  ---- how it went -------------------------------------------------------
 
-   answered from the facts    62   a real answer, drawn from what the villa has told us
-   deferred to the owner      33   understood, but the fact is null — says so, gives the email
-   declined by name            9   "nothing on file about X" — the villa has no such thing
-   repeat handled              0   same topic raised again — restated formally with a next step
-   did not understand         16   asked the guest to rephrase, or handed over
+   answered from the facts    70   a real answer, drawn from what the villa has told us
+   deferred to the owner      35   understood, but the fact is null — says so, gives the email
+   declined by name            8   "nothing on file about X" — the villa has no such thing
+   repeat handled              6   same topic raised again — restated formally with a next step
+   did not understand          7   asked the guest to rephrase, or handed over
                              ---
                              120
 
@@ -38,10 +40,11 @@
 
   2. Q: Is there a discount for a longer stay?
 
-     A: I did not catch that. I am good on rates, availability, the rooms and
-        pool, check-in, house rules and getting here — try me on one of those.
+     A: I do not have the nightly rates — they move with the season, so I
+        would only mislead you. The live prices are on the listing:
+        https://www.airbnb.co.in/rooms/17852391, or ask nyaragoa@gmail.com.
 
-     [topic: not understood  |  offered: What are the rates? / How many bedrooms? / Is there a pool? / Talk to a human]
+     [topic: price  |  offered: What about December? / How do I pay? / Is a deposit needed?]
 
 -----------------------------------------------------------------------------
 
@@ -77,9 +80,10 @@
 
   6. Q: whats ur cheapest month
 
-     A: I am not certain I follow. Were you asking about what it costs?
+     A: I did not catch that. I am good on rates, availability, the rooms and
+        pool, check-in, house rules and getting here — try me on one of those.
 
-     [topic: not understood  |  offered: What are the rates?]
+     [topic: not understood  |  offered: What are the rates? / How many bedrooms? / Is there a pool? / Talk to a human]
 
 -----------------------------------------------------------------------------
 
@@ -103,10 +107,11 @@
 
   9. Q: Is there a minimum stay over Christmas?
 
-     A: I did not catch that. I am good on rates, availability, the rooms and
-        pool, check-in, house rules and getting here — try me on one of those.
+     A: I do not have the nightly rates — they move with the season, so I
+        would only mislead you. The live prices are on the listing:
+        https://www.airbnb.co.in/rooms/17852391, or ask nyaragoa@gmail.com.
 
-     [topic: not understood  |  offered: What are the rates? / How many bedrooms? / Is there a pool? / Talk to a human]
+     [topic: price  |  offered: What about December? / How do I pay? / Is a deposit needed?]
 
 -----------------------------------------------------------------------------
 
@@ -208,10 +213,12 @@
 
  21. Q: Is there a garden to sit out in?
 
-     A: I did not catch that. I am good on rates, availability, the rooms and
-        pool, check-in, house rules and getting here — try me on one of those.
+     A: There are grounds around the house, and they are yours alone —
+        exclusive basis — the whole house is yours even if you book one room.
+        Dinner is provided on request; there is also a barbeque in the gazebo.
+        The pool is private, for the use of your party alone.
 
-     [topic: not understood  |  offered: What are the rates? / How many bedrooms? / Is there a pool? / Talk to a human]
+     [topic: grounds  |  offered: Is there a pool? / Can we get dinner made?]
 
 -----------------------------------------------------------------------------
 
@@ -268,19 +275,22 @@
 
  27. Q: Do you provide tea and coffee?
 
-     A: I did not catch that. I am good on rates, availability, the rooms and
-        pool, check-in, house rules and getting here — try me on one of those.
+     A: I am not certain I follow. Were you asking about food and breakfast?
 
-     [topic: not understood  |  offered: What are the rates? / How many bedrooms? / Is there a pool? / Talk to a human]
+     [topic: not understood]
 
 -----------------------------------------------------------------------------
 
  28. Q: Is there a barbecue we can use?
 
-     A: I did not catch that. I am good on rates, availability, the rooms and
-        pool, check-in, house rules and getting here — try me on one of those.
+     A: I think you are asking about the garden and outdoor space — there are
+        grounds around the house, and they are yours alone — exclusive basis —
+        the whole house is yours even if you book one room. Dinner is provided
+        on request; there is also a barbeque in the gazebo. The pool is
+        private, for the use of your party alone.
+        If that was not it, say it another way and I will try again.
 
-     [topic: not understood  |  offered: What are the rates? / How many bedrooms? / Is there a pool? / Talk to a human]
+     [topic: grounds  |  offered: What are the rates? / Is it available? / Talk to a human / Is there a pool?]
 
 -----------------------------------------------------------------------------
 
@@ -306,11 +316,14 @@
 
  31. Q: Is there a supermarket close by?
 
-     A: I have nothing on file about "supermarket" at the villa, and I would
-        rather say that than answer with something close but wrong.
-        nyaragoa@gmail.com will know for certain.
+     A: I think you are asking about food and breakfast — breakfast is
+        complimentary English breakfast every morning, plus unlimited tea,
+        coffee and juices all day. A cook can be arranged — ask when booking.
+        There are also plenty of shacks and restaurants around the virgin
+        beaches of South Goa, and delivery apps cover the area.
+        If that was not it, say it another way and I will try again.
 
-     [topic: declined  |  offered: What are the rates? / Is there a pool? / Talk to a human]
+     [topic: food  |  offered: What are the rates? / Is it available? / Talk to a human]
 
 -----------------------------------------------------------------------------
 
@@ -361,10 +374,12 @@
 
  36. Q: Can you pick us up from the railway station?
 
-     A: I did not catch that. I am good on rates, availability, the rooms and
-        pool, check-in, house rules and getting here — try me on one of those.
+     A: Airport transfers are complimentary — tell us your flight and we will
+        arrange the car. Scooters and cars are easy to rent locally and the
+        caretaker can set that up — having your own wheels makes a big
+        difference in Goa.
 
-     [topic: not understood  |  offered: What are the rates? / How many bedrooms? / Is there a pool? / Talk to a human]
+     [topic: transfer]
 
 -----------------------------------------------------------------------------
 
@@ -389,9 +404,11 @@
 
  39. Q: How far is the nearest town?
 
-     A: I am not certain I follow. Were you asking about the airport?
+     A: Ikshaa Luxury Villa is in Loutolim, South Goa. It is a 15 minute drive
+        to the virgin beaches of South Goa, and Margao station is a 10 minute
+        drive. The exact pin is shared once a booking is confirmed.
 
-     [topic: not understood  |  offered: How far is the airport? / How far is the beach?]
+     [topic: location  |  offered: How far is the airport? / How far is the beach?]
 
 -----------------------------------------------------------------------------
 
@@ -428,10 +445,11 @@
 
  43. Q: Is anyone there to let us in?
 
-     A: I did not catch that. I am good on rates, availability, the rooms and
-        pool, check-in, house rules and getting here — try me on one of those.
+     A: Check-in is flexible and check-out is flexible — nyaragoa@gmail.com
+        can give you exact times. Late arrivals are fine; early check-in
+        depends on the day before.
 
-     [topic: not understood  |  offered: What are the rates? / How many bedrooms? / Is there a pool? / Talk to a human]
+     [topic: checkin]
 
 -----------------------------------------------------------------------------
 
@@ -458,6 +476,7 @@
 
      A: I do not want to guess at the pet policy — nyaragoa@gmail.com will
         tell you straight away.
+        (Or did you mean the garden and outdoor space?)
 
      [topic: pets]
 
@@ -515,10 +534,13 @@
 
  52. Q: Can we bring our own alcohol?
 
-     A: I did not catch that. I am good on rates, availability, the rooms and
-        pool, check-in, house rules and getting here — try me on one of those.
+     A: I think you are asking about parties and events — house policy:
+        something the owner can confirm — nyaragoa@gmail.com. A quiet family
+        celebration is fine — a full event is not. If you are unsure which
+        yours is, check with the owner first on nyaragoa@gmail.com.
+        If that was not it, say it another way and I will try again.
 
-     [topic: not understood  |  offered: What are the rates? / How many bedrooms? / Is there a pool? / Talk to a human]
+     [topic: parties  |  offered: What are the rates? / Is it available? / Talk to a human]
 
 -----------------------------------------------------------------------------
 
@@ -990,16 +1012,18 @@
 
  98. Q: what can you help me with
 
-     A: I did not catch that. I am good on rates, availability, the rooms and
-        pool, check-in, house rules and getting here — try me on one of those.
+     A: I can cover rates and availability, the rooms and pool, check-in
+        times, the kitchen, house rules (pets, smoking, parties), getting here
+        from the airport, the beach, and how to pay or cancel. Just ask in
+        your own words.
 
-     [topic: not understood  |  offered: What are the rates? / How many bedrooms? / Is there a pool? / Talk to a human]
+     [topic: capabilities  |  offered: Rates / House rules / Getting here / Book it]
 
 -----------------------------------------------------------------------------
 
  99. Q: This place looks beautiful
 
-     A: Glad it appeals! It photographs well, and it holds up in person.
+     A: Thank you — the courtyard at night is the one that gets everyone.
 
      [topic: compliment]
 
@@ -1027,22 +1051,29 @@
 
 102. ↳ Q: what are your rates
 
-     A: I do not have the nightly rates — they move with the season, so I
+     A: You have asked about what it costs again, so my first answer cannot
+        have been much use. Putting it as precisely as I can:
+        I do not have the nightly rates — they move with the season, so I
         would only mislead you. The live prices are on the listing:
         https://www.airbnb.co.in/rooms/17852391, or ask nyaragoa@gmail.com.
+        If that still leaves the question open, the next step is to open the
+        live listing at https://www.airbnb.co.in/rooms/17852391, where the
+        current prices sit, and email nyaragoa@gmail.com with your exact dates
+        for a written quote.
 
-     [topic: price  |  offered: What about December? / How do I pay? / Is a deposit needed?]
+     [topic: price  |  offered: Talk to a human / What about December? / How do I pay? / Is a deposit needed?]
 
 -----------------------------------------------------------------------------
 
 103. ↳ Q: whats the price for a week
 
-     A: I do not have the nightly rates — they move with the season, so I
-        would only mislead you. The live prices are on the listing:
-        https://www.airbnb.co.in/rooms/17852391, or ask nyaragoa@gmail.com.
-        Tell them your exact dates and they will quote you properly.
+     A: I have given you everything I hold on what it costs, and saying it a
+        third time will not add to it. What will: open the live listing at
+        https://www.airbnb.co.in/rooms/17852391, where the current prices sit,
+        and email nyaragoa@gmail.com with your exact dates for a written
+        quote.
 
-     [topic: price  |  offered: What about December? / How do I pay? / Is a deposit needed?]
+     [topic: price  |  offered: Talk to a human / What about December? / How do I pay? / Is a deposit needed?]
 
 -----------------------------------------------------------------------------
 
@@ -1067,10 +1098,15 @@
 
 106. ↳ Q: is there a swimming pool
 
-     A: Yes — the pool is private, for the use of your party alone. It is not
+     A: You have asked about the pool again, so my first answer cannot have
+        been much use. Putting it as precisely as I can:
+        Yes — the pool is private, for the use of your party alone. It is not
         heated, though Goa rarely makes you want that.
+        If that still leaves the question open, the next step is to email
+        nyaragoa@gmail.com with the question exactly as you have put it here —
+        a person answers, usually quickly, and can tell you what I cannot.
 
-     [topic: pool  |  offered: Is it safe for kids? / How far is the beach?]
+     [topic: pool  |  offered: Talk to a human / Is it safe for kids? / How far is the beach?]
 
 -----------------------------------------------------------------------------
 
@@ -1089,14 +1125,19 @@
 
 108. ↳ Q: do you record inside the villa
 
-     A: I am not going to guess about cameras. Whether any are fitted, and
+     A: You have asked about safety again, so my first answer cannot have been
+        much use. Putting it as precisely as I can:
+        I am not going to guess about cameras. Whether any are fitted, and
         where, is something to get in writing before you book rather than from
         me. Write to nyaragoa@gmail.com and ask directly. The villa is let on
         an exclusive basis, so the house and grounds are yours alone, and
         Loutolim, South Goa is a quiet residential stretch that is comfortable
         to walk at night.
+        If that still leaves the question open, the next step is to ask
+        nyaragoa@gmail.com directly what is fitted and where. This is a
+        privacy question and you are entitled to a straight answer in writing.
 
-     [topic: safety]
+     [topic: safety  |  offered: Talk to a human]
 
 -----------------------------------------------------------------------------
 
@@ -1142,10 +1183,15 @@
 
 113. ↳ Q: is it heated
 
-     A: Yes — the pool is private, for the use of your party alone. It is not
+     A: You have asked about the pool again, so my first answer cannot have
+        been much use. Putting it as precisely as I can:
+        Yes — the pool is private, for the use of your party alone. It is not
         heated, though Goa rarely makes you want that.
+        If that still leaves the question open, the next step is to email
+        nyaragoa@gmail.com with the question exactly as you have put it here —
+        a person answers, usually quickly, and can tell you what I cannot.
 
-     [topic: pool  |  offered: Is it safe for kids? / How far is the beach?]
+     [topic: pool  |  offered: Talk to a human / Is it safe for kids? / How far is the beach?]
 
 -----------------------------------------------------------------------------
 
@@ -1207,10 +1253,16 @@
 
 120. ↳ Q: just tell me the price
 
-     A: I do not have the nightly rates — they move with the season, so I
+     A: You have asked about what it costs again, so my first answer cannot
+        have been much use. Putting it as precisely as I can:
+        I do not have the nightly rates — they move with the season, so I
         would only mislead you. The live prices are on the listing:
         https://www.airbnb.co.in/rooms/17852391, or ask nyaragoa@gmail.com.
+        If that still leaves the question open, the next step is to open the
+        live listing at https://www.airbnb.co.in/rooms/17852391, where the
+        current prices sit, and email nyaragoa@gmail.com with your exact dates
+        for a written quote.
 
-     [topic: price  |  offered: What about December? / How do I pay? / Is a deposit needed?]
+     [topic: price  |  offered: Talk to a human / What about December? / How do I pay? / Is a deposit needed?]
 
 -----------------------------------------------------------------------------
