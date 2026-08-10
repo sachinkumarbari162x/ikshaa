@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ikshaa — a note from Sachin</title>
+    <!-- Unlisted. Not in the sitemap, not in the menu, not indexed: this is a
+         note to one person that happens to live at a URL, which is the only
+         format that opens cleanly in WhatsApp on a phone. -->
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <meta name="theme-color" content="#2e2a24">
+
+    <!-- Self-contained on purpose. One request, nothing to wait for, works on
+         a slow connection in a village. -->
+    <style>
+        :root {
+            --ink: #2e2a24;
+            --soft: #5c554b;
+            --cream: #efe6d6;
+            --paper: #faf7f1;
+            --rule: rgba(46, 42, 36, 0.14);
+            --accent: #8c6a45;
+            --serif: Georgia, "Times New Roman", serif;
+            --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--paper);
+            color: var(--ink);
+            font-family: var(--sans);
+            font-size: 17px;
+            line-height: 1.65;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        .wrap { max-width: 34rem; margin: 0 auto; padding: 0 22px; }
+
+        header.top {
+            background: var(--ink);
+            color: var(--cream);
+            padding: 52px 0 44px;
+        }
+        header.top .wrap { padding-top: 0; }
+        .eyebrow {
+            font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
+            opacity: 0.62; margin: 0 0 14px;
+        }
+        h1 {
+            font-family: var(--serif); font-weight: 400;
+            font-size: 30px; line-height: 1.2; margin: 0 0 14px;
+        }
+        header.top p { margin: 0; opacity: 0.85; font-size: 16px; }
+
+        section { padding: 34px 0; border-bottom: 1px solid var(--rule); }
+        section:last-of-type { border-bottom: 0; }
+
+        h2 {
+            font-family: var(--serif); font-weight: 400;
+            font-size: 22px; line-height: 1.3; margin: 0 0 4px;
+        }
+        h2 + .sub {
+            font-size: 14px; color: var(--soft); margin: 0 0 16px;
+        }
+        p { margin: 0 0 15px; }
+        p:last-child { margin-bottom: 0; }
+        strong { font-weight: 600; }
+
+        /* Big, obvious, thumb-sized. She is holding a phone. */
+        .visit {
+            display: block; margin: 22px 0 0; padding: 17px 20px;
+            background: var(--ink); color: var(--cream);
+            border-radius: 12px; text-align: center; text-decoration: none;
+            font-size: 17px; letter-spacing: 0.02em;
+        }
+        .visit small { display: block; opacity: 0.6; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 4px; }
+
+        .steps { list-style: none; margin: 0; padding: 0; counter-reset: s; }
+        .steps > li {
+            counter-increment: s; position: relative;
+            padding: 0 0 20px 40px; margin: 0;
+        }
+        .steps > li::before {
+            content: counter(s); position: absolute; left: 0; top: 1px;
+            width: 26px; height: 26px; border-radius: 50%;
+            background: var(--cream); color: var(--ink);
+            font-size: 13px; font-weight: 600;
+            display: grid; place-items: center;
+        }
+        .steps h3 { margin: 0 0 4px; font-size: 16px; font-weight: 650; }
+        .steps p { margin: 0 0 6px; font-size: 15.5px; color: var(--soft); }
+        .steps a {
+            display: inline-block; margin-top: 4px;
+            color: var(--accent); font-size: 15px; font-weight: 600;
+            text-decoration: none; border-bottom: 1px solid currentColor;
+            padding-bottom: 1px;
+        }
+
+        .try {
+            background: #fff; border: 1px solid var(--rule);
+            border-radius: 10px; padding: 14px 16px; margin: 12px 0;
+            font-family: var(--serif); font-size: 16px; color: var(--ink);
+        }
+        .try span { display: block; padding: 3px 0; }
+
+        .note {
+            background: #fff; border-left: 3px solid var(--accent);
+            padding: 15px 17px; margin: 18px 0 0; border-radius: 0 8px 8px 0;
+            font-size: 15.5px;
+        }
+        .note p { margin-bottom: 10px; }
+
+        .asks { list-style: none; margin: 14px 0 0; padding: 0; }
+        .asks li {
+            padding: 11px 0 11px 26px; position: relative;
+            border-top: 1px solid var(--rule); font-size: 16px;
+        }
+        .asks li::before {
+            content: "—"; position: absolute; left: 0; color: var(--accent);
+        }
+        .asks li em { display: block; font-style: normal; font-size: 14.5px; color: var(--soft); margin-top: 2px; }
+
+        footer.end {
+            background: var(--cream); padding: 34px 0 44px;
+            font-size: 15.5px;
+        }
+        footer.end p { margin-bottom: 12px; }
+        footer.end a { color: var(--ink); }
+
+        a:focus-visible, .visit:focus-visible {
+            outline: 2px solid var(--accent); outline-offset: 3px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="top">
+        <div class="wrap">
+            <p class="eyebrow">Ikshaa · Loutolim</p>
+            <h1>I have built something for the villa, and I would like you to see it</h1>
+            <p>Ten minutes on your phone. No rush.</p>
+        </div>
+    </header>
+
+    <div class="wrap">
+
+        <section>
+            <p>Hello Carman,</p>
+            <p>Over the last few weeks I have built a new website for Ikshaa. It is
+                finished enough to look at properly, and I would rather you saw it and
+                told me what is wrong than have me keep polishing it on my own.</p>
+            <a class="visit" href="https://ikshaa.pages.dev/" target="_blank" rel="noopener">
+                Open the website
+                <small>ikshaa.pages.dev</small>
+            </a>
+        </section>
+
+        <section>
+            <h2>First, the money</h2>
+            <p class="sub">Because it is the thing people wonder about and nobody asks.</p>
+            <p><strong>This has cost you nothing, and there is nothing to pay going
+                    forward.</strong> Not for the work, not for keeping it running, not for
+                changes later. The hosting, the database and the email all sit inside free
+                allowances and will stay there comfortably.</p>
+            <p>I built it as a portfolio piece. That is why I could take the time to do it
+                properly rather than quickly.</p>
+            <div class="note">
+                <p><strong>One thing I would like to ask.</strong> If you are willing, I
+                    would like your permission to show Ikshaa in my portfolio as an example
+                    of my work.</p>
+                <p>Nothing about the site changes either way. If you would rather I did
+                    not, just say so and that is the end of it.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>How to look round it</h2>
+            <p class="sub">Phone or laptop, whichever you find easier. Both work.</p>
+
+            <ol class="steps">
+                <li>
+                    <h3>The first page</h3>
+                    <p>The big photograph changes by itself. Scroll down slowly — the
+                        rooms, the food, the village, things to do nearby.</p>
+                </li>
+                <li>
+                    <h3>The menu</h3>
+                    <p>Three small lines at the top left. Tap them and ten pages slide
+                        down. Tap the lines again to close it.</p>
+                </li>
+                <li>
+                    <h3>The villa tour — start here</h3>
+                    <p>Thirty-five photographs you walk through one at a time. Swipe, or
+                        do nothing and it moves on its own. This is the part no other
+                        villa near you has.</p>
+                    <a href="https://ikshaa.pages.dev/exploreIkshaa.html" target="_blank" rel="noopener">Open the tour</a>
+                </li>
+                <li>
+                    <h3>The gallery</h3>
+                    <p>Nine boxes, one for each part of the house. Tap a box to see the
+                        photographs full size, then swipe.</p>
+                    <a href="https://ikshaa.pages.dev/gallery.html" target="_blank" rel="noopener">Open the gallery</a>
+                </li>
+                <li>
+                    <h3>The chat — please test this one</h3>
+                    <p>The round button at the bottom right of every page. Type a
+                        question the way you would say it out loud.</p>
+                    <div class="try">
+                        <span>how many people can stay</span>
+                        <span>is there hot water</span>
+                        <span>how far is the airport</span>
+                    </div>
+                    <p>Then ask it something it cannot know — <strong>how much does it
+                            cost</strong>. It should tell you it does not know and give
+                        your email. It should never invent a price.</p>
+                    <p>That is the part worth your time. A guest trusts a website that
+                        admits what it does not know.</p>
+                </li>
+                <li>
+                    <h3>The journal</h3>
+                    <p>Four pieces about Goa — the food, the old houses of Loutolim and
+                        Chandor, and why the monsoon is worth coming for.</p>
+                    <a href="https://ikshaa.pages.dev/theBalcao.html" target="_blank" rel="noopener">Open the journal</a>
+                </li>
+                <li>
+                    <h3>The questions page</h3>
+                    <p>Seventeen questions guests ask often. Tap one and the answer
+                        opens underneath.</p>
+                    <a href="https://ikshaa.pages.dev/faq.html" target="_blank" rel="noopener">Open the questions</a>
+                </li>
+                <li>
+                    <h3>The letters</h3>
+                    <p>Put your own email in and send it. A welcome note should arrive
+                        within a minute — do check your spam folder and tell me if it
+                        lands there.</p>
+                    <a href="https://ikshaa.pages.dev/subscribe.html" target="_blank" rel="noopener">Open the signup</a>
+                </li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Two things I am not happy with</h2>
+            <p class="sub">Better you hear them from me.</p>
+            <p><strong>The photographs are small.</strong> They hold up on a phone, but on
+                a laptop screen several of them break up, and no amount of processing fixes
+                a picture that was not big enough to start with. If the photographer still
+                has the original files, they would lift every page at once. A short video
+                walk through the house would do even more.</p>
+            <p><strong>The address is temporary.</strong> Everything sits at
+                ikshaa.pages.dev. A proper domain — ikshaa.com or similar — costs very
+                little a year, and it matters: Google builds up its opinion of a site
+                against its domain and starts again from nothing when you move. The sooner
+                that is settled, the sooner all of this starts counting.</p>
+        </section>
+
+        <section>
+            <h2>What I need from you</h2>
+            <p class="sub">The site says "ask the owner" wherever I could not confirm
+                something. Every answer turns one of those into a real answer.</p>
+
+            <ul class="asks">
+                <li>Rates<em>Weekday, weekend, peak — or just tell me "the listing only", which is a fine answer</em></li>
+                <li>Minimum stay<em>And whether it changes at Christmas</em></li>
+                <li>Cancellation and deposit<em>What happens, by when, and how much is refundable</em></li>
+                <li>How guests can pay<em>Transfer, card, UPI, cash on arrival</em></li>
+                <li>Pets, smoking, parties, children<em>The four that decide a booking</em></li>
+                <li>A phone or WhatsApp number<em>The site only has your email. Most enquiries here start on WhatsApp</em></li>
+                <li>Cameras, and who is on the property overnight<em>Guests ask, and they deserve a straight answer rather than silence</em></li>
+                <li>Parking, hot water, mosquito nets<em>Small things, asked constantly</em></li>
+            </ul>
+
+            <div class="note">
+                <p><strong>One to double-check.</strong> I have taken the room numbers from
+                    your Airbnb listing — three bedrooms, four beds, two bathrooms, up to
+                    nine guests, check-in from 2pm, check-out by 11am.</p>
+                <p>The website now states those as fact. Please check them against what you
+                    would tell a guest on the phone, because if the listing is out of date
+                    anywhere, the website is too.</p>
+            </div>
+        </section>
+
+    </div>
+
+    <footer class="end">
+        <div class="wrap">
+            <p>If anything looks wrong or reads oddly, just tell me two things: which page
+                you were on, and what you saw. A photograph in the wrong place, a word
+                spelled wrong, an answer that sounds strange — all of it is quick to
+                change.</p>
+            <p><strong>Nothing is too small to mention.</strong></p>
+            <p style="margin-top:20px">— Sachin</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>

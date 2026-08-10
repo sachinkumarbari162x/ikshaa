@@ -541,7 +541,7 @@ function llmsTxt(faq) {
  * worse than no canonical at all.
  * ------------------------------------------------------------------ */
 function injectHead(html, file, extraSchema) {
-  if (file === '404.html') {
+  if (file === '404.html' || file === 'for-carman.html') {
     return html;   // noindex by design; a canonical would undo that
   }
   const head = headFor(file, extraSchema);

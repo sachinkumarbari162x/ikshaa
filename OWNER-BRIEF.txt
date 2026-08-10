@@ -124,8 +124,8 @@ long way off, and you would hear it from me before it happened, not after.
 
 
 The one thing worth spending money on is a proper domain — ikshaa.com or
-similar, which is a small yearly cost. Everything currently sits at
-ikshaa.pages.dev, and a search engine builds up its opinion of a site against
+similar, which is a small yearly cost. Everything currently sits at 
+development000.ikshaa.pages.dev, and a search engine builds up its opinion of a site against
 its domain, then starts again from nothing when you move. The sooner it is
 settled, the sooner that work starts counting.
 

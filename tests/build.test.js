@@ -236,7 +236,9 @@ describeIfBuilt('production build', () => {
     /* 404.html joins them: an error page offering a newsletter signup is
        the wrong thing to put in front of somebody who has just hit a dead
        link, and its whole job is to be short. */
-    const exempt = new Set(['subscribe.html', 'exploreIkshaa.html', '404.html']);
+    /* for-carman.html is an unlisted note to the owner, not part of the
+       site: no nav, no footer, no signup, noindex, absent from the sitemap. */
+    const exempt = new Set(['subscribe.html', 'exploreIkshaa.html', '404.html', 'for-carman.html']);
     const missing = [];
 
     for (const file of fs.readdirSync(DIST).filter((f) => f.endsWith('.html'))) {
@@ -384,7 +386,7 @@ describeIfBuilt('discoverability', () => {
     for (const file of pages()) {
       // 404.html is noindex on purpose — a canonical would invite the
       // indexing the page exists to prevent.
-      if (file === '404.html') { continue; }
+      if (file === '404.html' || file === 'for-carman.html') { continue; }
       const html = read(file);
       const missing = [];
       if (!/rel="canonical"/.test(html)) { missing.push('canonical'); }
