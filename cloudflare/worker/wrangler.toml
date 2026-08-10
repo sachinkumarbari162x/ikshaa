@@ -60,6 +60,11 @@ MAIL_FROM = "Carman at Ikshaa <carman@brownodin.com>"
 # Where a reply goes. The From address can send but not receive, and the
 # form tells guests a person reads what they write -- so this has to be a
 # mailbox somebody actually opens.
+# Where the welcome email points for dates. The listing is the authority on
+# price and availability, so the email links there rather than repeating a
+# number this system deliberately does not hold.
+BOOKING_URL = "https://www.airbnb.co.in/rooms/17852391"
+
 MAIL_REPLY_TO = "nyaragoa@gmail.com"
 
 # ---------------------------------------------------------------------------

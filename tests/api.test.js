@@ -587,3 +587,72 @@ describe('email provider policy', () => {
     }
   });
 });
+
+/* ---------------------------------------------------------------------
+ * The welcome email
+ *
+ * Now the only thing a new subscriber receives. Under double opt-in the
+ * confirmation did this job as a side effect; removing it left a form that
+ * accepted an address in silence.
+ * ------------------------------------------------------------------ */
+describe('welcome email', () => {
+  const { welcome } = require('../api/emails/messages');
+
+  const full = () => welcome({
+    name: 'Maria Fernandes', weekly: true, seasonal: true,
+    bookingUrl: 'https://www.airbnb.co.in/rooms/17852391',
+    unsubscribe: 'https://api.example.dev/unsubscribe?email=a%40b.com',
+  });
+
+  it('ships html and text, both saying the same things', () => {
+    const w = full();
+    expect(w.subject).toMatch(/welcome/i);
+    expect(w.html).toMatch(/<table|<p /);
+    // Plain text is not a courtesy: watches and preview panes render it, and
+    // an HTML-only message is a mild spam signal.
+    expect(w.text.length).toBeGreaterThan(200);
+    for (const part of [w.html, w.text]) {
+      expect(part).toMatch(/unsubscribe/i);
+      expect(part).toMatch(/airbnb\.co\.in/);
+    }
+  });
+
+  it('keeps its paragraph breaks in the text part', () => {
+    /* Regression. The optional trailing lines were filtered on falsiness,
+       which also removed every intentional blank line and collapsed the
+       whole letter into one unreadable block. */
+    const w = full();
+    expect(w.text).toMatch(/\n\n/);
+    expect(w.text.split('\n\n').length).toBeGreaterThanOrEqual(5);
+  });
+
+  it('says back exactly what was ticked', () => {
+    // A welcome describing the wrong subscription is worse than none: the
+    // reader cannot tell whether the form recorded them correctly.
+    expect(welcome({ weekly: true, seasonal: true }).text).toMatch(/once a week, and a note when the season turns/);
+    expect(welcome({ weekly: true, seasonal: false }).text).toMatch(/a letter about once a week\./);
+    expect(welcome({ weekly: false, seasonal: true }).text).toMatch(/season turns, a handful of times a year/);
+  });
+
+  it('greets by first name only, and copes without one', () => {
+    expect(full().text).toMatch(/^Dear Maria,/);
+    expect(welcome({}).text).toMatch(/^Hello,/);
+  });
+
+  it('never promises a confirmation step', () => {
+    /* The thing this email replaced. Any surviving "click the link" wording
+       would send the reader looking for a message that is never sent. */
+    const w = full();
+    for (const part of [w.html, w.text, w.subject]) {
+      expect(part).not.toMatch(/confirm/i);
+      expect(part).not.toMatch(/click the link|check your inbox/i);
+    }
+  });
+
+  it('omits the optional links rather than printing empty ones', () => {
+    const bare = welcome({ weekly: true, seasonal: true });
+    expect(bare.text).not.toMatch(/Dates:\s*$/m);
+    expect(bare.text).not.toMatch(/Stop receiving these:\s*$/m);
+    expect(bare.html).not.toMatch(/href="null"|href=""/);
+  });
+});

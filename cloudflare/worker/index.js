@@ -19,7 +19,7 @@
 
 import { Pool } from '@neondatabase/serverless';
 import * as store from '../../api/pg/db.js';
-import { confirmation } from '../../api/emails/messages.js';
+import { confirmation, welcome } from '../../api/emails/messages.js';
 import * as campaigns from '../../api/pg/campaigns.js';
 import { httpTransport } from '../../api/mailer.js';
 import { drainOutbox, sendReminders } from './scheduled.js';
@@ -190,6 +190,27 @@ export default {
         const result = await store.subscribe(pool, body, { verifiedBy: 'captcha+mx' });
         if (!result.ok) {
           return json(request, env, 422, { error: 'invalid', details: result.errors });
+        }
+
+        /* One welcome, to a genuinely new subscriber.
+         *
+         * The confirmation email used to do this as a side effect: it proved
+         * the address worked AND told the person something had happened.
+         * Removing it took the second job away with the first, and left a
+         * form that accepted an address in silence — which is how somebody
+         * concludes it did not work and submits again.
+         *
+         * `created` and not `ok`, deliberately: re-subscribing an address
+         * that is already on the list must not welcome them a second time.
+         *
+         * waitUntil, so the response does not wait on Resend. A guest who
+         * has filled in a form should not watch it spin while an SMTP
+         * provider thinks, and a slow provider must not turn a successful
+         * signup into a timeout. */
+        if (result.created) {
+          ctx.waitUntil(sendWelcome(env, body.email, body.name, {
+            weekly: result.weekly, seasonal: result.seasonal,
+          }));
         }
 
         return json(request, env, result.created ? 201 : 200, {
@@ -422,6 +443,59 @@ async function domainAcceptsMail(domain) {
   } catch (e) {
     return true;
   }
+}
+
+/* The one email a new subscriber now gets, sent the moment they sign up.
+ *
+ * It carries an unsubscribe link from the very first message. Consent that
+ * cannot be withdrawn easily is not worth much, and this is now the earliest
+ * point at which anyone can withdraw it — there is no confirmation step to
+ * simply ignore. */
+async function sendWelcome(env, email, name, prefs) {
+  if (!env.MAIL_API_KEY || !env.MAIL_FROM) {
+    console.warn('[mail] not configured — no welcome sent to %s', email);
+    return;
+  }
+
+  const base = (env.PUBLIC_BASE_URL || '').replace(/\/$/, '');
+  const letter = welcome({
+    name: name,
+    weekly: prefs && prefs.weekly,
+    seasonal: prefs && prefs.seasonal,
+    bookingUrl: env.BOOKING_URL || null,
+    unsubscribe: base ? base + '/unsubscribe?email=' + encodeURIComponent(email) : null,
+  });
+
+  await deliver(env, email, letter);
+}
+
+/* Shared by both senders. The difference between them is which words go out,
+   not how they are handed to the provider, and two copies of this drifted
+   the moment one gained a header the other did not. */
+async function deliver(env, email, letter) {
+  const res = await fetch(env.MAIL_ENDPOINT || 'https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + env.MAIL_API_KEY,
+    },
+    body: JSON.stringify({
+      from: env.MAIL_FROM,
+      to: [email],
+      /* The From address sends but cannot receive — no inbound MX, on
+         purpose. The welcome invites a reply, so those have to land
+         somewhere real or that invitation is a lie. */
+      reply_to: env.MAIL_REPLY_TO || undefined,
+      subject: letter.subject,
+      html: letter.html,
+      text: letter.text,
+    }),
+  });
+
+  if (!res.ok) {
+    console.error('[mail] provider %s: %s', res.status, (await res.text()).slice(0, 200));
+  }
+  return res.ok;
 }
 
 /* UNUSED as of the move to captcha + MX. Nothing calls this: signing up no

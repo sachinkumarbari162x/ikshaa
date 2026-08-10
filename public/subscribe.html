@@ -123,12 +123,15 @@
             </ul>
         </section>
 
-        <!-- The confirmation. Hidden until the form has actually been posted;
-             script.js reveals it when it sees ?subscribed=1 on the URL, which
-             is where the host sends the visitor after a successful submit. -->
-        <!-- Shown after the form is submitted, and again after the link in the
-             email is clicked. script.js rewrites the words per outcome; the
-             photograph and the two ways onward stay the same.
+        <!-- Shown once the form has been submitted. script.js rewrites the
+             three lines per outcome; the photograph and the two ways onward
+             stay the same.
+
+             There is no confirmation step any more, so the copy here is the
+             finished state rather than an instruction. What used to sit below
+             it — "check your inbox", and a list naming the sender and subject
+             of a confirmation email — described a step that no longer exists,
+             and was the last thing on the site still promising it.
 
              The Airbnb link is here on purpose. Somebody who has just handed
              over their address is the most interested they will ever be, and
@@ -141,23 +144,12 @@
             </div>
 
             <div class="thanksBody">
-                <p class="eyebrow" id="thanksEyebrow">Thank you</p>
-                <h2 class="sectionTitle" id="thanksTitle">Check your inbox</h2>
+                <p class="eyebrow" id="thanksEyebrow">Done</p>
+                <h2 class="sectionTitle" id="thanksTitle">You are on the list</h2>
                 <p class="bodyText" id="thanksText">
-                    One more step: we have sent you a note with a link in it. Clicking that link
-                    is what puts you on the list — nothing is sent until you do.
+                    That is everything — no link to click and nothing else to do. A short note
+                    is on its way to say hello, and the first letter follows within the week.
                 </p>
-
-                <!-- Only shown while a confirmation is outstanding. Naming the
-                     sender and the subject is the difference between somebody
-                     finding the email and giving up on it. -->
-                <ul class="thanksHints" id="thanksHints">
-                    <li>It comes from <strong>Carman</strong>, subject
-                        <em>&ldquo;Confirm your letters from Ikshaa&rdquo;</em>.</li>
-                    <li>If it is not there in a minute, look in spam or promotions once.</li>
-                    <li>Still nothing? Write to
-                        <a href="mailto:nyaragoa@gmail.com">nyaragoa@gmail.com</a> and we will sort it.</li>
-                </ul>
 
                 <div class="thanksActions">
                     <a class="ctaButton" href="https://www.airbnb.co.in/rooms/17852391"

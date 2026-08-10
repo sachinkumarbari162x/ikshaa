@@ -171,4 +171,93 @@ function letter(options) {
   return { subject: options.subject, html, text };
 }
 
-module.exports = { confirmation, reminder, letter };
+/* ---------------------------------------------------------------------
+ * Welcome
+ *
+ * Sent once, the moment somebody subscribes.
+ *
+ * Under double opt-in the confirmation email did this job as a side effect:
+ * it proved the address worked AND told the person something had happened.
+ * Removing it took the second job away with the first, and left a form that
+ * accepted an address in silence. Silence is how a person concludes it did
+ * not work, and subscribes again — or writes to ask.
+ *
+ * It also does something the confirmation could not: it is the first thing
+ * that ever arrives from this sending domain, so it establishes what the
+ * letters look like and who they are from while the reader is still
+ * expecting them. An unsubscribe link is in it from the first message,
+ * because consent that cannot be withdrawn easily is not worth much.
+ * ------------------------------------------------------------------ */
+
+function welcome(options) {
+  const settings = options || {};
+  const name = settings.name ? String(settings.name).split(/\s+/)[0] : '';
+  const hello = name ? 'Dear ' + esc(name) + ',' : 'Hello,';
+  const weekly = settings.weekly !== false;
+  const seasonal = settings.seasonal !== false;
+
+  /* Says back exactly what they ticked. A welcome that describes the wrong
+     subscription is worse than none — the reader has no way to tell whether
+     the form recorded them correctly, and this is the only chance to show it. */
+  const expect = weekly && seasonal
+    ? 'a letter about once a week, and a note when the season turns'
+    : weekly
+      ? 'a letter about once a week'
+      : seasonal
+        ? 'a note when the season turns, a handful of times a year'
+        : 'nothing at all, by the look of it &mdash; neither box was ticked';
+
+  const html = shell({
+    title: 'Welcome to the letters from Ikshaa',
+    preheader: 'You are on the list. Here is what will arrive, and how to stop it.',
+    unsubscribe: settings.unsubscribe,
+    body: `
+      <p style="margin:0 0 18px;">${hello}</p>
+
+      <p style="margin:0 0 18px;">
+        You are on the list &mdash; there is nothing further to click. From here you can
+        expect ${expect}.
+      </p>
+
+      <p style="margin:0 0 18px;">
+        They come from the house itself: what is flowering, what the cook is making,
+        what the weather has been doing to the courtyard. No offers and no campaigns.
+        If one ever reads like marketing, I have got it wrong.
+      </p>
+
+      ${settings.bookingUrl ? button(settings.bookingUrl, 'See dates for a stay') : ''}
+
+      <p style="margin:0 0 18px;color:rgba(46,42,36,0.68);font-size:15px;">
+        Reply to this if you have a question about the villa &mdash; it reaches a person,
+        not an autoresponder.
+      </p>
+
+      <p style="margin:22px 0 0;">Carman</p>`,
+  });
+
+  const text = [
+    hello.replace(/&#39;/g, "'"),
+    '',
+    'You are on the list - there is nothing further to click.',
+    'From here you can expect ' + expect.replace(/&mdash;/g, '-') + '.',
+    '',
+    'They come from the house itself: what is flowering, what the cook is',
+    'making, what the weather has been doing to the courtyard. No offers and',
+    'no campaigns. If one ever reads like marketing, I have got it wrong.',
+    '',
+    'Reply to this if you have a question about the villa - it reaches a',
+    'person, not an autoresponder.',
+    '',
+    'Carman',
+    'Ikshaa, Loutolim, South Goa',
+    'nyaragoa@gmail.com',
+    settings.bookingUrl ? '\nDates: ' + settings.bookingUrl : null,
+    settings.unsubscribe ? '\nStop receiving these: ' + settings.unsubscribe : null,
+    /* null, not '' — an empty string here IS a paragraph break, and filtering
+       on falsiness collapsed the whole letter into one block of text. */
+  ].filter((line) => line !== null).join('\n');
+
+  return { subject: 'Welcome to the letters from Ikshaa', html, text };
+}
+
+module.exports = { confirmation, reminder, letter, welcome };

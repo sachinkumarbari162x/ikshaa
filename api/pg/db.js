@@ -173,6 +173,10 @@ async function subscribe(pool, input, options) {
       // Mailable now — either they already were, or this signup verified them.
       confirmed: already || Boolean(upserted.rows[0].confirmed_at),
       verifiedBy: verifiedBy,
+      // What was actually stored, so a welcome can say back exactly what
+      // they ticked rather than guessing from the raw request body.
+      weekly: Boolean(value.weekly),
+      seasonal: Boolean(value.seasonal),
       confirmToken: token,
       confirmExpires: expires ? expires.toISOString() : null,
     };
