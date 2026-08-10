@@ -180,8 +180,10 @@ function lodgingSchema() {
     ].map(([name, yes]) => ({
       '@type': 'LocationFeatureSpecification', name: name, value: yes,
     })),
-    /* The listing is the authority on price and availability, and saying so
-       is more useful to an answer engine than silence. */
+    /* sameAs means "this is the same property elsewhere", which is what an
+       answer engine needs to reconcile the two records. It is not a claim
+       that the listing is where the facts live — bookings simply also come
+       through there. */
     sameAs: [FACTS.bookingUrl],
   };
 
@@ -467,7 +469,8 @@ function llmsTxt(faq) {
     '- Breakfast, WiFi, air conditioning and personal laundry are included',
     '- A cook can be arranged on request',
     '- Enquiries: ' + FACTS.email,
-    '- Bookings and live prices: ' + FACTS.bookingUrl,
+    '- Enquiries and quotes come from ' + FACTS.owner + ' direct at ' + FACTS.email,
+    '- Also bookable through Airbnb: ' + FACTS.bookingUrl,
     '',
     '## Pages',
     '',
@@ -528,12 +531,33 @@ function injectHead(html, file, extraSchema) {
   );
 }
 
-/* One extra link in the footer's Discover column, on every page that has one.
-   A page nothing links to is a page a crawler reaches last, if at all. */
+/* Links to the FAQ from the two places a visitor looks: the menu and the
+   footer. A page nothing links to is a page a crawler reaches last, if at
+   all — and one a guest never reaches by accident.
+ *
+ * Done here rather than in the source pages because faq.html only exists
+ * after the build assembles it; a link in public/ would point at a file that
+ * is not there until dist/ is written. */
 function linkFaq(html) {
   if (html.includes('href="faq.html"')) {
     return html;
   }
+
+  /* The nav entry, with its preview photograph. The two are paired by
+     data-preview and the widget asserts they match one for one, so adding a
+     link without an image would leave the panel showing whatever was last
+     hovered. */
+  html = html.replace(
+    /([ \t]*<li><a href="stayWithUs\.html" data-preview="stayWithUs">Stay With Us<\/a><\/li>\n)/,
+    '$1                <li><a href="faq.html" data-preview="faq">Questions</a></li>\n'
+  );
+  html = html.replace(
+    /([ \t]*<img class="previewImage" data-preview="stayWithUs"\n[ \t]*data-src="[^"]*" alt="">\n)/,
+    '$1                <img class="previewImage" data-preview="faq"\n' +
+    '                    data-src="./media/images/theCourtyard.webp" alt="">\n'
+  );
+
+  // And the footer's Discover column.
   return html.replace(
     /(<li><a href="guestBook\.html">Guest book<\/a><\/li>)/,
     '$1\n                        <li><a href="faq.html">Questions and answers</a></li>'

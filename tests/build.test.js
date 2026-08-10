@@ -557,3 +557,41 @@ describeIfBuilt('first paint', () => {
     }
   });
 });
+
+describeIfBuilt('the hero can actually be observed', () => {
+  it('keeps every slide inside the container the observer watches', () => {
+    /* The slideshow pauses itself when the hero scrolls away, via an
+       IntersectionObserver. It used to observe slides[0].parentElement, which
+       WAS the container until the photographs were wrapped in <picture> for
+       the AVIF fallback — and `picture { display: contents }` means that
+       wrapper generates no box, so the observer measured 0x0, reported
+       isIntersecting false, and froze the slideshow on its first slide.
+
+       script.js now walks up with closest('.baseContainer, .pageHero'). This
+       asserts the markup that makes that work: every slide has one of those
+       above it, and it is not the <picture>. */
+    const home = fs.readFileSync(path.join(DIST, 'index.html'), 'utf8');
+
+    const container = /<div class="baseContainer"[^>]*>([\s\S]*?)<\/div>/.exec(home);
+    expect(container).not.toBeNull();
+
+    // Every slide on the page sits inside it — none stranded outside.
+    const inside = (container[1].match(/class="slide[^"]*"/g) || []).length;
+    const total = (home.match(/class="slide[^"]*"/g) || []).length;
+    expect(total).toBeGreaterThan(1);
+    expect(inside).toBe(total);
+  });
+
+  it('gives every slide a caption to pair with', () => {
+    // showNext() pairs them BY POSITION, so a short list silently leaves the
+    // previous caption up under a new photograph.
+    const home = fs.readFileSync(path.join(DIST, 'index.html'), 'utf8');
+    const slides = (home.match(/class="slide[^"]*"/g) || []).length;
+    /* The optional-space group matters: `heroCaptions` is the CONTAINER, and
+       a looser pattern counts it as a fourteenth caption. querySelectorAll
+       matches class tokens exactly, so the browser never made that mistake —
+       only this test did. */
+    const captions = (home.match(/class="heroCaption(?: [^"]*)?"/g) || []).length;
+    expect(captions).toBe(slides);
+  });
+});

@@ -441,6 +441,60 @@ function main() {
     fs.writeFileSync(subscribeAt, page);
   }
 
+  /* ---- comments stay in the source, not on the site ------------------
+   *
+   * public/ is full of commentary explaining why things are the way they
+   * are — which bug a rule fixes, what was measured, what was tried and
+   * rejected. That is worth keeping for whoever edits it next, and it has no
+   * business being served to a visitor: view-source on a villa's website
+   * should show a villa's website, not a maintenance log.
+   *
+   * Stripped from the built copy only. Nothing in public/ is touched.
+   *
+   * Conservative on purpose. HTML and CSS comments have unambiguous
+   * delimiters. JavaScript does not — `//` appears in every https:// URL and
+   * `/*` can sit inside a string or a regex — so only block comments that
+   * OWN their line are removed, and every file is re-parsed afterwards. A
+   * stripped file that no longer parses is a broken site, so the parse is
+   * the gate rather than a courtesy. */
+  let stripped = 0;
+
+  const parses = (code) => {
+    try { new (require('vm').Script)(code); return true; } catch (e) { return false; }
+  };
+
+  const walkBuilt = (dir) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) { walkBuilt(full); continue; }
+
+      const ext = path.extname(entry.name).toLowerCase();
+      const before = fs.readFileSync(full, 'utf8');
+      let after = before;
+
+      if (ext === '.html') {
+        // Conditional comments are long dead, and none are used here.
+        after = after.replace(/<!--[\s\S]*?-->\n?/g, '');
+      } else if (ext === '.css') {
+        after = after.replace(/\/\*[\s\S]*?\*\//g, '');
+      } else if (ext === '.js') {
+        const candidate = after.replace(/^[ \t]*\/\*[\s\S]*?\*\/[ \t]*\n/gm, '');
+        after = parses(candidate) ? candidate : after;
+      } else {
+        continue;
+      }
+
+      // Collapse the blank lines the removals leave behind.
+      after = after.replace(/\n{3,}/g, '\n\n');
+
+      if (after !== before) {
+        fs.writeFileSync(full, after);
+        stripped += before.length - after.length;
+      }
+    }
+  };
+  walkBuilt(OUT);
+
   fs.writeFileSync(path.join(OUT, 'robots.txt'), seo.robotsTxt());
   fs.writeFileSync(path.join(OUT, 'sitemap.xml'), seo.sitemapXml(pages));
   fs.writeFileSync(path.join(OUT, 'llms.txt'), seo.llmsTxt(faq));

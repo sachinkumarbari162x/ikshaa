@@ -372,13 +372,12 @@
                    a sentence that said nothing, at length. */
                 if (!FACTS.rateWeekday && !FACTS.rateWeekend && !FACTS.ratePeak) {
                     var ask = 'I will not quote you a rate I cannot stand behind — they move with the ' +
-                        'season, and a wrong number is worse than none. The live prices are on the listing: ' +
-                        FACTS.bookingUrl + '.';
+                        'season, and a wrong number is worse than none. Send me your dates at ' +
+                        contact() + ' and I will quote you properly.';
                     if (e.nights || e.checkIn) {
-                        ask += ' Send me those dates at ' + contact() + ' and I will quote you properly.';
-                    } else {
-                        ask += ' Send me your dates at ' + contact() + ' and I will quote you properly.';
+                        ask = ask.replace('Send me your dates', 'Send me those dates');
                     }
+                    ask += ' You can also book us through Airbnb: ' + FACTS.bookingUrl + '.';
                     return ask;
                 }
 
@@ -1081,9 +1080,8 @@
         switch (intentId) {
             case 'price':
             case 'payment':
-                return 'open the live listing at ' + FACTS.bookingUrl +
-                    ', where the current prices sit, and send me your dates at ' + who +
-                    ' — I will quote you properly';
+                return 'send me your dates at ' + who + ' and I will quote you properly. ' +
+                    'You can also book through our Airbnb listing at ' + FACTS.bookingUrl;
             case 'availability':
                 return 'write to me at ' + who + ' with your arrival date, the number of nights and how many ' +
                     'of you there are — that is everything needed to check the calendar and hold it';

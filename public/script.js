@@ -521,7 +521,22 @@ function scheduleNext() {
 }
 
 if (slides.length > 0) {
-  const heroRoot = slides[0].parentElement;
+  /* The CONTAINER, not the slide's parent.
+   *
+   * This read slides[0].parentElement, which was the hero container right up
+   * until the photographs were wrapped in <picture> for the AVIF fallback.
+   * After that it resolved to the <picture> itself — and `picture { display:
+   * contents }`, added to stop those wrappers breaking the grid, means the
+   * element generates no box at all.
+   *
+   * An IntersectionObserver watching a boxless element measures a 0x0 rect
+   * and reports isIntersecting: false. So heroOnScreen went false on the
+   * first callback, the timer was cleared, and the slideshow stopped dead on
+   * its first slide — on every page with a hero, permanently.
+   *
+   * closest() walks up to something that actually occupies space, and keeps
+   * working whether or not a slide is wrapped. */
+  const heroRoot = slides[0].closest('.baseContainer, .pageHero') || slides[0].parentElement;
 
   if (heroRoot && 'IntersectionObserver' in window) {
     new IntersectionObserver(
