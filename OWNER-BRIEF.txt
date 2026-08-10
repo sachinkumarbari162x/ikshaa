@@ -30,9 +30,21 @@
 
 Hi Carman,
 
-The new Ikshaa website is ready to look at. Here is where it has got to.
+The new Ikshaa website is ready to look at.
 
     ikshaa.pages.dev
+
+First, so there is no confusion about money: this has cost you nothing and
+there is nothing to pay going forward. Not for the work, not for keeping it
+running, not for changes later. I built it as a portfolio piece, which is why
+I could take the time to do it properly rather than quickly.
+
+What I would like in return, if you are willing, is your permission to show
+Ikshaa in my portfolio as an example of my work — I am building a practice
+around this kind of system. Nothing about the site changes either way, and if
+you would rather I did not, please simply say so and that is the end of it.
+
+Here is where it has got to.
 
 A few things it does that an ordinary villa site does not.
 
@@ -69,11 +81,21 @@ worth coming for. It gives people a reason to stay on the site rather than
 glance and leave, and it is the sort of writing that helps Google find you.
 
 
-A ROOM-BY-ROOM TOUR
+A ROOM-BY-ROOM TOUR, AND A GALLERY THAT NEEDS BETTER PHOTOGRAPHS
 
 Thirty-five photographs you can walk through, and a separate gallery of
 thirty-seven more, sorted by room — bedrooms, bathrooms, the courtyard, the
 pool, the grounds.
+
+I have to be straight about these. The photographs I was given are small.
+They hold up on a phone, but on a laptop screen several of them break up
+visibly, and no amount of processing fixes a picture that was not big enough
+to begin with. I have squeezed what I can out of them.
+
+This is the single biggest thing holding the site back, and it is the easiest
+to fix. Original full-size files, if the photographer still has them, would
+lift every page at once. A short video walk through the house would do even
+more — that is what people expect to see now before they book somewhere.
 
 
 IT WORKS PROPERLY ON A PHONE
@@ -92,16 +114,38 @@ inventing an answer.
 
 IT COSTS ALMOST NOTHING TO RUN
 
-The hosting, the database and the email all sit inside free allowances.
+The hosting, the database and the email all sit inside free allowances, and
+they will stay there comfortably at the traffic a villa website sees.
 
+To be precise rather than reassuring: those allowances are generous but not
+infinite. If Ikshaa were ever getting thousands of people on the site at the
+same moment, we would need to pay for capacity. That is a good problem and a
+long way off, and you would hear it from me before it happened, not after.
+
+
+The one thing worth spending money on is a proper domain — ikshaa.com or
+similar, which is a small yearly cost. Everything currently sits at
+ikshaa.pages.dev, and a search engine builds up its opinion of a site against
+its domain, then starts again from nothing when you move. The sooner it is
+settled, the sooner that work starts counting.
 
 I have matched every detail to your Airbnb listing: three bedrooms, four
 beds, two bathrooms, up to nine guests, check-in from 2pm, check-out by 11am.
 Your Goa registration number, HOTS000253, is in the footer of every page, and
 the site says you have been welcoming guests since 2009.
 
-I have written a short guide below on how to look round it on your phone. It
-takes about ten minutes, and the chat is the part worth your time.
+Do check the bedroom and bathroom numbers against what you would tell a guest
+on the phone. I have taken them from the listing, and the site now states
+them as fact — so if the listing is out of date anywhere, the website is too.
+
+I have written a short guide below on how to look round it. It takes about
+ten minutes. Use a phone or a laptop, whichever you find easier — it is built
+for both.
+
+If you only look at two things, make them the villa tour and the chat. Open
+the menu, the three lines at the top left, and tap Villa Tour: thirty-five
+photographs you walk through one at a time. It is the part of the site no
+other villa near you has.
 
 There is also a list of things only you can answer. Once I have those,
 several parts of the site stop saying "ask the owner" and start giving guests
@@ -117,9 +161,11 @@ a straight answer instead.
  (this can be sent on its own — written for Carman, on a phone)
 -------------------------------------------------------------------------------
 
-Open your phone and go to:   ikshaa.pages.dev
+Open ikshaa.pages.dev on your phone, or on a laptop if you prefer a bigger
+screen. Both work.
 
-Take about ten minutes. Go in this order.
+Take about ten minutes and go in this order. Steps 3 and 5 are the ones to
+linger on.
 
 
  1.  THE FIRST PAGE

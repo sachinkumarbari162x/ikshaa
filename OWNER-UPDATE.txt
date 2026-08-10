@@ -1,3 +1,11 @@
+I have developed this project for my portfolio which will cost zero dime(development, maintanence, versioning)[letting you know 
+so that you can witness magic of my creation without overhead tension] as my basic development project which is of
+commmerical grade production system which is accessble at global level, from anycorner of world 
+with internet. I have a firm believe that this will help Ikshaa villa with better visiblity, web-presentation, 
+guest trust (it is already good), as some guests need complete information when go anywhere. More important it will
+help me with your permission -/\-(joing hands as request), I would like to place this project on my portfolio as AI SaaS Developer, which will go with my other
+projects. You Just seat-back count money. I would recommend you check the villa tour page, click on the 3 lines. check on mobile or laptop which you feel better
+there somestill confusions about rooms and bathrooms, so I have kept it open in development
 ===============================================================================
  IKSHAA — WHERE THE WEBSITE HAS GOT TO
  Prepared 10 August 2026  ·  ikshaa.pages.dev
@@ -51,7 +59,8 @@ the great houses at Loutolim and Chandor, and why the monsoon is worth coming
 for. It gives people a reason to stay on the site, and it is the sort of
 writing that helps Google find you.
 
-A ROOM-BY-ROOM TOUR
+A ROOM-BY-ROOM TOUR (Gallery pages yet to update as I was able to find poor quality -
+-images and it was difficult to refine them for development, even on laptop screen images crack)
 Thirty-five photographs you can walk through, and a gallery of another
 thirty-seven sorted by room — bedrooms, bathrooms, the courtyard, the pool,
 the grounds.
@@ -66,7 +75,9 @@ which things they must not guess at — your rates, your check-in times,
 whether there are cameras — so they point to you instead of inventing a
 figure.
 
-IT COSTS ALMOST NOTHING TO RUN
+IT COSTS ALMOST NOTHING TO RUN (AT A TESTING PHASE, UNTIL WE HAVE 1000s of guest coming at same time)
+If we can get ikshaa.com domain, our main pain will be resolved, some good quality images 
+and videos
 The hosting, the database and the email all sit inside free allowances.
 
 I have matched every detail to your Airbnb listing — three bedrooms, four
