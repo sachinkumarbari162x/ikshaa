@@ -184,7 +184,7 @@ function lodgingSchema() {
        answer engine needs to reconcile the two records. It is not a claim
        that the listing is where the facts live — bookings simply also come
        through there. */
-    sameAs: [FACTS.bookingUrl],
+    sameAs: [FACTS.bookingUrl, 'https://www.instagram.com/ikshaagoa/'],
   };
 
   if (FACTS.phone) { schema.telephone = FACTS.phone; }
@@ -471,6 +471,7 @@ function llmsTxt(faq) {
     '- Enquiries: ' + FACTS.email,
     '- Enquiries and quotes come from ' + FACTS.owner + ' direct at ' + FACTS.email,
     '- Also bookable through Airbnb: ' + FACTS.bookingUrl,
+    '- Instagram: https://www.instagram.com/ikshaagoa/',
     '',
     '## Pages',
     '',

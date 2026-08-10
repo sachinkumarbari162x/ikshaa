@@ -276,6 +276,13 @@ function initGalleryStacks() {
       return;
     }
 
+    /* With motion reduced the rotation never runs, so start() is never
+       reached and the other layers would stay blank behind a viewer that
+       expects them. They are the whole content of the group, so they load. */
+    if (prefersReducedMotion) {
+      hydrateAll(layers);
+    }
+
     const nextLayer = createRandomOrder(layers);
     // Burn the fixed opener: the markup already shows layers[0], so without
     // this the first tick would "change" to the image already displayed.
@@ -305,6 +312,13 @@ function initGalleryStacks() {
     }
 
     function start() {
+      /* Now, not on page load. Every layer in a stack sits in the layout, so
+         loading="lazy" deferred none of them once the tile was on screen —
+         a four-photograph tile fetched all four to display one. The rest
+         arrive here, when the tile is genuinely in view and about to need
+         them. */
+      hydrateAll(layers);
+
       if (timer === null && !prefersReducedMotion) {
         schedule();
       }
@@ -386,7 +400,12 @@ function initLightbox() {
       return;
     }
 
-    sources = layers.map((layer) => layer.getAttribute('src'));
+    /* A tile can be clicked the instant it appears, before its deferred
+       layers have been given a src. Hydrating here means the viewer always
+       has real URLs to step through, and it is a no-op for anything the
+       rotation already reached. */
+    hydrateAll(layers);
+    sources = layers.map((layer) => layer.getAttribute('src') || layer.dataset.src);
     const titleNode = tile.querySelector('.galleryTileTitle');
     groupTitle = titleNode ? titleNode.textContent.trim() : '';
 

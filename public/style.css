@@ -3435,3 +3435,47 @@ picture {
     transform: none;
   }
 }
+
+/* --- Scrollbars, barely there -------------------------------------------
+ *
+ * The default Windows bar is 17px of grey furniture down the edge of a page
+ * whose whole point is photographs. Thin, tinted from the palette, and it
+ * appears on hover rather than sitting there.
+ *
+ * Not hidden. A scrollbar is the only thing that tells a visitor how much
+ * page is left, and on a long gallery that is information, not decoration —
+ * `scrollbar-width: none` would take it away entirely.
+ */
+html {
+  scrollbar-width: thin;                        /* Firefox */
+  scrollbar-color: rgba(46, 42, 36, 0.28) transparent;
+}
+
+/* WebKit and Blink want the pseudo-elements instead. */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(46, 42, 36, 0.22);
+  border-radius: 999px;
+  /* A transparent border with background-clip is the only way to inset a
+     WebKit thumb; padding and margin do nothing to it. */
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(46, 42, 36, 0.42);
+}
+
+/* The overlay panel scrolls its own list on a short screen, and a bar there
+   would sit on cream rather than white. */
+.nav-panel {
+  scrollbar-color: rgba(46, 42, 36, 0.3) transparent;
+}
