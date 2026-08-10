@@ -579,7 +579,8 @@ describe('bot', () => {
 
         it('flags a party over capacity in the summary', () => {
             const res = bot.respond('book 20 to 22 december for 12 people', NOW);
-            expect(res.text).toMatch(/above the 6-guest limit/i);
+            // 9, not 6: the listing maximum, verified by the owner against Airbnb.
+            expect(res.text).toMatch(/above the 9-guest limit/i);
         });
 
         it('flags a stay under the minimum', () => {

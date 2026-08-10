@@ -31,8 +31,13 @@
         owner: 'Carman',
         area: 'Loutolim, South Goa',
         bedrooms: 3,
-        bathrooms: 3,
-        sleeps: 6,
+        beds: 4,
+        // Was 3. The listing says 2, and the owner has confirmed the listing.
+        bathrooms: 2,
+        // Was 6, which is the comfortable number rather than the maximum the
+        // listing accepts. Both are true and only one of them is bookable.
+        sleeps: 9,
+        sleepsComfortably: 6,
         extraBed: false,
 
         // The villa is never shared. This is the single most important
@@ -41,18 +46,25 @@
         deposit: '50% to confirm the booking, non-refundable',
 
         pool: 'private, for the use of your party alone',
-        wifi: 'complimentary WiFi throughout',
+        wifi: 'complimentary high-speed WiFi throughout, for up to 25 devices',
         ac: 'air-conditioned bedrooms and living room',
         kitchen: 'large and fully equipped',
         cook: 'a cook can be arranged — ask when booking',
         breakfast: 'complimentary English breakfast every morning, plus unlimited tea, coffee and juices all day',
         dinner: 'provided on request; there is also a barbeque in the gazebo',
         laundry: 'personal laundry included',
-        tv: 'satellite TV and DVD, and iPod docking',
+        tv: 'satellite TV',
         newspaper: 'a daily newspaper',
         wellness: 'massage services and yoga can be arranged at the house',
         medical: 'medical service on call',
-        childcare: 'baby sitting, with prior intimation',
+        water: 'filtered drinking water throughout',
+        // Open to guests since 2009. Seventeen years of it is a trust signal
+        // no amount of copy substitutes for.
+        since: 2009,
+        // Goa tourism registration. Worth showing: it is the difference
+        // between a registered property and somebody's spare house.
+        registration: 'HOTS000253',
+        childcare: 'babysitting, with a little notice',
         shower: "Goa's biggest rainshower heads",
 
         /* Goa has had two international airports since 2023, and guests book
@@ -64,7 +76,8 @@
            materially further than Dabolim — but "materially further" is all
            that can be said without a figure somebody has actually driven. */
         airportNorthDistance: null,
-        airportTransfer: 'complimentary — send me your flight details and I will have the car waiting',
+        airportTransfer: 'complimentary from Dabolim — send me your flight details and I will have '
+            + 'the car waiting',
         railway: 'Margao station is a 10 minute drive',
         beachName: 'the virgin beaches of South Goa',
         beachDistance: 'a 15 minute drive',
@@ -80,14 +93,14 @@
         ratePeak: null,
         minNights: null,
         securityDeposit: null,
-        checkIn: null,
-        checkOut: null,
+        checkIn: 'from 2pm, and the door is open until midnight',
+        checkOut: 'by 11am',
         earlyCheckIn: null,
         cancellation: null,
-        housekeeping: null,
+        housekeeping: 'daily',
         parking: null,
         payments: null,
-        power: null,
+        power: '24/7 generator backup, indoors and out',
         // Asked often enough to route, never yet answered by the owner.
         hotWater: null,
         mosquito: null,
@@ -259,7 +272,7 @@
                 ', ' + b.guests + ' guest' + (b.guests === 1 ? '' : 's') + '.');
 
             if (b.guests > F.sleeps) {
-                out.push('That is above the ' + F.sleeps + '-guest limit, so the owner would need to approve it.');
+                out.push('That is above the ' + F.sleeps + '-guest limit, so I would need to approve it myself.');
             }
             // Only raised when a minimum is actually known. `null < n` is
             // false, so an unset minimum silently never fired — which read
@@ -271,7 +284,7 @@
             }
 
             out.push('I cannot hold dates myself — send exactly that to ' + contact() +
-                ' and they will confirm availability.');
+                ' and I will confirm availability.');
             return out.join(' ');
         },
 
@@ -448,12 +461,15 @@
                 /\b(fit|big enough|large enough|room for|space for|enough (room|space|beds))\b/],
             answer: function (ctx) {
                 var e = ctx.entities || {};
-                var base = FACTS.bedrooms + ' bedrooms and ' + FACTS.bathrooms + ' bathrooms, sleeping ' +
-                    FACTS.sleeps + ' comfortably' + (FACTS.extraBed ? ', with an extra bed available on request' : '') + '.';
+                var base = FACTS.bedrooms + ' bedrooms, ' + FACTS.beds + ' beds and ' +
+                    FACTS.bathrooms + ' bathrooms. ' + FACTS.sleepsComfortably +
+                    ' sleep comfortably, and the booking will take up to ' + FACTS.sleeps + '.';
                 if (e.guests) {
-                    base += e.guests <= FACTS.sleeps
+                    base += e.guests <= FACTS.sleepsComfortably
                         ? ' ' + e.guests + ' is well within that.'
-                        : ' ' + e.guests + ' is over the ' + FACTS.sleeps + '-guest limit, so that would need checking with the owner first.';
+                        : e.guests <= FACTS.sleeps
+                            ? ' ' + e.guests + ' fits, though it is above the number I would call comfortable — tell me who is coming and I will be straight with you about it.'
+                            : ' ' + e.guests + ' is over the ' + FACTS.sleeps + ' the house takes, so that one needs me directly.';
                 }
                 return base;
             }
@@ -597,7 +613,8 @@
                     fact(FACTS.airportNorthDistance,
                         'a good deal further; ask me at ' + contact() +
                         ' and I will tell you what that drive really takes before you book it') +
-                    '. Either way the transfer is ' + FACTS.airportTransfer + '.';
+                    '. The transfer is ' + FACTS.airportTransfer +
+                    '; from Mopa, tell me and I will arrange a car and tell you the fare.';
             }
         },
         /* Arriving by train had no intent of its own. "Margao station is a 10
@@ -681,10 +698,14 @@
                 /\b(let|lets|letting) (us|me) in\b/, /\bmeet(ing)? us\b/,
                 /\b(hand over|collect|pick up) the keys?\b/],
             answer: function () {
-                return 'Check-in is ' + fact(FACTS.checkIn, 'flexible') + ' and check-out is ' +
-                    fact(FACTS.checkOut, 'flexible') + ' — ' + contact() + ' can give you exact times. ' +
+                /* The times are known now, so the sentence no longer offers to
+                   find them out — that offer read as a deferral sitting next
+                   to a real answer, which is worse than either alone. */
+                return 'Check-in is ' + fact(FACTS.checkIn, 'flexible') + '. Check-out is ' +
+                    fact(FACTS.checkOut, 'flexible') + '. ' +
                     // No Cap() here — a semicolon carries on the sentence.
-                    'Late arrivals are fine; ' + fact(FACTS.earlyCheckIn, 'early check-in depends on the day before') + '.';
+                    'A late flight is no trouble at all; ' +
+                    fact(FACTS.earlyCheckIn, 'arriving early depends on the day before, so ask me and I will check') + '.';
             }
         },
         {

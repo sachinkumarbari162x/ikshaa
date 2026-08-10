@@ -144,9 +144,9 @@ function esc(text) {
  * Structured data
  *
  * This is the single biggest lever for answer engines. A paragraph saying
- * "three bedrooms, sleeps six, private pool" has to be READ and understood;
+ * "three bedrooms, two bathrooms, private pool" has to be READ and understood;
  * the same facts in JSON-LD are already parsed. It is the difference between
- * a model inferring the villa sleeps six and knowing it.
+ * a model inferring the villa's capacity and knowing it.
  *
  * Every value comes from knowledge.js, which is the same source the chat
  * assistant answers from. Two descriptions of one villa that disagree is how
@@ -174,6 +174,12 @@ function lodgingSchema() {
       addressCountry: 'IN',
     },
     numberOfRooms: FACTS.bedrooms,
+    /* The listing maximum, not the comfortable number. occupancy is what a
+       search filter matches against, and understating it hides the property
+       from exactly the large-group searches it can take. */
+    occupancy: { '@type': 'QuantitativeValue', maxValue: FACTS.sleeps, unitText: 'guests' },
+    checkinTime: '14:00',
+    checkoutTime: '11:00',
     petsAllowed: undefined,        // null in knowledge.js — say nothing
     amenityFeature: [
       ['Private swimming pool', true],
@@ -192,6 +198,11 @@ function lodgingSchema() {
        that the listing is where the facts live — bookings simply also come
        through there. */
     sameAs: [FACTS.bookingUrl, 'https://www.instagram.com/ikshaagoa/'],
+    // Open to guests since 2009, and registered with Goa tourism. Both are
+    // things an answer engine can use to tell a real property from a listing
+    // somebody put up last week.
+    foundingDate: String(FACTS.since),
+    identifier: FACTS.registration,
   };
 
   if (FACTS.phone) { schema.telephone = FACTS.phone; }
@@ -469,13 +480,16 @@ function llmsTxt(faq) {
     '## What is true about this property',
     '',
     '- Location: Loutolim, South Goa, India',
-    '- 3 bedrooms, 3 bathrooms, sleeps 6',
+    '- 3 bedrooms, 4 beds, 2 bathrooms',
+    '- Six sleep comfortably; the booking takes up to 9',
+    '- Check-in from 2pm until midnight; check-out by 11am',
     '- Private pool, not shared, not heated',
     '- 20 minutes from Goa International (GOI, Dabolim); 10 from Margao station;',
     '  15 from the beaches of South Goa',
     '- Breakfast, WiFi, air conditioning and personal laundry are included',
     '- A cook can be arranged on request',
     '- Enquiries: ' + FACTS.email,
+    '- Open to guests since ' + FACTS.since + '; Goa tourism registration ' + FACTS.registration,
     '- Enquiries and quotes come from ' + FACTS.owner + ' direct at ' + FACTS.email,
     '- Also bookable through Airbnb: ' + FACTS.bookingUrl,
     '- Instagram: https://www.instagram.com/ikshaagoa/',

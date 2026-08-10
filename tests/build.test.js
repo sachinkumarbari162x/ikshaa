@@ -463,8 +463,14 @@ describeIfBuilt('discoverability', () => {
 
     expect(flat).not.toMatch(/null/);
     expect(schema).not.toHaveProperty('priceRange');
-    expect(schema).not.toHaveProperty('checkinTime');
     expect(schema).not.toHaveProperty('petsAllowed');
+
+    /* checkinTime USED to be here, asserting its absence while the fact was
+       null. The owner has since verified the listing, so it is known and
+       stating it is now the correct behaviour — the rule was never "omit
+       these fields", it was "omit what we cannot stand behind". */
+    expect(schema.checkinTime).toBe('14:00');
+    expect(schema.checkoutTime).toBe('11:00');
   });
 
   it('welcomes the AI crawlers by name and refuses the harvesters', () => {
