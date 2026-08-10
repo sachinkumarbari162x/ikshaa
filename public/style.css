@@ -3031,3 +3031,96 @@ body.newsletterOpen {
 picture {
   display: contents;
 }
+
+/* --- Questions and answers ---------------------------------------------
+ *
+ * <details> rather than a JavaScript accordion. Seventeen answers open at
+ * once is a wall nobody reads, and folding them in markup keeps every word
+ * in the DOM — which is the point of the page. A crawler, an answer engine
+ * and a screen reader all get the full text; only the presentation folds.
+ * Behind JavaScript, none of them would.
+ */
+.faqList {
+  max-width: 820px;
+  margin: 0 auto clamp(60px, 8vw, 96px);
+  padding: 0 var(--gutter);
+}
+
+.faqItem {
+  border-bottom: 1px solid var(--footer-rule);
+}
+
+.faqItem summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5em;
+  padding: 1.15em 0;
+  cursor: pointer;
+  /* The default triangle sits at the wrong baseline against a serif heading
+     and cannot be styled consistently across browsers. Replaced below. */
+  list-style: none;
+}
+
+.faqItem summary::-webkit-details-marker {
+  display: none;
+}
+
+.faqItem summary h3 {
+  display: inline;
+  font-family: var(--serif);
+  font-size: var(--text-md);
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+/* A plus that becomes a minus. Drawn in CSS so it needs no asset and
+   inherits the text colour wherever this lands. */
+.faqItem summary::after {
+  content: "";
+  flex: 0 0 auto;
+  width: 13px;
+  height: 13px;
+  margin-top: 0.45em;
+  background:
+    linear-gradient(var(--ink), var(--ink)) center/100% 1px no-repeat,
+    linear-gradient(var(--ink), var(--ink)) center/1px 100% no-repeat;
+  opacity: 0.55;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.faqItem[open] summary::after {
+  /* Rotating a quarter turn hides the vertical stroke behind the horizontal
+     one, so the plus becomes a minus with no second shape to maintain. */
+  transform: rotate(90deg);
+  background: linear-gradient(var(--ink), var(--ink)) center/100% 1px no-repeat;
+  opacity: 0.8;
+}
+
+.faqItem summary:hover h3 {
+  opacity: 0.62;
+}
+
+.faqItem summary:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+
+.faqItem p {
+  max-width: 66ch;
+  margin: 0 0 1.1em;
+  padding-right: 2.5em;
+  font-size: var(--text-sm);
+  line-height: 1.85;
+  color: var(--footer-muted);
+}
+
+.faqItem p:last-child {
+  padding-bottom: 0.6em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faqItem summary::after {
+    transition: none;
+  }
+}

@@ -1634,7 +1634,11 @@ function initSubscribeApi() {
     data.captcha = data['cf-turnstile-response'] || '';
     delete data['cf-turnstile-response'];
 
-    if (!data.captcha) {
+    /* Only insist on a token when a widget is actually on the page. The
+       build strips the widget when no site key is configured, and blocking
+       on a challenge that was never rendered would refuse every subscriber
+       rather than protecting the form from anyone. */
+    if (form.querySelector('.cf-turnstile') && !data.captcha) {
       status.hidden = false;
       status.textContent = 'Please complete the "are you a person" check just above the button.';
       return;

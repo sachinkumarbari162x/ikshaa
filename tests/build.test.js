@@ -299,7 +299,18 @@ describeIfBuilt('production build', () => {
      * project deliberately excludes. Walking dist/ back to public/ tests the
      * real property, and it holds wherever the checkout came from.
      */
-    const GENERATED = new Set(['_headers']); // written by build.js, never copied
+    /* Written by build.js rather than copied from public/.
+     *
+     * Named individually on purpose. The invariant this test protects is
+     * that the build COPIES — so a file appearing in dist/ with no source
+     * must be one we deliberately generate, and anything else is a bug worth
+     * failing on. A blanket exemption would have let the next stray file
+     * through unnoticed. */
+    const GENERATED = new Set([
+      '_headers',
+      'faq.html',                 // assembled from knowledge.js at build time
+      'robots.txt', 'sitemap.xml', 'llms.txt',
+    ]);
     const orphaned = [];
 
     /* Code is emitted under a content-hashed name, so dist/script.7f3a91c4.js
@@ -355,5 +366,140 @@ describeIfBuilt('production build', () => {
 
     const mb = size(DIST) / 1048576;
     expect(mb).toBeLessThan(BUDGET_MB);
+  });
+});
+
+/* ---------------------------------------------------------------------
+ * What the site tells search engines and answer engines
+ * ------------------------------------------------------------------ */
+describeIfBuilt('discoverability', () => {
+  const pages = () => fs.readdirSync(DIST).filter((f) => f.endsWith('.html'));
+  const read = (f) => fs.readFileSync(path.join(DIST, f), 'utf8');
+
+  it('gives every page a canonical, a description and Open Graph tags', () => {
+    const gaps = [];
+    for (const file of pages()) {
+      const html = read(file);
+      const missing = [];
+      if (!/rel="canonical"/.test(html)) { missing.push('canonical'); }
+      if (!/<meta name="description"/.test(html)) { missing.push('description'); }
+      if (!/property="og:title"/.test(html)) { missing.push('og:title'); }
+      if (!/property="og:image"/.test(html)) { missing.push('og:image'); }
+      if (missing.length) { gaps.push(file + ': ' + missing.join(', ')); }
+    }
+    expect(gaps).toEqual([]);
+  });
+
+  it('never repeats a description across two pages', () => {
+    /* Duplicate descriptions are the commonest own goal here: Google picks
+       its own snippet instead, and an answer engine gets the same sentence
+       about ten different pages. */
+    const seen = new Map();
+    for (const file of pages()) {
+      const found = /<meta name="description" content="([^"]+)"/.exec(read(file));
+      if (!found) { continue; }
+      const dupe = seen.get(found[1]);
+      expect(dupe ? dupe + ' and ' + file : null).toBeNull();
+      seen.set(found[1], file);
+    }
+  });
+
+  it('declares canonicals that the sitemap actually lists', () => {
+    /* The invariant that matters. A canonical pointing at a URL the sitemap
+       does not contain is a site arguing with itself, and it is exactly what
+       happens when the two are maintained by hand. */
+    const sitemap = fs.readFileSync(path.join(DIST, 'sitemap.xml'), 'utf8');
+    const listed = new Set([...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]));
+
+    const orphans = [];
+    for (const file of pages()) {
+      const found = /rel="canonical" href="([^"]+)"/.exec(read(file));
+      if (found && !listed.has(found[1])) { orphans.push(file + ' -> ' + found[1]); }
+    }
+    expect(orphans).toEqual([]);
+  });
+
+  it('points canonicals at the URL the host redirects to', () => {
+    /* Both hosts strip .html and 308 to the extensionless URL. A canonical
+       ending in .html therefore names a URL that immediately redirects,
+       which wastes the crawl and splits the signal between two addresses. */
+    const sitemap = fs.readFileSync(path.join(DIST, 'sitemap.xml'), 'utf8');
+    expect(sitemap).not.toMatch(/\.html<\/loc>/);
+
+    for (const file of pages()) {
+      const found = /rel="canonical" href="([^"]+)"/.exec(read(file));
+      if (found) { expect(found[1]).not.toMatch(/\.html$/); }
+    }
+  });
+
+  it('ships structured data that parses', () => {
+    /* Malformed JSON-LD is worse than none: the crawler drops it silently,
+       so the page looks fine and simply carries no structured data. */
+    let blocks = 0;
+    for (const file of pages()) {
+      for (const m of read(file).matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
+        const parsed = JSON.parse(m[1]);          // throws on malformed
+        expect(parsed['@context']).toBe('https://schema.org');
+        expect(typeof parsed['@type']).toBe('string');
+        blocks++;
+      }
+    }
+    expect(blocks).toBeGreaterThanOrEqual(2);     // LodgingBusiness + FAQPage
+  });
+
+  it('never puts a null fact into structured data', () => {
+    /* 24 facts are null on purpose so the bot defers rather than inventing.
+       Structured data states things with more authority than prose does, so
+       a guess here would be the worst place to make one. */
+    const home = read('index.html');
+    const schema = JSON.parse(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/.exec(home)[1]);
+    const flat = JSON.stringify(schema);
+
+    expect(flat).not.toMatch(/null/);
+    expect(schema).not.toHaveProperty('priceRange');
+    expect(schema).not.toHaveProperty('checkinTime');
+    expect(schema).not.toHaveProperty('petsAllowed');
+  });
+
+  it('welcomes the AI crawlers by name and refuses the harvesters', () => {
+    const robots = fs.readFileSync(path.join(DIST, 'robots.txt'), 'utf8');
+
+    for (const agent of ['GPTBot', 'ClaudeBot', 'OAI-SearchBot', 'PerplexityBot',
+      'Googlebot', 'Bingbot', 'Google-Extended']) {
+      expect(robots).toMatch(new RegExp('User-agent: ' + agent + '\s*\nAllow: /'));
+    }
+    for (const agent of ['AhrefsBot', 'SemrushBot', 'Bytespider']) {
+      expect(robots).toMatch(new RegExp('User-agent: ' + agent));
+    }
+    expect(robots).toMatch(/Disallow: \/api\//);
+    expect(robots).toMatch(/Sitemap: https:\/\/\S+\/sitemap\.xml/);
+  });
+
+  it('tells an assistant which facts it must not invent', () => {
+    /* The point of llms.txt here is not the links. It is this list: an
+       assistant that guesses a nightly rate, or answers the camera question,
+       does real harm to somebody planning around it. */
+    const llms = fs.readFileSync(path.join(DIST, 'llms.txt'), 'utf8');
+    expect(llms).toMatch(/do not state these as fact/i);
+    for (const topic of ['rates', 'Check-in', 'cancellation', 'cameras', 'Accessibility']) {
+      expect(llms).toMatch(new RegExp(topic, 'i'));
+    }
+  });
+
+  it('answers the FAQ instead of deferring on it', () => {
+    /* "Ask the owner" is a true answer in a chat window and a wasted slot in
+       a search result. Every published Q&A has to actually answer. */
+    const faq = read('faq.html');
+    const schema = JSON.parse(
+      [...faq.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+        .map((m) => m[1]).find((s) => s.includes('FAQPage'))
+    );
+
+    expect(schema.mainEntity.length).toBeGreaterThanOrEqual(12);
+    for (const entry of schema.mainEntity) {
+      expect(entry.acceptedAnswer.text).not.toMatch(/owner can confirm|rather not guess/);
+      // The chat's first person does not belong on a page.
+      expect(entry.acceptedAnswer.text).not.toMatch(/\bI (do not|am not|cannot)\b/);
+    }
   });
 });

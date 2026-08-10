@@ -896,9 +896,12 @@
             patterns: [/\b(garden|lawn|gazebo|barbe?c?que|bbq|terrace|veranda|courtyard)\b/,
                 /\bsit\s+out(side)?\b/, /\beat\s+outside\b/],
             answer: function () {
-                return 'There are grounds around the house, and they are yours alone — ' +
-                    FACTS.exclusive.replace(/^The villa is let on an /, '') + '. ' +
-                    'Dinner is ' + FACTS.dinner + '. The pool is ' + FACTS.pool + '.';
+                // Not a substring of FACTS.exclusive: stripping its opening
+                // clause left "and they are yours alone — exclusive basis —
+                // the whole house is yours", which reads like a fragment.
+                return 'There are grounds around the house, and they are yours alone — the villa ' +
+                    'is let on an exclusive basis. Dinner is ' + FACTS.dinner +
+                    '. The pool is ' + FACTS.pool + '.';
             },
             chips: ['Is there a pool?', 'Can we get dinner made?']
         },
