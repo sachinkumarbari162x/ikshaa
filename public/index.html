@@ -5,15 +5,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ikshaa — A Luxury Heritage Villa in South Goa</title>
-    <!-- Cormorant Garamond for display, Jost for text -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Jost:wght@300;400;500&display=swap"
-        rel="stylesheet">
+    <!-- Served from this origin. Was three tags pointing at two Google
+         domains, the last of them a render-blocking stylesheet that had to
+         answer before the hero could paint. -->
+    <link rel="stylesheet" href="fonts.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="chat/chat.css">
-    <link rel="preload" as="image" href="./imagesIkshaa/IkshaaBedroom.webp" fetchpriority="high">
+    <!-- Preloads the AVIF, because that is what <picture> below actually
+         renders. This used to name the .webp: the browser fetched it at high
+         priority, threw it away when <picture> chose the AVIF, and then
+         fetched the AVIF with no priority at all. The preload was delaying
+         the very element it was meant to accelerate.
+
+         type= is what makes one preload safe for both: a browser that cannot
+         decode AVIF ignores this line entirely and loads the WebP normally,
+         so nobody fetches two copies. -->
+    <link rel="preload" as="image" type="image/avif" href="./imagesIkshaa/IkshaaBedroom.avif" fetchpriority="high">
 </head>
 
 <body>
