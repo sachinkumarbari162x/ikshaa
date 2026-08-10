@@ -233,7 +233,10 @@ describeIfBuilt('production build', () => {
        either — its own comment says a full one "would undo the point of a
        full-screen walk" — and it has no <main> to put a footer in. The way
        out is the single back-link in the corner, which is the design. */
-    const exempt = new Set(['subscribe.html', 'exploreIkshaa.html']);
+    /* 404.html joins them: an error page offering a newsletter signup is
+       the wrong thing to put in front of somebody who has just hit a dead
+       link, and its whole job is to be short. */
+    const exempt = new Set(['subscribe.html', 'exploreIkshaa.html', '404.html']);
     const missing = [];
 
     for (const file of fs.readdirSync(DIST).filter((f) => f.endsWith('.html'))) {
@@ -379,6 +382,9 @@ describeIfBuilt('discoverability', () => {
   it('gives every page a canonical, a description and Open Graph tags', () => {
     const gaps = [];
     for (const file of pages()) {
+      // 404.html is noindex on purpose — a canonical would invite the
+      // indexing the page exists to prevent.
+      if (file === '404.html') { continue; }
       const html = read(file);
       const missing = [];
       if (!/rel="canonical"/.test(html)) { missing.push('canonical'); }

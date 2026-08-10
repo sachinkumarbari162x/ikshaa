@@ -527,6 +527,9 @@ function llmsTxt(faq) {
  * worse than no canonical at all.
  * ------------------------------------------------------------------ */
 function injectHead(html, file, extraSchema) {
+  if (file === '404.html') {
+    return html;   // noindex by design; a canonical would undo that
+  }
   const head = headFor(file, extraSchema);
   if (!head || html.includes('rel="canonical"')) {
     return html;                       // unknown page, or already done
@@ -557,7 +560,7 @@ function linkFaq(html) {
      last hovered. Order here has to match order there. */
   html = html.replace(
     /([ \t]*<li><a href="stayWithUs\.html" data-preview="stayWithUs">Stay With Us<\/a><\/li>\n)/,
-    '$1                <li><a href="theBalcao.html" data-preview="balcao">The Balc&atilde;o <span class="navNote">Journal</span></a></li>\n' +
+    '$1                <li><a href="theBalcao.html" data-preview="balcao">The Balc&atilde;o</a></li>\n' +
     '                <li><a href="faq.html" data-preview="faq">Questions</a></li>\n'
   );
   html = html.replace(

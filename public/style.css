@@ -3775,3 +3775,38 @@ html {
     vertical-align: 0.3em;
   }
 }
+
+/* --- 404 -----------------------------------------------------------------
+ * Cloudflare Pages serves this with a real 404 status when it exists. Without
+ * it, every unknown path answered 200 with the home page — which meant a
+ * search engine could file each typo'd URL as another copy of the front page,
+ * and a broken asset looked like a working one to anything checking.
+ */
+.notFound {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: clamp(90px, 18vh, 190px) var(--gutter) clamp(60px, 12vh, 120px);
+  text-align: center;
+}
+
+.notFoundLinks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6em 1.6em;
+  list-style: none;
+  margin: 2em 0 2.4em;
+  padding: 0;
+}
+
+.notFoundLinks a {
+  color: var(--ink);
+  font-size: var(--text-sm);
+  text-decoration: underline;
+  text-decoration-color: var(--footer-rule);
+  text-underline-offset: 0.28em;
+}
+
+.notFoundLinks a:hover {
+  text-decoration-color: currentColor;
+}
