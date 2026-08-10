@@ -557,7 +557,7 @@ function linkFaq(html) {
      last hovered. Order here has to match order there. */
   html = html.replace(
     /([ \t]*<li><a href="stayWithUs\.html" data-preview="stayWithUs">Stay With Us<\/a><\/li>\n)/,
-    '$1                <li><a href="theBalcao.html" data-preview="balcao">The Balc&atilde;o</a></li>\n' +
+    '$1                <li><a href="theBalcao.html" data-preview="balcao">The Balc&atilde;o <span class="navNote">Journal</span></a></li>\n' +
     '                <li><a href="faq.html" data-preview="faq">Questions</a></li>\n'
   );
   html = html.replace(
@@ -571,7 +571,7 @@ function linkFaq(html) {
   // And the footer's Discover column.
   return html.replace(
     /(<li><a href="guestBook\.html">Guest book<\/a><\/li>)/,
-    '$1\n                        <li><a href="theBalcao.html">The Balc&atilde;o</a></li>' +
+    '$1\n                        <li><a href="theBalcao.html">The Balc&atilde;o &mdash; journal</a></li>' +
     '\n                        <li><a href="faq.html">Questions and answers</a></li>'
   );
 }
