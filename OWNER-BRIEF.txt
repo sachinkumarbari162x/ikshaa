@@ -3,17 +3,24 @@
  Prepared 10 August 2026  ·  ikshaa.pages.dev
 ===============================================================================
 
- Two parts to this file:
+ Three parts:
 
    PART 1   a message you can send Carman as it is
    PART 2   a step-by-step guide to the site, written for her, on a phone
    PART 3   the list of things only she can answer
 
  Part 3 is the one that matters. Twenty-five details on the site are still
- blank because nobody has confirmed them, and the site is deliberately
- written to say "ask the owner" rather than guess at any of them. Every
- answer she supplies turns one of those into a real answer, in the chat, on
- the questions page, and in what Google shows.
+ blank because nobody has confirmed them. The site is written to say "ask the
+ owner" rather than guess at any of them, which is the right behaviour to
+ keep — but every answer she gives turns one of those into a real answer, in
+ the chat, on the questions page, and in what Google shows a guest.
+
+ A NOTE ON THE NEWSLETTER, BECAUSE IT IS EASY TO OVERSTATE
+ There are five addresses on the list and all five are ours, from testing.
+ No guest has subscribed yet, and nobody should imply otherwise. What is true
+ is that the whole path works end to end — form, filtering, welcome email,
+ weekly send, unsubscribe — and it is waiting for traffic, which needs a real
+ domain more than it needs anything else.
 
 
 ===============================================================================
@@ -23,74 +30,91 @@
 
 Hi Carman,
 
-The new Ikshaa website is live and I wanted to show you where it has got to.
+The new Ikshaa website is ready to look at. Here is where it has got to.
 
     ikshaa.pages.dev
 
 A few things it does that an ordinary villa site does not.
 
+
 IT ANSWERS GUESTS ON ITS OWN
-There is a chat assistant on every page that handles the questions people
-actually ask — the pool, breakfast, how to get here from either airport,
-arriving by train, what is included, how many it sleeps. It covers around
-forty-four topics.
 
-It is written so that it will never invent an answer. If it does not know
-something it says so plainly and points the guest to your email, rather than
-guessing and having them plan around something untrue. It costs nothing per
-message, however many people use it.
+There is a chat assistant on every page. It handles the questions people
+actually ask — the pool, breakfast, how to reach you from either airport,
+coming by train, what is included, how many the house sleeps. Forty-four
+topics in all.
 
-A WEEKLY LETTER
-Guests can subscribe and get a short note from the house. Five people have
-signed up already(testing). The form turns away temporary and fake addresses, so the
-list stays worth having, and every letter carries a one-click unsubscribe.
+It is built so that it will never invent an answer. When it does not know
+something it says so plainly and gives your email address, instead of
+guessing and leaving a guest to plan around something untrue. It costs
+nothing per message, no matter how many people use it.
+
+
+A WEEKLY LETTER, READY TO START
+
+Guests can subscribe and receive a short note from the house. The form turns
+away temporary and fake addresses, so the list stays worth having, and every
+letter carries a one-click unsubscribe.
+
+Nobody has subscribed yet — the five addresses on it are mine, from testing.
+That is expected at this stage. The whole path works; it is waiting for
+people to arrive, which is mostly a question of the domain name below.
+
 
 A JOURNAL
-Four pieces about Goa — what susegad actually means, what the food really is,
-the great houses at Loutolim and Chandor, and why the monsoon is worth coming
-for. It gives people a reason to stay on the site, and it is the sort of
-writing that helps Google find you.
+
+Four pieces of writing about Goa: what susegad actually means, what the food
+really is, the great houses at Loutolim and Chandor, and why the monsoon is
+worth coming for. It gives people a reason to stay on the site rather than
+glance and leave, and it is the sort of writing that helps Google find you.
+
 
 A ROOM-BY-ROOM TOUR
-Thirty-five photographs you can walk through, and a gallery of another
-thirty-seven sorted by room — bedrooms, bathrooms, the courtyard, the pool,
-the grounds.
+
+Thirty-five photographs you can walk through, and a separate gallery of
+thirty-seven more, sorted by room — bedrooms, bathrooms, the courtyard, the
+pool, the grounds.
+
 
 IT WORKS PROPERLY ON A PHONE
+
 Which is where most people will see it.
 
+
 IT IS BUILT TO BE FOUND
+
 Set up so Google reads it correctly, and so do the AI assistants people
-increasingly use to plan travel. The site tells those assistants, in writing,
+increasingly use to plan a trip. The site tells those assistants, in writing,
 which things they must not guess at — your rates, your check-in times,
-whether there are cameras — so they point to you instead of inventing a
-figure.
+whether there are cameras — so that they send people to you instead of
+inventing an answer.
+
 
 IT COSTS ALMOST NOTHING TO RUN
+
 The hosting, the database and the email all sit inside free allowances.
 
-I have matched every detail to your Airbnb listing — three bedrooms, four
-beds, two bathrooms, up to nine guests, check-in from 2pm, check-out by 11am
-— and put your Goa registration number, HOTS000253, in the footer of every
-page.
 
-I have written a short guide below on how to look round it on your phone.
-It takes about ten minutes.
+I have matched every detail to your Airbnb listing: three bedrooms, four
+beds, two bathrooms, up to nine guests, check-in from 2pm, check-out by 11am.
+Your Goa registration number, HOTS000253, is in the footer of every page, and
+the site says you have been welcoming guests since 2009.
 
-There is also a list of things only you can answer. Once I have those, several
-parts of the site stop saying "ask the owner" and start giving guests a
-straight answer instead.
+I have written a short guide below on how to look round it on your phone. It
+takes about ten minutes, and the chat is the part worth your time.
+
+There is also a list of things only you can answer. Once I have those,
+several parts of the site stop saying "ask the owner" and start giving guests
+a straight answer instead.
 
 -------------------------------------------------------------------------------
  END OF MESSAGE
 ===============================================================================
 
 
-
-
 ===============================================================================
  PART 2 — HOW TO LOOK ROUND YOUR WEBSITE
- (this can be sent on its own — it is written for Carman, on a phone)
+ (this can be sent on its own — written for Carman, on a phone)
 -------------------------------------------------------------------------------
 
 Open your phone and go to:   ikshaa.pages.dev
@@ -100,12 +124,12 @@ Take about ten minutes. Go in this order.
 
  1.  THE FIRST PAGE
 
-     The big photo changes by itself. Just watch it for a moment.
+     The big photo changes by itself. Watch it for a moment.
 
-     Now scroll down slowly. You will go past the rooms, the food, the
-     village, and things to do nearby.
+     Now scroll down slowly. You will pass the rooms, the food, the village,
+     and things to do nearby.
 
-     Keep scrolling to the bottom. That is the whole page.
+     Keep going to the bottom. That is the whole page.
 
 
  2.  THE MENU
@@ -122,7 +146,7 @@ Take about ten minutes. Go in this order.
 
      Thirty-five photos of the house, one after another.
 
-     Swipe to go forward. Or do nothing and it moves on its own.
+     Swipe to go forward. Or do nothing, and it moves on its own.
 
      To leave, tap the small arrow at the top left.
 
@@ -134,7 +158,7 @@ Take about ten minutes. Go in this order.
 
      The photos inside each box change by themselves.
 
-     Tap a box to see the photos big. Then swipe left and right.
+     Tap a box to see them big, then swipe left and right.
      Tap the X to close.
 
 
@@ -142,7 +166,7 @@ Take about ten minutes. Go in this order.
 
      This is the part to spend time on.
 
-     Tap the round button. Type a question the same way you would say it.
+     Tap the round button. Type a question the way you would say it out loud.
 
      Try these three:
 
@@ -157,13 +181,14 @@ Take about ten minutes. Go in this order.
      It should tell you it does not know, and give your email address.
      It should NOT make up a price.
 
-     That is the most important thing to check. Guests trust a website that
-     admits what it does not know. Please try a few more of your own.
+     That is the most important thing to check. A guest trusts a website that
+     admits what it does not know. Please try a few questions of your own,
+     especially awkward ones.
 
 
  6.  THE JOURNAL           (menu, then "The Balcao")
 
-     Four pieces of writing about Goa. Food, the old houses, the rains.
+     Four pieces of writing about Goa: the food, the old houses, the rains.
 
      There is a list at the top. Tap a title to jump to it.
 
@@ -172,18 +197,17 @@ Take about ten minutes. Go in this order.
 
      Seventeen questions guests ask often.
 
-     Tap any question. The answer opens underneath.
+     Tap any question and the answer opens underneath.
 
 
  8.  THE LETTERS           (bottom of the first page, "Subscribe")
 
      Put in your own email and send it.
 
-     A welcome note should reach you in about a minute. Check your spam
-     folder too, and tell me if it lands there.
+     A welcome note should reach you in about a minute. Look in your spam
+     folder too, and tell me if it lands there — that is worth knowing.
 
-     At the bottom of that note there is a link to stop the letters. That
-     link works.
+     At the bottom of that note there is a link to stop the letters. It works.
 
 
  9.  BOOK NOW              (top right of every page)
@@ -194,13 +218,13 @@ Take about ten minutes. Go in this order.
 -------------------------------------------------------------------------------
  IF SOMETHING LOOKS WRONG
 
- Just tell me two things:
+ Tell me two things:
 
      which page you were on
      what you saw
 
  A photo in the wrong place, a word spelled wrong, an answer that reads
- oddly — all of it is quick to change. Nothing you say is too small.
+ oddly — all of it is quick to change. Nothing is too small to mention.
 -------------------------------------------------------------------------------
 
 
@@ -208,7 +232,7 @@ Take about ten minutes. Go in this order.
  PART 3 — WHAT WE NEED FROM CARMAN
 ===============================================================================
 
- Grouped by how much difference each one makes. If she only answers the first
+ Grouped by how much difference each one makes. If she answers only the first
  group, that is most of the value.
 
 
@@ -220,7 +244,7 @@ Take about ten minutes. Go in this order.
         which is a perfectly good answer and the site will say so.
 
    [ ]  MINIMUM STAY
-        Any, and does it change over Christmas and New Year.
+        Any, and whether it changes over Christmas and New Year.
 
    [ ]  CANCELLATION TERMS
         What happens, and by when.
@@ -239,8 +263,8 @@ Take about ten minutes. Go in this order.
         Children   — welcome? cot available? any age limits?
 
    [ ]  A PHONE OR WHATSAPP NUMBER
-        The site currently offers only email. For a villa booking, a number
-        converts far better — most enquiries in India start on WhatsApp.
+        The site offers only email at the moment. For a villa booking a
+        number does far better — most enquiries in India begin on WhatsApp.
 
 
  SECOND — asked often, currently unanswered
@@ -248,17 +272,17 @@ Take about ten minutes. Go in this order.
 
    [ ]  CAMERAS AND PERIMETER SECURITY
         Worth handling carefully. A guest asking whether they are recorded is
-        asking a privacy question and deserves a straight answer. The site
-        currently refuses to guess, which is right — but a real answer is
-        better than a refusal. Are there cameras, where are they, and is
-        anyone on the property overnight?
+        asking about their privacy and deserves a straight answer. The site
+        refuses to guess, which is right — but a real answer is better than a
+        refusal. Are there cameras, where are they, and is anyone on the
+        property overnight?
 
    [ ]  ACCESSIBILITY
-        Steps, doorways, bathrooms. Described honestly rather than
-        generally — somebody is planning around it.
+        Steps, doorways, bathrooms. Described honestly rather than in general
+        terms — somebody is planning around it.
 
    [ ]  PARKING
-        How many cars, and is it inside the gate.
+        How many cars, and whether it is inside the gate.
 
    [ ]  HOT WATER
         Every bathroom, around the clock?
@@ -267,10 +291,10 @@ Take about ten minutes. Go in this order.
         Provided, or should guests bring their own?
 
    [ ]  EV CHARGING
-        Increasingly asked. Is there a point, or somewhere nearby?
+        Increasingly asked. Is there a point at the house, or nearby?
 
    [ ]  TOUR GUIDE AND CATERING
-        Can either be arranged, and roughly what do they cost?
+        Can either be arranged, and roughly what does it cost?
 
 
  THIRD — two things I am stuck on
@@ -279,21 +303,24 @@ Take about ten minutes. Go in this order.
    [ ]  THE BEACH DRIVE
         The Airbnb listing says "a 20 mins drive away from the Goa airport or
         from the nearest beaches of south Goa". The website says fifteen
-        minutes to the beaches, in sixteen different places. Which is right?
+        minutes to the beaches, in sixteen separate places. Which is right?
         I have left it alone rather than change all sixteen on a guess.
 
    [ ]  A DOMAIN NAME
-        Everything currently lives at ikshaa.pages.dev. Search reputation
+        Everything currently sits at ikshaa.pages.dev. Search reputation
         builds up on a domain and starts again from nothing when you move, so
-        the sooner this is decided the better. ikshaa.com or similar.
+        the sooner this is settled the better. ikshaa.com, or similar.
+
+        This is also what the newsletter is waiting for. Nobody subscribes to
+        a site they cannot find.
 
 
  ONE TO RAISE IN CONVERSATION, NOT IN WRITING
 -------------------------------------------------------------------------------
 
    The Airbnb rating is strong — 4.93 from 165 reviews, Superhost, replies
-   within the hour. That belongs on the site, near the booking button, where
-   it will do more for enquiries than another photograph.
+   within the hour. That belongs on the site near the booking button, where
+   it will do more for enquiries than another photograph would.
 
    Two conditions. Ask her permission first. And it should appear as plain
    text crediting Airbnb, not marked up for Google as the site's own rating —
@@ -305,7 +332,7 @@ Take about ten minutes. Go in this order.
  FOR YOUR REFERENCE — NOT FOR SENDING
 ===============================================================================
 
- What is live and verified as of today:
+ Live and verified today:
 
    Pages                    13, all reachable, no broken links
    Villa tour               35 photographs
@@ -313,7 +340,7 @@ Take about ten minutes. Go in this order.
    Chat topics              44, answering 100% of the test set
    Published questions      17 on the questions page
    Journal pieces           4
-   Newsletter subscribers   5, all confirmed
+   Newsletter subscribers   5 — ALL OURS, from testing. No guest yet.
    Automated checks         431, all passing
    Monthly running cost     effectively zero
 
@@ -325,13 +352,13 @@ Take about ten minutes. Go in this order.
    Housekeeping             was unknown, now daily
    Power                    was unknown, now 24/7 generator backup
    Airport transfers        now correctly stated as free FROM DABOLIM only;
-                            the site was promising a free car to anyone
+                            the site had been promising a free car to anyone
                             flying into Mopa
    Spelling                 Loutulim -> Loutolim, Carmen -> Carman
 
- Still deliberately blank: 25 facts, listed in Part 2. The site says "ask the
- owner" for every one of them rather than guessing, which is the behaviour to
- keep — but each one answered is one less reason for a guest to write in
- before booking.
+ Still deliberately blank: 25 facts, listed in Part 3. The site says "ask the
+ owner" for every one rather than guessing, which is the behaviour to keep —
+ but each one answered is one less reason for a guest to write in before
+ booking, and one more question the site can win in search.
 
 ===============================================================================
