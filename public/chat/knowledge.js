@@ -570,7 +570,7 @@
             patterns: [/\bbeach\b/, /\bhow far.*(sea|ocean)\b/],
             answer: function () {
                 return 'It is ' + FACTS.beachDistance + ' to ' + FACTS.beachName +
-                    '. Not beachfront, but easily walkable.';
+                    '. Not beachfront — the coast is a short drive rather than a walk.';
             }
         },
         {

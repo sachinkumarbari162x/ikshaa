@@ -111,6 +111,13 @@ const PAGES = {
     image: 'hamBurgerDropImages/StayWithUs/Courtyard.webp',
     priority: '0.9',
   },
+  'theBalcao.html': {
+    title: 'The Balcão — Ikshaa',
+    description:
+      'Notes from a village in South Goa: what susegad actually means, what Goa really eats, the great houses of Loutolim and Chandor, and coming in the rains.',
+    image: 'imagesIkshaa/Courtyard.webp',
+    priority: '0.8',
+  },
   'faq.html': {
     title: 'Questions and Answers — Ikshaa',
     description:
@@ -544,24 +551,28 @@ function linkFaq(html) {
     return html;
   }
 
-  /* The nav entry, with its preview photograph. The two are paired by
-     data-preview and the widget asserts they match one for one, so adding a
-     link without an image would leave the panel showing whatever was last
-     hovered. */
+  /* Two nav entries, each with its preview photograph. The two lists are
+     paired by data-preview and the widget matches them one for one, so a
+     link added without an image would leave the panel showing whatever was
+     last hovered. Order here has to match order there. */
   html = html.replace(
     /([ \t]*<li><a href="stayWithUs\.html" data-preview="stayWithUs">Stay With Us<\/a><\/li>\n)/,
-    '$1                <li><a href="faq.html" data-preview="faq">Questions</a></li>\n'
+    '$1                <li><a href="theBalcao.html" data-preview="balcao">The Balc&atilde;o</a></li>\n' +
+    '                <li><a href="faq.html" data-preview="faq">Questions</a></li>\n'
   );
   html = html.replace(
     /([ \t]*<img class="previewImage" data-preview="stayWithUs"\n[ \t]*data-src="[^"]*" alt="">\n)/,
-    '$1                <img class="previewImage" data-preview="faq"\n' +
+    '$1                <img class="previewImage" data-preview="balcao"\n' +
+    '                    data-src="./imagesIkshaa/Courtyard.webp" alt="">\n' +
+    '                <img class="previewImage" data-preview="faq"\n' +
     '                    data-src="./media/images/theCourtyard.webp" alt="">\n'
   );
 
   // And the footer's Discover column.
   return html.replace(
     /(<li><a href="guestBook\.html">Guest book<\/a><\/li>)/,
-    '$1\n                        <li><a href="faq.html">Questions and answers</a></li>'
+    '$1\n                        <li><a href="theBalcao.html">The Balc&atilde;o</a></li>' +
+    '\n                        <li><a href="faq.html">Questions and answers</a></li>'
   );
 }
 

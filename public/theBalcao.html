@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Balcão — Ikshaa</title>
+    <!-- Served from this origin. Was three tags pointing at two Google
+         domains, the last of them a render-blocking stylesheet that had to
+         answer before the hero could paint. -->
+    <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="chat/chat.css">
+    <!-- Preloads the AVIF, because that is what <picture> below actually
+         renders. This used to name the .webp: the browser fetched it at high
+         priority, threw it away when <picture> chose the AVIF, and then
+         fetched the AVIF with no priority at all. The preload was delaying
+         the very element it was meant to accelerate.
+
+         type= is what makes one preload safe for both: a browser that cannot
+         decode AVIF ignores this line entirely and loads the WebP normally,
+         so nobody fetches two copies. -->
+    <link rel="preload" as="image" type="image/avif" href="./imagesIkshaa/chorlaghat.avif" fetchpriority="high">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false"
+            aria-controls="navPanel">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="villaName"><a href="index.html">Ikshaa</a></div>
+
+        <a class="navBook" href="stayWithUs.html">Book Now</a>
+
+        <div class="nav-panel" id="navPanel">
+            <ul class="nav-links" id="navLinks">
+                <li><a href="ourHeritage.html" data-preview="ourHeritage">Our Heritage</a></li>
+                <li><a href="gallery.html" data-preview="gallery">Gallery</a></li>
+                <li><a href="exploreIkshaa.html" data-preview="villaTour">Villa Tour</a></li>
+                <li><a href="exploreGoa.html" data-preview="exploreGoa">Explore Goa</a></li>
+                <li><a href="goanCuisine.html" data-preview="goanCuisine">Goan Cuisine</a></li>
+                <li><a href="guestBook.html" data-preview="guestBook">Guest Book</a></li>
+                <li><a href="findingUs.html" data-preview="findingUs">Finding Us</a></li>
+                <li><a href="stayWithUs.html" data-preview="stayWithUs">Stay With Us</a></li>
+            </ul>
+
+            <div class="nav-preview" id="navPreview">
+                <img class="previewImage isVisible" data-preview="ourHeritage"
+                    data-src="./hamBurgerDropImages/OurHeritage/IkshaaDoor.webp" alt="">
+                <img class="previewImage" data-preview="gallery"
+                    data-src="./hamBurgerDropImages/Gallery/IkshaaPool.webp" alt="">
+                <img class="previewImage" data-preview="villaTour"
+                    data-src="./hamBurgerDropImages/VillaTour/mainGateOfIkshaa.avif" alt="">
+                <img class="previewImage" data-preview="exploreGoa"
+                    data-src="./hamBurgerDropImages/ExploreGoa/goaRoads.webp" alt="">
+                <img class="previewImage" data-preview="goanCuisine"
+                    data-src="./hamBurgerDropImages/GoanCuisine/dining.webp" alt="">
+                <img class="previewImage" data-preview="guestBook"
+                    data-src="./hamBurgerDropImages/GuestBook/toasting.webp" alt="">
+                <img class="previewImage" data-preview="findingUs"
+                    data-src="./hamBurgerDropImages/FindingUs/chorlaghat.webp" alt="">
+                <img class="previewImage" data-preview="stayWithUs"
+                    data-src="./hamBurgerDropImages/StayWithUs/Courtyard.webp" alt="">
+            </div>
+        </div>
+    </nav>
+
+    <header class="pageHero" data-nav-dark>
+        <picture><source srcset="./imagesIkshaa/Courtyard.avif" type="image/avif"><source srcset="./imagesIkshaa/Courtyard.webp" type="image/webp"><img class="pageHeroImage" src="./imagesIkshaa/Courtyard.webp" alt="" fetchpriority="high" decoding="async"></picture>
+        <div class="pageHeroScrim"></div>
+        <h1 class="pageHeroTitle">The Balc&atilde;o</h1>
+        <p class="scrollCue">Scroll</p>
+    </header>
+
+    <main class="siteContent">
+
+        <section class="journalIntro">
+            <p class="eyebrow">Notes from the house</p>
+            <h2 class="sectionTitle">Writing from a village in South Goa</h2>
+            <p class="bodyText">A balc&atilde;o is the covered porch of an old Goan house, with seats built into
+                the wall and a view of the road. It is where the afternoon is spent, and where most
+                of what anyone knows about a village gets passed along. This is that, written down.</p>
+        </section>
+
+        <nav class="journalIndex" aria-label="Articles">
+            <ol>
+                <li><a href="#susegad"><span class="journalNum">01</span>
+                    <span><strong>Susegad is not laziness</strong>
+                    <em>What the word actually means, and why the pace here is deliberate.</em></span></a></li>
+                <li><a href="#cuisine"><span class="journalNum">02</span>
+                    <span><strong>What Goa actually eats</strong>
+                    <em>Xacuti, cafreal, sorpotel and the bread that arrives twice a day.</em></span></a></li>
+                <li><a href="#houses"><span class="journalNum">03</span>
+                    <span><strong>The great houses of Loutolim and Chandor</strong>
+                    <em>Two villages of Portuguese-era mansions, most of them still lived in.</em></span></a></li>
+                <li><a href="#monsoon"><span class="journalNum">04</span>
+                    <span><strong>Coming in the rains</strong>
+                    <em>Why June to September is the season we would choose ourselves.</em></span></a></li>
+            </ol>
+        </nav>
+
+        <div class="tileRule" role="presentation"></div>
+
+        <article class="article" id="susegad">
+            <p class="eyebrow">Lifestyle</p>
+            <h2>Susegad is not laziness</h2>
+            <p class="articleLede">Visitors hear the word within a day of arriving, and almost everyone
+                mistranslates it.</p>
+            <p class="articleMeta">Words by Carman &nbsp;&middot;&nbsp; Reading time: 4 minutes</p>
+
+            <p>Susegad comes from the Portuguese <em>sossegado</em> &mdash; quiet, settled, at rest. Four
+                hundred and fifty years of Portuguese rule left Goa a language, a cuisine, a body of law
+                and this one word, which has outlasted most of the rest.</p>
+
+            <p>It is usually explained to tourists as laziness, generally by people who have been here
+                three days. That is not what it means. Susegad is the refusal to be hurried by things
+                that do not warrant hurry. It is a judgement about what is worth rushing for, and the
+                answer is: very little.</p>
+
+            <blockquote>The village does not slow down for guests. That is rather the point of coming.</blockquote>
+
+            <p>You will notice it first in the afternoons. Between roughly one and four, Loutolim closes.
+                Not by ordinance &mdash; by consensus. The heat makes an argument that everybody accepted
+                a long time ago, and the shops reopen when it has passed.</p>
+
+            <p>It takes most people two days to stop resenting this and start arranging their day around
+                it. The third morning is usually when a guest says they have slept properly for the first
+                time in months.</p>
+            <figure class="articleFigure">
+                <picture><source srcset="./imagesIkshaa/Courtyard.avif" type="image/avif"><source srcset="./imagesIkshaa/Courtyard.webp" type="image/webp"><img src="./imagesIkshaa/Courtyard.webp" alt="" loading="lazy" decoding="async"></picture>
+                <figcaption>The courtyard, mid-afternoon. Nothing is happening, deliberately.</figcaption>
+            </figure>
+        </article>
+
+        <div class="tileRule" role="presentation"></div>
+
+        <article class="article" id="cuisine">
+            <p class="eyebrow">Cuisine</p>
+            <h2>What Goa actually eats</h2>
+            <p class="articleLede">Very little of it is the beach-shack menu, and almost none of it is
+                what gets served as "Goan" elsewhere in India.</p>
+            <p class="articleMeta">Words by Carman &nbsp;&middot;&nbsp; Reading time: 6 minutes</p>
+
+            <p>Goan food is a collision. Coconut, kokum and rice from the Konkan coast; chilli, vinegar
+                and pork from the Portuguese, who also brought the cashew and the potato from Brazil.
+                The result is a cuisine with a sourness to it that most Indian regional cooking does
+                not have.</p>
+
+            <h3>The dishes worth asking for</h3>
+
+            <p><strong>Xacuti</strong> (say it <em>sha-KOO-tee</em>) is chicken or lamb in a sauce of
+                roasted coconut and something like a dozen spices, ground down until it is almost black.
+                It is the most laborious thing in the repertoire and the one to order if you eat only
+                one Goan dish.</p>
+
+            <p><strong>Cafreal</strong> is the green one &mdash; coriander, green chilli, ginger and
+                vinegar, usually on chicken. The name and the method came with Mozambican and Angolan
+                cooks who arrived through Portuguese ports, which is a longer journey than most recipes
+                make.</p>
+
+            <p><strong>Sorpotel</strong> is pork, offal, vinegar and heat, and it improves for three or
+                four days in the pot. It is Christmas food in Catholic households and it is not a dish
+                anybody makes in small quantities.</p>
+
+            <p><strong>Ambot tik</strong> means sour and hot, which is the whole recipe. Usually shark
+                or catfish, no coconut, and a good deal sharper than it looks.</p>
+
+            <p>And <strong>poi</strong>, the bread. A pillowy, slightly sour roll that the
+                <em>poder</em> &mdash; the baker &mdash; still delivers by bicycle, twice a day, with a
+                squeeze horn. It is the sound most guests remember afterwards.</p>
+
+            <div class="articleCallout">
+                <p>Bebinca is the one to leave room for: a layered coconut-and-egg-yolk pudding, each
+                    layer baked separately before the next goes on. Seven layers is standard and sixteen
+                    is showing off. It takes hours and tastes like it took hours.</p>
+            </div>
+
+            <p>To drink, there is feni &mdash; distilled from cashew apples in the spring, or from
+                coconut sap the rest of the year. Cashew feni holds a Geographical Indication, the same
+                protection Champagne has, and it is a genuinely local spirit rather than a souvenir.
+                It is also strong enough that most visitors get it wrong exactly once.</p>
+
+            <p>A cook can be arranged at the house, and it is worth doing for at least one evening.
+                Ask about xacuti specifically &mdash; it is not something anyone makes for one meal.</p>
+            <figure class="articleFigure">
+                <picture><source srcset="./hamBurgerDropImages/GoanCuisine/dining.avif" type="image/avif"><source srcset="./hamBurgerDropImages/GoanCuisine/dining.webp" type="image/webp"><img src="./hamBurgerDropImages/GoanCuisine/dining.webp" alt="" loading="lazy" decoding="async"></picture>
+                <figcaption>Dinner at the house. The barbeque in the gazebo does the rest of the work.</figcaption>
+            </figure>
+        </article>
+
+        <div class="tileRule" role="presentation"></div>
+
+        <article class="article" id="houses">
+            <p class="eyebrow">Where to go</p>
+            <h2>The great houses of Loutolim and Chandor</h2>
+            <p class="articleLede">Two villages, twenty minutes apart, holding the best surviving
+                domestic architecture in Goa &mdash; and most of it is still somebody's home.</p>
+            <p class="articleMeta">Words by Carman &nbsp;&middot;&nbsp; Reading time: 5 minutes</p>
+
+            <p>The Portuguese-era mansions of South Goa were built by families who made money in the
+                spice and colonial trades, and they were built to a pattern: a blank, high wall to the
+                road, a balc&atilde;o at the front, and everything of interest turned inward around a
+                courtyard. From outside they give away very little. That is intentional.</p>
+
+            <p>Loutolim, where this house is, has several. <strong>Casa Araujo Alvares</strong> is the
+                one set up for visitors, with rooms kept as they were and a sound-and-light commentary
+                that is more charming than it sounds.</p>
+
+            <p>Chandor, a short drive inland, has the one everybody comes for. <strong>Braganza
+                House</strong> runs the length of an entire side of the village square, and is
+                extraordinary for a reason that is easy to miss: it is divided down the middle between
+                two branches of the same family, who inherited it in the eighteenth century and have
+                maintained their halves separately ever since. You can tour both. They do not match.</p>
+
+            <blockquote>These are houses, not museums. Somebody lives behind most of the doors you
+                are not shown.</blockquote>
+
+            <p>Go in the morning. The light in those long ballroom windows is the entire point, and
+                by three the shutters are usually closed against the heat.</p>
+            <figure class="articleFigure">
+                <picture><source srcset="./imagesIkshaa/IkshaaDoor.avif" type="image/avif"><source srcset="./imagesIkshaa/IkshaaDoor.webp" type="image/webp"><img src="./imagesIkshaa/IkshaaDoor.webp" alt="" loading="lazy" decoding="async"></picture>
+                <figcaption>The door at Ikshaa. The pattern is the same across the village.</figcaption>
+            </figure>
+        </article>
+
+        <div class="tileRule" role="presentation"></div>
+
+        <article class="article" id="monsoon">
+            <p class="eyebrow">Season</p>
+            <h2>Coming in the rains</h2>
+            <p class="articleLede">June to September is the season most people avoid and the one we
+                would choose.</p>
+            <p class="articleMeta">Words by Carman &nbsp;&middot;&nbsp; Reading time: 4 minutes</p>
+
+            <p>The monsoon arrives in Goa around the first week of June and does not so much rain as
+                commit to it. For three months the state turns a green that photographs badly and looks
+                extraordinary in person, the paddy fields fill, and the waterfalls that are a trickle in
+                March become the reason people drive into the ghats.</p>
+
+            <p>Most of the coast shuts. The shacks come down &mdash; they are temporary structures,
+                rebuilt every October &mdash; the water is too rough to swim, and the crowds go home.</p>
+
+            <p>What is left is the Goa that lives here. Villages you can walk through without meeting a
+                tour group. Restaurants where the table is yours for the evening. Rates that bear no
+                relation to December.</p>
+
+            <div class="articleCallout">
+                <p>It does not rain all day. It rains hard, often in the afternoon, and then it stops
+                    and everything drips and steams and smells of wet earth. Plan around it rather than
+                    against it and the day works perfectly well.</p>
+            </div>
+
+            <p>A house with a courtyard is a good place to watch it from. That is more or less what the
+                courtyard is for.</p>
+            <figure class="articleFigure">
+                <picture><source srcset="./imagesIkshaa/rain.avif" type="image/avif"><source srcset="./imagesIkshaa/rain.webp" type="image/webp"><img src="./imagesIkshaa/rain.webp" alt="" loading="lazy" decoding="async"></picture>
+                <figcaption>Rain over the villa. Three months of this, and then it stops.</figcaption>
+            </figure>
+        </article>
+
+        <div class="tileRule" role="presentation"></div>
+
+        <section class="journalOutro">
+            <p class="eyebrow">Come and see</p>
+            <h2 class="sectionTitle">All of this is within an afternoon</h2>
+            <p class="bodyText">The houses, the food and the rains are twenty minutes from the door in
+                one direction or another. If you would like a week of it, tell me your dates.</p>
+            <p><a class="ctaButton" href="stayWithUs.html">Check dates</a></p>
+        </section>
+
+        <div class="squareWhiteRoundCard" id="subscribe">
+            <h2 class="sectionTitle">Letters from Ikshaa</h2>
+            <p class="bodyText">One letter a week from the house, and a note when the season turns.
+                No offers, no campaigns — and you can stop it in one click.</p>
+            <!-- The address is collected on subscribe.html, where there is room to
+                 say what actually arrives before anyone hands one over. -->
+            <a class="ctaButton" href="subscribe.html">Subscribe</a>
+        </div>
+
+        <footer class="footer">
+            <div class="footerGrid">
+                <div class="footerCol footerBrand">
+                    <h2 class="sectionTitle">Ikshaa</h2>
+                    <p>A 3 bedroom luxury villa with private pool in Loutolim, South Goa.</p>
+                </div>
+
+                <div class="footerCol">
+                    <p class="eyebrow">Contact</p>
+                    <p><a href="mailto:nyaragoa@gmail.com">nyaragoa@gmail.com</a></p>
+                </div>
+
+                <div class="footerCol">
+                    <p class="eyebrow">Finding us</p>
+                    <ul>
+                        <li>Loutolim, South Goa</li>
+                        <li>20 minutes from Goa airport</li>
+                        <li>10 minutes from Margao station</li>
+                        <li>15 minutes from the beaches</li>
+                    </ul>
+                </div>
+
+                <div class="footerCol">
+                    <p class="eyebrow">Discover</p>
+                    <ul>
+                        <li><a href="ourHeritage.html">Our heritage</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                        <li><a href="guestBook.html">Guest book</a></li>
+                    </ul>
+                    <p class="eyebrow" style="margin-top:1.6em">Connect</p>
+                    <ul class="footerSocial">
+                        <li><a href="https://www.instagram.com/ikshaagoa/" target="_blank" rel="noopener noreferrer"><svg class="socialIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4.4" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="17.4" cy="6.6" r="1.25" fill="currentColor"/></svg><span>Instagram</span></a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="platformRow">
+                <p class="eyebrow">Book us on</p>
+                <ul class="platformList">
+                    <li><a href="https://www.airbnb.co.in/rooms/17852391" target="_blank"
+                            rel="noopener noreferrer"><svg class="socialIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21.2c-2.6 0-4.4-1.6-4.4-3.9 0-1 .3-2 1-3.3.6-1.2 3.4-6.4 3.4-6.4s2.8 5.2 3.4 6.4c.7 1.3 1 2.3 1 3.3 0 2.3-1.8 3.9-4.4 3.9z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 2.8c1.1 0 1.9.7 2.6 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M12 2.8c-1.1 0-1.9.7-2.6 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Airbnb</span></a></li>
+                </ul>
+            </div>
+
+            <div class="footerLegal">
+                <p class="footerBase">&copy; 2026 Ikshaa. All rights reserved.</p>
+            </div>
+        </footer>
+    </main>
+
+    <script src="script.js"></script>
+
+    <!-- Chat widget. One script, not five: chat.js fetches its own language
+         engine (nlu, knowledge, bot — 34KB) when the browser goes idle or the
+         visitor first moves, so first paint never waits on a panel most
+         people do not open. -->
+    <script src="chat/chat.js" defer></script>
+</body>
+
+</html>
