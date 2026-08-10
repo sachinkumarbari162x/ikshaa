@@ -55,8 +55,15 @@
         childcare: 'baby sitting, with prior intimation',
         shower: "Goa's biggest rainshower heads",
 
+        /* Goa has had two international airports since 2023, and guests book
+           into either without realising how far apart they are. */
         airport: 'Goa International (GOI, Dabolim)',
         airportDistance: 'a 20 minute drive',
+        airportNorth: 'Manohar International (GOX, Mopa)',
+        /* UNKNOWN. Mopa is in Pernem at the top of the state, so it is
+           materially further than Dabolim — but "materially further" is all
+           that can be said without a figure somebody has actually driven. */
+        airportNorthDistance: null,
         airportTransfer: 'complimentary — send me your flight details and I will have the car waiting',
         railway: 'Margao station is a 10 minute drive',
         beachName: 'the virgin beaches of South Goa',
@@ -570,15 +577,48 @@
             id: 'airport',
             negativeExamples: ['can you organise a car from the airport', 'will you send a vehicle to meet the flight'],
             concepts: ['@airport'],
-            keywords: ['airport', 'flight', 'dabolim'],
+            keywords: ['airport', 'flight', 'dabolim', 'mopa', 'gox', 'manohar', 'terminal'],
             questionTypes: ['how_far'],
             examples: ['how far is the airport', 'distance from airport', 'which airport should i fly into',
-                'how long from dabolim', 'do you pick up from the airport', 'is mopa or dabolim closer'],
-            patterns: [/\bairport\b/],
+                'how long from dabolim', 'do you pick up from the airport', 'is mopa or dabolim closer',
+                'how far is mopa', 'which airport is nearer', 'i am flying into the new airport',
+                'is the old airport closer', 'how long from mopa to the villa'],
+            patterns: [/\bairport\b/, /\b(mopa|dabolim|gox)\b/, /\bmanohar\b/],
+            /* Both of them, and which to book — that is the decision behind
+               the question. Naming only Dabolim was no use at all to somebody
+               already holding a ticket into Mopa, and this intent listed "is
+               mopa or dabolim closer" as an example while answering about one
+               airport. */
             answer: function () {
-                return 'The nearest airport is ' + FACTS.airport + ' — ' + FACTS.airportDistance +
-                    '. The transfer is ' + FACTS.airportTransfer + '.';
+                return 'Two of them, and they are a long way apart. ' + FACTS.airport +
+                    ' is the near one — ' + FACTS.airportDistance +
+                    ' — so fly into that if you have the choice. ' + FACTS.airportNorth +
+                    ' sits at the top of the state and is ' +
+                    fact(FACTS.airportNorthDistance,
+                        'a good deal further; ask me at ' + contact() +
+                        ' and I will tell you what that drive really takes before you book it') +
+                    '. Either way the transfer is ' + FACTS.airportTransfer + '.';
             }
+        },
+        /* Arriving by train had no intent of its own. "Margao station is a 10
+           minute drive" appeared as a clause inside the location answer, so
+           somebody asking about the railway got told where the villa is —
+           which is not what they asked. Plenty of Indian guests come down on
+           the Konkan line rather than fly. */
+        {
+            id: 'railway',
+            keywords: ['train', 'railway', 'station', 'madgaon', 'margao station', 'konkan'],
+            examples: ['how far is the railway station', 'can i come by train',
+                'which station should i get off at', 'how far is madgaon station',
+                'is margao station close', 'arriving by train'],
+            patterns: [/\b(railway|train)\b/, /\b(madgaon|margao)\s+station\b/, /\bkonkan\b/],
+            questionTypes: ['how_far', 'where'],
+            answer: function () {
+                return 'Come by train if it suits you — ' + FACTS.railway +
+                    ', which is closer than the airport. Tell me your train and arrival time at ' +
+                    contact() + ' and I will have a car meet you.';
+            },
+            chips: ['How far is the airport?', 'Can you arrange a car?']
         },
         {
             id: 'transfer',

@@ -554,6 +554,7 @@
            about…", and the router prompt needs a real description for every
            id it is allowed to choose. */
         grounds: 'the garden and outdoor space',
+        railway: 'getting here by train',
         hotwater: 'hot water in the bathrooms',
         mosquitoes: 'mosquitoes, nets and repellent',
         evcharging: 'charging an electric car',
