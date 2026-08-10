@@ -467,7 +467,9 @@ describe('bot', () => {
         it('folds a greeting into a short opener', () => {
             const res = bot.respond('hi, how much does it cost?', NOW);
             expect(res.text).toMatch(/^Hello!/);
-            expect(res.text).toMatch(/night/);
+            // The listing URL, not a phrase from the rate answer: the wording
+            // has now changed twice under a test whose subject is the fold.
+            expect(res.text).toMatch(/airbnb\.co\.in/);
         });
 
         it('does not answer the same intent twice', () => {
@@ -475,8 +477,9 @@ describe('bot', () => {
             // longer opens "Weekdays are" while rates are unset, so anchor
             // on a phrase the reply actually contains either way.
             const res = bot.respond('how much is it and what is the price?', NOW);
-            const marker = bot.knowledge.FACTS.rateWeekday ? /Weekdays are/g : /do not have the nightly rates/g;
-            expect(res.text.match(marker) || []).toHaveLength(1);
+            // Counts the listing URL, which the rate answer carries whether or
+            // not the rates themselves are set, and whatever voice it is in.
+            expect(res.text.match(/airbnb\.co\.in/g) || []).toHaveLength(1);
         });
     });
 
@@ -618,7 +621,9 @@ describe('bot', () => {
         it('takes a complaint on the chin', () => {
             const res = bot.respond('this bot is useless', NOW);
             expect(res.intent).toBe('complaint');
-            expect(res.text).toMatch(/\+91|person/i);
+            expect(res.text).toMatch(/nyaragoa@gmail\.com/);
+            // It has to own the miss, not argue with the guest.
+            expect(res.text).toMatch(/sorry|missing/i);
         });
     });
 
@@ -858,8 +863,10 @@ describe('routing questions with no answer yet', () => {
         ['is there an ev charger', 'evcharging'],
     ])('%s -> %s', (question, intent) => {
         expect(intentOf(question)).toBe(intent);
-        // Deferral, not invention: the underlying facts are still null.
-        expect(textOf(question)).toMatch(/owner can confirm/);
+        /* Deferral, not invention: the underlying facts are still null. Keyed
+           on the handoff rather than its wording — "owner can confirm" was the
+           old phrasing and broke the moment the assistant found its voice. */
+        expect(textOf(question)).toMatch(/write to me at|ask me at|send me/);
     });
 
     /* The neighbours these were stolen from, and nearly stole back.

@@ -489,9 +489,9 @@
     Bot.prototype.notOnFile = function (phrase) {
         var F = this.knowledge.FACTS;
         return {
-            text: 'I have nothing on file about "' + phrase + '" at the villa, and I would rather ' +
-                'say that than answer with something close but wrong. ' +
-                (F.phone ? F.phone : F.email) + ' will know for certain.',
+            text: 'I have nothing on file about "' + phrase + '" here, and I would rather say so ' +
+                'than answer with something close but wrong. Write to me at ' +
+                (F.phone ? F.phone : F.email) + ' and I will tell you for certain.',
             chips: ['What are the rates?', 'Is there a pool?', 'Talk to a human']
         };
     };
@@ -506,8 +506,8 @@
         // Escalation outranks everything — three misses means stop guessing.
         if (this.context.unknownStreak >= 3) {
             return {
-                text: 'I keep missing what you need, and that is on me — I only know the villa basics. ' +
-                    'Reach ' + (F.phone ? F.phone : F.email) + ' and a person will sort it out properly.',
+                text: 'I keep missing what you need, and that is on me. Write to me at ' +
+                    (F.phone ? F.phone : F.email) + ' and I will sort it out properly.',
                 chips: ['Start over']
             };
         }
@@ -788,7 +788,8 @@
         var mood = best && best.analysis ? best.analysis.sentimentScore : 0;
         if (mood <= -2 && best && best.status === 'confident' && best.intent.id !== 'complaint') {
             var F2 = this.knowledge.FACTS;
-            replies.push('If this is going in circles, ' + (F2.phone ? F2.phone : F2.email) + ' gets you a person.');
+            replies.push('If this is going in circles, write to me at ' +
+                (F2.phone ? F2.phone : F2.email) + ' and I will pick it up myself.');
         }
 
         return {

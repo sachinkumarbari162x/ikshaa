@@ -3157,3 +3157,130 @@ picture {
 .formNotice--warn {
   border-left-color: #8a6717;
 }
+
+/* ============================================================
+   MOBILE NAVIGATION — measured fixes
+   ============================================================
+
+   Two faults, both arithmetic rather than taste.
+
+   1. THE MENU COULD NOT BE FINISHED. The panel is a fixed 100dvh with no
+      scroll, and `body.menuOpen { overflow: hidden }` stops the page moving
+      behind it. The link list has grown to twelve; at --text-xl (2x base)
+      with 10px of padding each it needs about 795px:
+
+          small Android  360x640   needs 792px   152px unreachable
+          iPhone SE      375x667   needs 793px   126px unreachable
+          iPhone 12-15   390x745   needs 795px    50px unreachable
+          iPhone Plus    414x830   needs 797px   fits
+
+      Because the panel centres its content, the overflow is clipped at BOTH
+      ends. The links lost off the bottom were Guest Book, Finding Us and
+      Stay With Us — the last of which is the booking page, which is to say
+      the most important link on the site was unreachable on most phones.
+
+   2. THE NAVBAR OVERLAPPED ITSELF. "Ikshaa" is absolutely centred and "Book
+      Now" is pinned right, so nothing in the layout keeps them apart:
+
+          small Android  360px   gap -13px   overlapping
+          iPhone SE      375px   gap  -6px   overlapping
+          iPhone 12      390px   gap  +1px   touching
+          iPhone Plus    414px   gap +12px   clear
+
+   ------------------------------------------------------------ */
+
+/* --- The panel scrolls, always ---
+   Not only on phones. A laptop in landscape at 600px tall has the same
+   problem, and a height-based rule catches both without guessing at
+   device classes. */
+.nav-panel {
+  overflow-y: auto;
+  /* Stops a bounce at the end of the list from scrolling the page behind. */
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Centring is right only while the content fits. Once it does not, centring
+   is what hides the two ends — so the panel packs from the top and lets the
+   list run on instead. */
+@media (max-width: 768px), (max-height: 700px) {
+  .nav-panel {
+    align-items: flex-start;
+    /* Clears the fixed navbar, so the first link is not sitting under the
+       hamburger the visitor just pressed. */
+    padding: clamp(72px, 14vh, 104px) var(--gutter) clamp(32px, 8vh, 56px);
+  }
+
+  .nav-links {
+    width: 100%;
+    gap: 2px;
+  }
+
+  /* From 2x base to a clamp topping out near 1.5x. Twelve links at the old
+     size could not fit any phone made; at this size the list needs about
+     500px and clears every one of them, scroll or no scroll. */
+  .nav-links a {
+    padding: 0.62em 20px;
+    font-size: clamp(1.05rem, 0.86rem + 1.1vw, 1.5rem);
+    letter-spacing: 0.1em;
+  }
+}
+
+/* --- The navbar stops colliding ---
+   Both sides give a little: the button loses side padding it does not need
+   at this width, and the wordmark loses tracking. Neither is hidden —
+   "Book Now" is the conversion and the wordmark is the brand. */
+@media (max-width: 430px) {
+  .navBook {
+    padding: 0.75em 1.05em;
+    letter-spacing: 0.12em;
+    text-indent: 0.12em;
+  }
+
+  .villaName {
+    font-size: var(--text-base);
+    letter-spacing: 0.16em;
+    text-indent: 0.16em;
+  }
+}
+
+/* Below this the two genuinely cannot share a row at a legible size, so the
+   wordmark yields. The hamburger and Book Now both still work, and every
+   page carries the name in its <title> and its H1. */
+@media (max-width: 340px) {
+  .villaName {
+    display: none;
+  }
+}
+
+/* --- The stagger covers every link ---
+   The delays were written out to ten "so adding another link needs no change
+   here". Two links later, eleven and twelve had no delay at all and arrived
+   ahead of the ones above them. */
+.nav-panel.active li:nth-child(11) { transition-delay: 1.35s; }
+.nav-panel.active li:nth-child(12) { transition-delay: 1.42s; }
+.nav-panel.active li:nth-child(13) { transition-delay: 1.49s; }
+.nav-panel.active li:nth-child(14) { transition-delay: 1.56s; }
+
+/* Nobody should wait a second and a half to reach a link on a phone. The
+   stagger is a flourish for a wide screen; down here it is latency. */
+@media (max-width: 768px), (max-height: 700px) {
+  .nav-panel.active li {
+    transition-delay: 0s;
+  }
+}
+
+/* --- The preview image, between phone and desktop ---
+   Hidden under 768px because a touch screen cannot hover it. Between there
+   and about 1024px it was taking 38vw beside twelve links at 2x base, which
+   is more than the row has. */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .nav-preview {
+    width: min(32vw, 320px);
+  }
+
+  .nav-links a {
+    font-size: clamp(1.35rem, 0.9rem + 1.6vw, 1.9rem);
+    padding: 7px 0;
+  }
+}

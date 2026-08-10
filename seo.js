@@ -246,8 +246,17 @@ function faqEntries(bot) {
      * assistant to say — "I do not have the nightly rates" — and on a page
      * they read as though the villa itself is unsure. The facts are the same
      * either way; the pronoun is what does not travel. */
-    const defers = /owner can confirm|rather not guess|do not want to guess|will know for certain|not something I can confirm/.test(answer);
-    const firstPerson = /\bI (do not|am not|cannot|can not|would rather|only know|keep missing|have)\b/.test(answer);
+    /* Matched on the HANDOFF, not on a turn of phrase.
+     *
+     * This used to look for "owner can confirm", which was the exact wording
+     * of the old deferral. Rewriting the assistant in Carman's voice changed
+     * every one of those sentences, the filter stopped matching, and two
+     * deferrals quietly appeared on the public FAQ — a page whose entire
+     * purpose is answers. Asking somebody to write in is the durable signal;
+     * the words around it are not. */
+    const defers = /write to me at|ask me at|ask me directly|send me your|tell me at|put the specifics to me/.test(answer) ||
+      /owner can confirm|rather not guess|will know for certain/.test(answer);
+    const firstPerson = /\bI (do not|am not|cannot|can not|will not|would rather|only know|keep missing|have)\b/.test(answer);
     if (defers || firstPerson) {
       continue;
     }

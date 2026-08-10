@@ -503,3 +503,57 @@ describeIfBuilt('discoverability', () => {
     }
   });
 });
+
+/* ---------------------------------------------------------------------
+ * The hero paints without waiting for JavaScript
+ * ------------------------------------------------------------------ */
+describeIfBuilt('first paint', () => {
+  it('ships the opening slide already visible', () => {
+    /* Every .slide is opacity:0 with a 1000ms fade, and only JS adds
+       .isVisible. With the first slide left to that, the hero stayed blank
+       until script.js had downloaded, parsed and run — and then took a
+       further second to fade in. That is a second of LCP handed away on
+       every single visit, and it looked like a broken page.
+
+       showNext() adds the class the first slide already has, so this costs
+       the slideshow nothing. */
+    const home = fs.readFileSync(path.join(DIST, 'index.html'), 'utf8');
+    const slides = [...home.matchAll(/class="(slide[^"]*)"/g)].map((m) => m[1]);
+
+    expect(slides.length).toBeGreaterThan(1);
+    expect(slides[0]).toContain('isVisible');
+    // Exactly one, or two would crossfade against each other on load.
+    expect(slides.filter((c) => c.includes('isVisible'))).toHaveLength(1);
+  });
+
+  it('preloads the format the page will actually render', () => {
+    /* Eight pages preloaded the .webp while <picture> rendered the .avif:
+       the browser fetched one at high priority, discarded it, then fetched
+       the other with none. */
+    const mismatched = [];
+    for (const file of fs.readdirSync(DIST).filter((f) => f.endsWith('.html'))) {
+      const html = fs.readFileSync(path.join(DIST, file), 'utf8');
+      const preload = /rel="preload" as="image"[^>]*href="([^"]+)"/.exec(html);
+      const picks = /<picture><source srcset="([^"]+\.avif)"/.exec(html);
+      if (preload && picks && preload[1] !== picks[1]) {
+        mismatched.push(file + ': preloads ' + preload[1] + ' but renders ' + picks[1]);
+      }
+      // A preload naming an AVIF must carry type=, or a browser that cannot
+      // decode it downloads a file it can never show.
+      if (preload && /\.avif$/.test(preload[1])) {
+        expect(html).toMatch(/rel="preload" as="image" type="image\/avif"/);
+      }
+    }
+    expect(mismatched).toEqual([]);
+  });
+
+  it('loads no third-party stylesheet before first paint', () => {
+    // Google Fonts cost ~320ms of render-blocking time and then chained to a
+    // second origin for the files themselves.
+    for (const file of fs.readdirSync(DIST).filter((f) => f.endsWith('.html'))) {
+      const html = fs.readFileSync(path.join(DIST, file), 'utf8');
+      expect(html).not.toMatch(/<link[^>]*fonts\.googleapis\.com/);
+      expect(html).not.toMatch(/<link[^>]*rel="preconnect"[^>]*gstatic/);
+    }
+  });
+});

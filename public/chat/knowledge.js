@@ -57,7 +57,7 @@
 
         airport: 'Goa International (GOI, Dabolim)',
         airportDistance: 'a 20 minute drive',
-        airportTransfer: 'complimentary — tell us your flight and we will arrange the car',
+        airportTransfer: 'complimentary — send me your flight details and I will have the car waiting',
         railway: 'Margao station is a 10 minute drive',
         beachName: 'the virgin beaches of South Goa',
         beachDistance: 'a 15 minute drive',
@@ -141,7 +141,8 @@
     }
 
     function fact(value, fallback) {
-        return value ? value : (fallback || 'something the owner can confirm — ' + contact());
+        return value ? value : (fallback ||
+            'something I would rather confirm for you myself — write to me at ' + contact());
     }
 
     var CONCEPTS = {
@@ -284,8 +285,8 @@
             ],
             weight: 1.05,
             answer: function () {
-                return ['Hello! I look after questions about ' + FACTS.name + '. Ask me anything — rates, the pool, how far the beach is, whatever you need.',
-                    'Hi there! Happy to help with anything about ' + FACTS.name + '. What would you like to know?'];
+                return ['Hello — ' + FACTS.owner + ' here. I look after ' + FACTS.name + '. Ask me anything: rates, the pool, how far the beach is, whatever you need to know before you come.',
+                    'Hello! ' + FACTS.owner + ' here. Happy to help with anything about ' + FACTS.name + ' — what would you like to know?'];
             },
             chips: ['What are the rates?', 'Is it available in December?', 'How far is the beach?']
         },
@@ -319,8 +320,10 @@
                 /\bwhat('s| is) your name\b/,
                 /\b(chatting|talking|speaking) (to|with) (a )?(bot|robot|machine|computer|human|person)\b/],
             answer: function () {
-                return 'I am a small script, not a person and not an AI — just pattern matching over what I have been told about ' +
-                    FACTS.name + '. I am good with the practical questions; for anything unusual, ' + contact() + ' reaches a human.';
+                return 'Straight answer: I am the assistant that hands over ' + FACTS.owner +
+                    '\u2019s answers, not ' + FACTS.owner + ' herself — pattern matching across what she has ' +
+                    'told me about the house, and neither a person nor an AI. I am good on the practical ' +
+                    'things. For anything else, write to her at ' + contact() + ' and she will answer you herself.';
             }
         },
         {
@@ -368,10 +371,13 @@
                    version stitched the fallback in three times and produced
                    a sentence that said nothing, at length. */
                 if (!FACTS.rateWeekday && !FACTS.rateWeekend && !FACTS.ratePeak) {
-                    var ask = 'I do not have the nightly rates — they move with the season, so I would only mislead you. ' +
-                        'The live prices are on the listing: ' + FACTS.bookingUrl + ', or ask ' + contact() + '.';
+                    var ask = 'I will not quote you a rate I cannot stand behind — they move with the ' +
+                        'season, and a wrong number is worse than none. The live prices are on the listing: ' +
+                        FACTS.bookingUrl + '.';
                     if (e.nights || e.checkIn) {
-                        ask += ' Tell them your exact dates and they will quote you properly.';
+                        ask += ' Send me those dates at ' + contact() + ' and I will quote you properly.';
+                    } else {
+                        ask += ' Send me your dates at ' + contact() + ' and I will quote you properly.';
                     }
                     return ask;
                 }
@@ -665,7 +671,8 @@
             // fresh question, so the reply agrees rather than announcing.
             answer: function (ctx) {
                 if (FACTS.pets === null) {
-                    return 'I do not want to guess at the pet policy — ' + contact() + ' will tell you straight away.';
+                    return 'I would rather tell you about pets myself than have you plan around a guess. ' +
+                    'Write to me at ' + contact() + ' — tell me the breed and size, and I will answer straight away.';
                 }
                 if (FACTS.pets) {
                     return ctx.negated
@@ -703,7 +710,7 @@
             answer: function (ctx) {
                 return (ctx.negated ? 'Correct — ' : 'House policy: ') + fact(FACTS.parties) +
                     '. A quiet family celebration is fine — a full event is not. ' +
-                    'If you are unsure which yours is, check with the owner first on ' + contact() + '.';
+                    'If you are unsure which yours is, ask me first at ' + contact() + '.';
             }
         },
         {
@@ -726,8 +733,9 @@
                 'can i change my dates', 'is my deposit refundable', 'what happens if my flight is cancelled'],
             patterns: [/\bcancel(lation)?\b/, /\brefund\b/],
             answer: function () {
-                return fact(FACTS.cancellation, 'The cancellation policy is something the owner can confirm — ' + contact()) +
-                    '. Date changes are usually easier than cancelling — ask early and they will normally accommodate you.';
+                return 'The cancellation terms are ' +
+                    fact(FACTS.cancellation, 'something I would rather put in writing for you before you pay anything — write to me at ' + contact()) +
+                    '. Changing dates is usually easier than cancelling outright, so ask me early and I will do what I can.';
             }
         },
         {
@@ -741,10 +749,10 @@
             patterns: [/\bhow.*(do i|to) pay\b/, /\b(upi|deposit|advance)\b/,
                 /\b(up ?front|in advance|send (the |you )?(money|payment)|how do i pay|make the payment)\b/],
             answer: function () {
-                return 'Which payment methods are accepted is ' +
-                    fact(FACTS.payments, 'something the owner can confirm — ' + contact()) +
+                return 'How you can pay is ' +
+                    fact(FACTS.payments, 'something I will set out for you when you book — write to me at ' + contact()) +
                     '. Terms are ' + FACTS.deposit + ', plus a refundable security deposit, the amount of which is ' +
-                    fact(FACTS.securityDeposit, 'set by the owner') + '.';
+                    fact(FACTS.securityDeposit, 'something I will confirm with you at the same time') + '.';
             }
         },
         {
@@ -755,7 +763,7 @@
                 'is laundry available', 'is there a washing machine', 'do you change the linen'],
             patterns: [/\b(clean|housekeep|laundry|towel|linen)/],
             answer: function () {
-                return 'Housekeeping comes ' + fact(FACTS.housekeeping, 'on a schedule the owner can confirm — ' + contact()) +
+                return 'Housekeeping comes ' + fact(FACTS.housekeeping, 'on a schedule I will confirm with you when you book — ask me at ' + contact()) +
                     '. Linen and towels are provided and changed during your stay. Laundry: ' + FACTS.laundry + '.';
             }
         },
@@ -819,8 +827,8 @@
             negativeExamples: ['what is there to do nearby', 'which beach is closest', 'can i rent a scooter'],
             answer: function () {
                 return Cap(fact(FACTS.tourGuide,
-                    'a guide is not something I can confirm. Ask ' + contact() + ' and they will tell you what ' +
-                    'can be arranged and roughly what it costs')) +
+                    'let me arrange that with you directly rather than guess at it — write to me at ' +
+                    contact() + ' and I will tell you what is possible and what it costs')) +
                     '. What I can tell you is where to point one: the old Portuguese houses at Loutolim and ' +
                     'Chandor, the spice farms inland, the Latin quarter in Panjim, and the beaches further south. ' +
                     'The caretaker can usually set up a car and driver, which covers most of what a guide would.';
@@ -848,10 +856,10 @@
                 return 'For something small and private the house is well set up: the kitchen is ' +
                     FACTS.kitchen + ', ' + FACTS.cook + ', and dinner is ' + FACTS.dinner + '. ' +
                     Cap(fact(FACTS.eventCatering,
-                        'bringing in a caterer or extra staff is a question for ' + contact() +
-                        ', who will know who is good locally and what the house allows')) + '. ' +
+                        'tell me what you have in mind at ' + contact() + ' and I will arrange a caterer ' +
+                        'or extra staff — I know who is good locally and what the house can take')) + '. ' +
                     'The policy on larger events is a separate matter: ' +
-                    fact(FACTS.parties, 'the owner decides that case by case') + '.';
+                    fact(FACTS.parties, 'something I decide case by case — tell me what you have in mind') + '.';
             }
         },
         {
@@ -914,7 +922,7 @@
             patterns: [/\b(hot|warm)\s+water\b/, /\bgeyser\b/, /\bwater\s+heater\b/],
             answer: function () {
                 return 'Whether every bathroom runs hot water around the clock is ' +
-                    fact(FACTS.hotWater, 'something the owner can confirm — ' + contact()) +
+                    fact(FACTS.hotWater) +
                     '. The showers themselves are ' + FACTS.shower + '.';
             },
             chips: ['What is in the bathrooms?', 'Talk to a human']
@@ -926,8 +934,7 @@
                 'are there a lot of mosquitoes', 'any insect problem'],
             patterns: [/\bmosquito(es|s)?\b/, /\brepellent\b/, /\binsect(s)?\b/],
             answer: function () {
-                return 'Nets and repellent are ' +
-                    fact(FACTS.mosquito, 'something the owner can confirm — ' + contact()) +
+                return 'Nets and repellent are ' + fact(FACTS.mosquito) +
                     '. Goa has mosquitoes, more so through the monsoon, so it is a fair thing to ask before you come.';
             },
             chips: ['Talk to a human']
@@ -946,8 +953,7 @@
                 /\b(car|vehicle|ev)\b.*\bcharg(e|ing|er)\b/
             ],
             answer: function () {
-                return 'A charging point for an electric car is ' +
-                    fact(FACTS.evCharging, 'something the owner can confirm — ' + contact()) +
+                return 'A charging point for an electric car is ' + fact(FACTS.evCharging) +
                     '. Worth settling before you drive down rather than after.';
             },
             chips: ['Is there parking?', 'Talk to a human']
@@ -972,7 +978,9 @@
             patterns: [/\b(wheelchair|accessib|disabled|mobility)/],
             answer: function () {
                 if (FACTS.accessible === null) {
-                    return 'I would rather not guess about access. Tell ' + contact() + ' what you need and they will describe the house honestly.';
+                    return 'I will not guess about access — it matters far too much to get wrong. Tell me ' +
+                    'exactly what you need at ' + contact() + ' and I will describe the house honestly, ' +
+                    'steps, doorways and bathrooms included.';
                 }
                 return yn(FACTS.accessible,
                     'Yes, the villa is step-free and wheelchair accessible.',
@@ -1025,7 +1033,8 @@
                 'give me the owner contact', 'i want to speak to someone', 'whatsapp number', 'email address'],
             patterns: [/\b(contact|phone|whatsapp|call|email)\b/, /\b(talk|speak) to (a )?(human|person|someone|owner|manager)\b/],
             answer: function () {
-                return 'Reach us on ' + contact() + '. A real person answers, usually quickly.';
+                return 'Write to me at ' + contact() + '. That reaches me directly rather than an ' +
+                    'autoresponder, and I answer quickly.';
             }
         },
         {
@@ -1048,8 +1057,8 @@
                 /\b(useless|stupid|dumb|terrible|worst|rubbish|not helping|waste of time)\b/],
             weight: 0.95,
             answer: function () {
-                return 'Fair enough — I only know what I have been told about the villa, and I am clearly missing what you need. ' +
-                    contact() + ' gets you a person who can actually help.';
+                return 'I am sorry — I am clearly missing what you actually need, and going round again ' +
+                    'will not fix it. Write to me at ' + contact() + ' and I will answer you myself.';
             }
         }
     ];
@@ -1073,41 +1082,41 @@
             case 'price':
             case 'payment':
                 return 'open the live listing at ' + FACTS.bookingUrl +
-                    ', where the current prices sit, and email ' + who +
-                    ' with your exact dates for a written quote';
+                    ', where the current prices sit, and send me your dates at ' + who +
+                    ' — I will quote you properly';
             case 'availability':
-                return 'email ' + who + ' with your arrival date, the number of nights and how many ' +
+                return 'write to me at ' + who + ' with your arrival date, the number of nights and how many ' +
                     'of you there are — that is everything needed to check the calendar and hold it';
             case 'cancellation':
-                return 'ask ' + who + ' for the cancellation terms in writing before you pay the deposit, ' +
-                    'so what you agreed is on record';
+                return 'ask me at ' + who + ' for the cancellation terms in writing before you pay the deposit, ' +
+                    'so what we agree is on record';
             case 'checkin':
             case 'checkout':
-                return 'send ' + who + ' your flight or train time and ask them to confirm the arrival ' +
+                return 'send me your flight or train time at ' + who + ' and I will confirm the arrival ' +
                     'arrangement — the caretaker needs to know when to meet you';
             case 'airport':
             case 'transfer':
-                return 'send ' + who + ' your flight number and landing time, and they will arrange the car';
+                return 'send me your flight number and landing time at ' + who + ' and I will have the car waiting';
             case 'cameras':
             case 'safety':
-                return 'ask ' + who + ' directly what is fitted and where. This is a privacy question and ' +
-                    'you are entitled to a straight answer in writing';
+                return 'ask me directly at ' + who + ' what is fitted and where. This is a privacy question and ' +
+                    'you are entitled to a straight answer from me in writing';
             case 'pets':
             case 'smoking':
             case 'parties':
             case 'children':
-                return 'put the specifics to ' + who + ' — the breed and size, or the number of guests and ' +
+                return 'put the specifics to me at ' + who + ' — the breed and size, or the number of guests and ' +
                     'the hours — and get the answer in writing before you book';
             case 'accessibility':
-                return 'tell ' + who + ' exactly what access you need, and ask them to describe the ' +
+                return 'tell me at ' + who + ' exactly what access you need, and I will describe the ' +
                     'steps, doorways and bathrooms honestly rather than in general terms';
             case 'tourguide':
             case 'gatherings':
-                return 'email ' + who + ' with the date and what you have in mind, and they will tell you ' +
+                return 'write to me at ' + who + ' with the date and what you have in mind, and I will tell you ' +
                     'what can be arranged and what it costs';
             default:
-                return 'email ' + who + ' with the question exactly as you have put it here — a person ' +
-                    'answers, usually quickly, and can tell you what I cannot';
+                return 'write to me at ' + who + ' with the question exactly as you have put it here — I answer ' +
+                    'these myself, usually quickly, and can tell you what this assistant cannot';
         }
     }
 

@@ -5,15 +5,11 @@
 (function () {
     'use strict';
 
-    var STORE_KEY = 'ikshaa.chat.transcript';
-    var STATE_KEY = 'ikshaa.chat.state';
-    var MAX_STORED = 40;
 
     /* An unbounded message is the cheapest way to make this widget misbehave:
        the matcher is TF-IDF over the input, so a pasted megabyte is a
-       megabyte of tokenising and cosine scoring on the main thread, and it
-       then goes into sessionStorage until the quota throws. Nobody asks a
-       villa a 2000-character question — this is generous for a real one and
+       megabyte of tokenising and cosine scoring on the main thread. Nobody
+       asks a villa a 2000-character question — this is generous for a real one and
        flatly refuses the other kind. */
     var MAX_INPUT = 600;
     var ROLES = { me: true, bot: true };
@@ -299,7 +295,6 @@
                         askAssistant(lastGuestText, []).then(function (routed) {
                             dots.remove();
                             busy = false;
-                            saveState();
                             say(routed ? routed.text : handoffText(), routed ? [] : ['Start over']);
                         });
                         return;
@@ -376,61 +371,30 @@
                 .catch(function () { return null; });   // offline, blocked, slow: fall through
         }
 
-        /* ---------------- persistence ---------------- */
-
-        function save(role, text) {
-            try {
-                var hist = JSON.parse(sessionStorage.getItem(STORE_KEY) || '[]');
-                hist.push({ role: role, text: text });
-                sessionStorage.setItem(STORE_KEY, JSON.stringify(hist.slice(-MAX_STORED)));
-            } catch (e) { /* private mode — transcript just won't persist */ }
-        }
-
-        /* sessionStorage is same-origin, not trusted. Anything already able to
-           write to it could put a crafted role in here, and `role` is
-           concatenated straight into a class name. Text is safe either way —
-           bubble() writes textContent — but the shape is checked before use
-           rather than after something has gone wrong. */
-        function restore() {
-            var hist = [];
-            try { hist = JSON.parse(sessionStorage.getItem(STORE_KEY) || '[]'); } catch (e) { }
-            if (!Array.isArray(hist)) { return false; }
-
-            var clean = hist.filter(function (m) {
-                return m && ROLES[m.role] === true && typeof m.text === 'string';
-            }).slice(-MAX_STORED);
-
-            clean.forEach(function (m) { bubble(m.role, m.text.slice(0, MAX_INPUT * 8)); });
-            return clean.length > 0;
-        }
-
-        // Persist what the bot knows, not just what was said — otherwise a
-        // reload leaves the guest's dates on screen but gone from the bot.
-        function saveState() {
-            try { sessionStorage.setItem(STATE_KEY, JSON.stringify(bot.exportState())); } catch (e) { }
-        }
-
-        function restoreState() {
-            try {
-                var raw = sessionStorage.getItem(STATE_KEY);
-                if (raw) return bot.importState(JSON.parse(raw));
-            } catch (e) { /* corrupt or unavailable — start clean */ }
-            return false;
-        }
-
-        function forget() {
-            try {
-                sessionStorage.removeItem(STORE_KEY);
-                sessionStorage.removeItem(STATE_KEY);
-            } catch (e) { }
-        }
+        /* ---------------- persistence: none ----------------
+         *
+         * The conversation lives for as long as the page does, and no longer.
+         *
+         * It used to be kept in sessionStorage — transcript and the bot's own
+         * memory both — so a reload picked the thread back up. That is the
+         * right behaviour for a support desk and the wrong one here. A guest
+         * reads four pages of a villa site in a sitting; every one of them
+         * reopened whatever they had half-asked on the last, including the
+         * dates they had given and the topics already counted as asked. What
+         * felt like continuity from the inside read as a widget that would not
+         * let go.
+         *
+         * Nothing to clear, nothing to expire, and nothing of a guest's
+         * conversation is written to their device at all — which is also the
+         * simplest possible answer to what the widget stores about them.
+         * ------------------------------------------------------------ */
 
         /* ---------------- conversation ---------------- */
 
         function handoffText() {
             var F = KNOWLEDGE.FACTS || {};
-            return 'I still cannot place that one, and I would rather say so than guess. ' +
-                (F.phone ? F.phone : F.email) + ' reaches a person who will know.';
+            return 'I still cannot place that one, and I would rather say so than guess at it. ' +
+                'Write to me at ' + (F.phone ? F.phone : F.email) + ' and I will answer you myself.';
         }
 
         /* The same handoff, phrased to be appended rather than to stand
@@ -439,8 +403,8 @@
            sentence directly above it. */
         function handoffLine() {
             var F = KNOWLEDGE.FACTS || {};
-            return 'If I am still not getting it, ' + (F.phone ? F.phone : F.email) +
-                ' reaches a person who will know.';
+            return 'If I am still not getting it, write to me at ' + (F.phone ? F.phone : F.email) +
+                ' and I will answer you myself.';
         }
 
         function say(text, chips) {
@@ -451,7 +415,6 @@
                 dots.remove();
                 bubble('bot', text);
                 renderChips(chips);
-                save('bot', text);
                 busy = false;
             }, wait);
         }
@@ -465,7 +428,6 @@
 
             lastGuestText = text;
             bubble('me', text);
-            save('me', text);
             renderChips([]);
             ui.input.value = '';
             ui.input.style.height = 'auto';
@@ -473,7 +435,6 @@
 
             // "start over" wipes the stored conversation, not just the bot's memory.
             if (/^\s*(start over|reset|restart|clear)\s*$/i.test(text)) {
-                forget();
                 ui.log.textContent = '';
             }
 
@@ -499,7 +460,6 @@
                 var chips = (reply.chips || []).slice();
                 if (chips.indexOf(HUMAN_CHIP) === -1) { chips.push(HUMAN_CHIP); }
 
-                saveState();
                 say(reply.text + '\n\n' + handoffLine(), chips);
                 return;
             }
@@ -514,7 +474,6 @@
                 askAssistant(text, shortlist).then(function (routed) {
                     dots.remove();
                     busy = false;
-                    saveState();
                     if (routed) {
                         say(routed.text, routed.chips);
                     } else {
@@ -527,7 +486,6 @@
                 return;
             }
 
-            saveState();
             say(reply.text, reply.chips);
         }
 
@@ -706,17 +664,11 @@
 
         /* ---------------- first run ---------------- */
 
-        var hadTranscript = restore();
-        restoreState();
-
-        if (!hadTranscript) {
-            bubble('bot', 'Hello! I can answer most things about Ikshaa Luxury Villa — rates, availability, ' +
-                'the rooms and pool, house rules, how to get here. Ask in your own words.');
-            renderChips(['What are the rates?', 'How many bedrooms?', 'How far is the beach?', 'Is it available?']);
-        } else if (bot.context.pendingSlot) {
-            // Mid-booking when the page reloaded: pick the thread back up.
-            renderChips((KNOWLEDGE.BOOKING.chips || {})[bot.context.pendingSlot] || []);
-        }
+        /* Always the greeting. There is no stored transcript to come back
+           to, so every page load is a first one. */
+        bubble('bot', 'Hello! I can answer most things about Ikshaa Luxury Villa — rates, availability, ' +
+            'the rooms and pool, house rules, how to get here. Ask in your own words.');
+        renderChips(['What are the rates?', 'How many bedrooms?', 'How far is the beach?', 'Is it available?']);
 
         // Arriving from the chat icon (chaticon.html) means the guest has already
         // asked for the chat — don't make them click a second time.

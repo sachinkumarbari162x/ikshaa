@@ -507,21 +507,35 @@
    what the button is FOR, which is what a first-time visitor needs.
 
    A container with two controls: the question, and a dismiss that closes
-   the prompts WITHOUT touching the launcher. Sits to the left so it never
-   covers the button it is pointing at. */
+   the prompts WITHOUT touching the launcher.
+
+   ABOVE the launcher, not beside it. Sitting to the left meant the bubble
+   had only the width between the button and the screen edge to work with —
+   on a phone that was about 218px, so Carman's one-line offer wrapped to
+   four lines in a tall narrow box that was harder to read than no prompt.
+   Above, the whole width of the page is available and the same sentence
+   sits on one or two comfortable lines.
+
+   It still never covers the button it points at: the tail is on the
+   bottom edge and the launcher is below it. */
 .chat__nudge {
     position: absolute;
-    right: calc(100% + 12px);
-    top: 50%;
-    transform: translateY(-50%) translateX(10px);
+    right: 0;
+    bottom: calc(100% + 14px);
+    transform: translateY(8px);
 
     display: flex;
     align-items: flex-start;
-    gap: 2px;
+    gap: 6px;
 
-    max-width: min(16rem, 56vw);
-    padding: 0.65em 0.5em 0.65em 1.05em;
-    border-radius: 16px 16px 4px 16px;
+    /* max-content so a short prompt stays a short bubble, capped by whatever
+       the viewport can actually give: the beacon sits a gutter from the right
+       edge, so that gutter plus a margin comes off the top. */
+    width: max-content;
+    max-width: min(26rem, calc(100vw - var(--gutter, 24px) - 2rem));
+    padding: 0.85em 0.6em 0.85em 1.15em;
+    /* Square corner bottom-right, where the tail meets the launcher. */
+    border-radius: 18px 18px 4px 18px;
 
     background: #fff;
     box-shadow: 0 6px 24px rgba(20, 17, 14, 0.22);
@@ -533,7 +547,7 @@
 
 .chat__nudge.is-in {
     opacity: 1;
-    transform: translateY(-50%) translateX(0);
+    transform: translateY(0);
     pointer-events: auto;
 }
 
@@ -545,8 +559,11 @@
     background: none;
     color: #2e2a24;
     font-family: inherit;
-    font-size: 0.82rem;
-    line-height: 1.4;
+    /* Up from 0.82rem. This is a sentence a stranger reads once, at arm's
+       length, over a photograph — the old size was sized to fit the narrow
+       box rather than to be read. */
+    font-size: 0.94rem;
+    line-height: 1.5;
     text-align: left;
     cursor: pointer;
 }
@@ -586,12 +603,13 @@
     border-radius: 4px;
 }
 
-/* The tail, pointing at the launcher */
+/* The tail, pointing down at the launcher below it. Offset from the corner
+   rather than centred on it, so it lands over the middle of the button. */
 .chat__nudge::after {
     content: "";
     position: absolute;
-    right: -5px;
-    bottom: 10px;
+    right: 24px;
+    bottom: -5px;
     width: 12px;
     height: 12px;
     background: #fff;
@@ -599,22 +617,12 @@
     border-radius: 2px;
 }
 
+/* The base rule is now what this used to override, so only the things that
+   genuinely differ on a small screen remain: a touch target that clears the
+   44px minimum, and text that does not shrink with the launcher. */
 @media (max-width: 560px) {
     .chat__nudge {
-        right: 0;
-        top: auto;
-        bottom: calc(100% + 12px);
-        transform: translateY(8px);
-        border-radius: 16px 16px 16px 4px;
-        max-width: 68vw;
-    }
-
-    .chat__nudge.is-in {
-        transform: translateY(0);
-    }
-
-    .chat__nudge::after {
-        right: 22px;
-        bottom: -5px;
+        max-width: calc(100vw - var(--gutter, 24px) - 1.5rem);
+        padding: 0.8em 0.5em 0.8em 1em;
     }
 }
