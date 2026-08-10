@@ -6,9 +6,10 @@
  Two parts to this file:
 
    PART 1   a message you can send Carman as it is
-   PART 2   the list of things only she can answer
+   PART 2   a step-by-step guide to the site, written for her, on a phone
+   PART 3   the list of things only she can answer
 
- Part 2 is the one that matters. Twenty-five details on the site are still
+ Part 3 is the one that matters. Twenty-five details on the site are still
  blank because nobody has confirmed them, and the site is deliberately
  written to say "ask the owner" rather than guess at any of them. Every
  answer she supplies turns one of those into a real answer, in the chat, on
@@ -73,68 +74,138 @@ beds, two bathrooms, up to nine guests, check-in from 2pm, check-out by 11am
 — and put your Goa registration number, HOTS000253, in the footer of every
 page.
 
-There is a short list below of things only you can answer. Once I have them,
-several parts of the site stop saying "ask the owner" and start giving guests
-a straight answer instead.
+I have written a short guide below on how to look round it on your phone.
+It takes about ten minutes.
 
-HOW TO LOOK ROUND IT
-
-Open ikshaa.pages.dev on your phone. Then:
-
-  1. THE FRONT PAGE
-     The photographs change on their own. Scroll down slowly and you will
-     pass the rooms, the food, the village, things to do, and the signup for
-     the letters at the bottom.
-
-  2. THE MENU
-     Tap the three lines at the top left. Ten pages. Tap any one to go
-     there. Tap the three lines again to close it.
-
-  3. THE VILLA TOUR      (menu, then Villa Tour)
-     Thirty-five photographs, one at a time. Swipe to move, or wait and it
-     moves by itself. The arrow at the top left brings you back.
-
-  4. THE GALLERY         (menu, then Gallery)
-     Nine boxes, one for each part of the house. The photographs inside each
-     box change on their own. Tap a box to see them full size, then swipe
-     left and right.
-
-  5. THE CHAT
-     The round button at the bottom right of every page. Tap it and ask
-     anything the way you would say it out loud. Try:
-         how many people can stay
-         is there hot water
-         how far is the airport
-     Then try asking something it cannot know, such as the price. It should
-     say it does not know and give your email address. That part is the one
-     worth testing, because it is what stops it telling a guest something
-     untrue.
-
-  6. THE JOURNAL         (menu, then The Balcao)
-     Four pieces of writing about Goa. Tap a title in the list at the top to
-     jump straight to it.
-
-  7. THE QUESTIONS PAGE  (menu, then Questions)
-     Seventeen common questions. Tap one to open the answer.
-
-  8. THE LETTERS         (bottom of the front page, Subscribe)
-     Try it with your own address. A welcome note should arrive within a
-     minute, with an unsubscribe link at the bottom of it.
-
-  9. BOOK NOW
-     Top right of every page. It goes to the booking page, and from there to
-     Airbnb.
-
-If anything looks wrong, or reads wrong, just tell me which page and what
-you saw. Small corrections are quick.
+There is also a list of things only you can answer. Once I have those, several
+parts of the site stop saying "ask the owner" and start giving guests a
+straight answer instead.
 
 -------------------------------------------------------------------------------
  END OF MESSAGE
 ===============================================================================
 
 
+
+
 ===============================================================================
- PART 2 — WHAT WE NEED FROM CARMAN
+ PART 2 — HOW TO LOOK ROUND YOUR WEBSITE
+ (this can be sent on its own — it is written for Carman, on a phone)
+-------------------------------------------------------------------------------
+
+Open your phone and go to:   ikshaa.pages.dev
+
+Take about ten minutes. Go in this order.
+
+
+ 1.  THE FIRST PAGE
+
+     The big photo changes by itself. Just watch it for a moment.
+
+     Now scroll down slowly. You will go past the rooms, the food, the
+     village, and things to do nearby.
+
+     Keep scrolling to the bottom. That is the whole page.
+
+
+ 2.  THE MENU
+
+     Look at the top left. Three small lines.
+
+     Tap them. A list of ten pages slides down.
+
+     Tap any name to go there.
+     Tap the three lines again to close the list.
+
+
+ 3.  THE VILLA TOUR        (menu, then "Villa Tour")
+
+     Thirty-five photos of the house, one after another.
+
+     Swipe to go forward. Or do nothing and it moves on its own.
+
+     To leave, tap the small arrow at the top left.
+
+
+ 4.  THE GALLERY           (menu, then "Gallery")
+
+     Nine boxes. One for the bedrooms, one for the pool, one for the
+     courtyard, and so on.
+
+     The photos inside each box change by themselves.
+
+     Tap a box to see the photos big. Then swipe left and right.
+     Tap the X to close.
+
+
+ 5.  THE CHAT              (round button, bottom right of every page)
+
+     This is the part to spend time on.
+
+     Tap the round button. Type a question the same way you would say it.
+
+     Try these three:
+
+         how many people can stay
+         is there hot water
+         how far is the airport
+
+     Now try one it cannot know:
+
+         how much does it cost
+
+     It should tell you it does not know, and give your email address.
+     It should NOT make up a price.
+
+     That is the most important thing to check. Guests trust a website that
+     admits what it does not know. Please try a few more of your own.
+
+
+ 6.  THE JOURNAL           (menu, then "The Balcao")
+
+     Four pieces of writing about Goa. Food, the old houses, the rains.
+
+     There is a list at the top. Tap a title to jump to it.
+
+
+ 7.  THE QUESTIONS PAGE    (menu, then "Questions")
+
+     Seventeen questions guests ask often.
+
+     Tap any question. The answer opens underneath.
+
+
+ 8.  THE LETTERS           (bottom of the first page, "Subscribe")
+
+     Put in your own email and send it.
+
+     A welcome note should reach you in about a minute. Check your spam
+     folder too, and tell me if it lands there.
+
+     At the bottom of that note there is a link to stop the letters. That
+     link works.
+
+
+ 9.  BOOK NOW              (top right of every page)
+
+     Takes a guest to the booking page, and from there to Airbnb.
+
+
+-------------------------------------------------------------------------------
+ IF SOMETHING LOOKS WRONG
+
+ Just tell me two things:
+
+     which page you were on
+     what you saw
+
+ A photo in the wrong place, a word spelled wrong, an answer that reads
+ oddly — all of it is quick to change. Nothing you say is too small.
+-------------------------------------------------------------------------------
+
+
+===============================================================================
+ PART 3 — WHAT WE NEED FROM CARMAN
 ===============================================================================
 
  Grouped by how much difference each one makes. If she only answers the first
