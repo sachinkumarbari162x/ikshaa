@@ -3284,3 +3284,101 @@ picture {
     padding: 7px 0;
   }
 }
+
+/* ============================================================
+   BUTTONS — the wipe goes white
+   ============================================================
+
+   The mechanism already existed: a panel behind the label slides in from
+   the right on hover. Only the colour and the contrast change here.
+
+   White is not simply a swap. The button's own background is a deliberate
+   rgba(46, 42, 36, 0.55) "liquid" layer and the panel sits BEHIND it, so a
+   white panel composites to roughly #8c8a87 — mid grey. White text on that
+   is 2.6:1, which fails AA and would have shipped looking merely a bit dim
+   rather than obviously wrong.
+
+   So the dark layer thins on hover as the white arrives. The composite
+   lands near #e6e5e4, the label flips to ink, and the pair reads 12:1.
+   ------------------------------------------------------------ */
+
+.ctaButton::after,
+.navBook::after {
+  background-color: #fff;
+}
+
+/* Thins the liquid layer so the panel underneath reads as white rather than
+   as grey. Transitioned on the same curve as the wipe, so the two are one
+   movement rather than a colour change racing a slide. */
+.ctaButton:hover,
+.ctaButton:focus-visible {
+  background-color: rgba(46, 42, 36, 0.06);
+  color: var(--ink);
+}
+
+.ctaButton {
+  transition: color 0.45s ease, background-color 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Over a photograph the button starts light already, so only the label has
+   anywhere to go. */
+.ctaButton--onImage:hover,
+.ctaButton--onImage:focus-visible {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: var(--ink);
+}
+
+/* --- Book Now gets the same wipe ---
+   It had none: a flat darkening on hover, which read as a different
+   component to every other button on the site. */
+.navBook {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition: color 0.45s ease, background-color 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.navBook::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  /* 101%, not 100%: at fractional widths a 100% offset leaves a hairline of
+     colour along the right edge at rest. */
+  transform: translateX(101%);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.navBook:hover::after,
+.navBook:focus-visible::after {
+  transform: translateX(0);
+}
+
+/* Overrides the flat darkening this used to do, and drops the text shadow —
+   it exists to hold white letters over a photograph, and there is no white
+   letter left once the panel has arrived. */
+.navBook:hover,
+.navBook:focus-visible {
+  background-color: rgba(58, 54, 49, 0.06);
+  color: var(--ink);
+  text-shadow: none;
+}
+
+/* The wipe is the flourish; the state change is the information. Anyone who
+   has asked for less movement still gets the white and the ink, arriving
+   without the slide. */
+@media (prefers-reduced-motion: reduce) {
+  .ctaButton::after,
+  .navBook::after {
+    transition: none;
+    transform: translateX(0);
+    opacity: 0;
+  }
+
+  .ctaButton:hover::after,
+  .ctaButton:focus-visible::after,
+  .navBook:hover::after,
+  .navBook:focus-visible::after {
+    opacity: 1;
+  }
+}
