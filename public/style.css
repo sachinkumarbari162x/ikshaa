@@ -3382,3 +3382,56 @@ picture {
     opacity: 1;
   }
 }
+
+/* --- Explore the Villa: the shots are links now -------------------------
+ *
+ * They always pointed at the tour in spirit — a strip of rooms with no way
+ * into the room-by-room walk was the one thing a visitor would try to click.
+ *
+ * Only the picture is wrapped, not the caption: <figcaption> has to stay a
+ * direct child of <figure>, so wrapping both would be invalid. The anchor
+ * carries an aria-label because alt is empty by design — the caption does
+ * that work, and a link whose only content is a decorative image has no
+ * accessible name at all.
+ */
+.exploreShot {
+  display: block;
+  border-radius: 20px;
+  overflow: hidden;
+  /* The lift is on the anchor rather than the image so the corners clip
+     cleanly through the transform. */
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.45s ease;
+}
+
+.exploreShot:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 34px rgba(46, 42, 36, 0.18);
+}
+
+.exploreShot:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+
+/* Cropping to 3:4 is what the strip does, and a photograph the visitor can
+   now open should not also creep under the pointer. */
+.exploreShot img {
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.exploreShot:hover img {
+  transform: scale(1.03);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .exploreShot,
+  .exploreShot img {
+    transition: none;
+  }
+
+  .exploreShot:hover,
+  .exploreShot:hover img {
+    transform: none;
+  }
+}
