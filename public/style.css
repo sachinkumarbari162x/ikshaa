@@ -3124,3 +3124,36 @@ picture {
     transition: none;
   }
 }
+
+/* --- The subscribe notifier --------------------------------------------
+ *
+ * One line, in place, under the heading of the form it belongs to. It
+ * replaced a full-width card that swapped out for the form on success —
+ * a large block of markup shipped on every load to be shown once, which on
+ * a phone pushed the form itself off the screen the moment it appeared.
+ *
+ * Three outcomes share one element because they are one thing to the
+ * reader: whether the address went in. Colour separates them; the words do
+ * the actual work.
+ */
+.formNotice {
+  margin: 0 0 1.6em;
+  padding: 0.85em 1.1em;
+  border-left: 3px solid var(--footer-rule);
+  background: var(--cream);
+  font-size: var(--text-sm);
+  line-height: 1.65;
+  max-width: 60ch;
+}
+
+/* On the list, or already on it. Not two colours: to the person reading,
+   both mean the address is where they wanted it. */
+.formNotice--good {
+  border-left-color: #2c6a4f;
+}
+
+/* An expired or broken link from an older email. Worth distinguishing,
+   because unlike the two above it asks the reader to do something. */
+.formNotice--warn {
+  border-left-color: #8a6717;
+}

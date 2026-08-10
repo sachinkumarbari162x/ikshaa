@@ -114,50 +114,8 @@
                     <p>The monsoon breaking, the Carnival, the quiet weeks after Christmas. Only
                         when Goa genuinely changes — a handful of times a year.</p>
                 </li>
-                <li>
-                    <span class="promiseMark" aria-hidden="true">03</span>
-                    <h3>Nothing else</h3>
-                    <p>No offers, no discounts, no campaigns. We do not sell or pass on your
-                        address, and one click at the foot of any letter ends it.</p>
-                </li>
             </ul>
         </section>
-
-        <!-- Shown once the form has been submitted. script.js rewrites the
-             three lines per outcome; the photograph and the two ways onward
-             stay the same.
-
-             There is no confirmation step any more, so the copy here is the
-             finished state rather than an instruction. What used to sit below
-             it — "check your inbox", and a list naming the sender and subject
-             of a confirmation email — described a step that no longer exists,
-             and was the last thing on the site still promising it.
-
-             The Airbnb link is here on purpose. Somebody who has just handed
-             over their address is the most interested they will ever be, and
-             a page that only says "thank you" wastes that. It is offered, not
-             forced — the quieter link back to the house sits beside it. -->
-        <div class="subscribeCard subscribeThanks" id="subscribeThanks" hidden>
-            <div class="thanksFigure">
-                <img src="./media/images/machilaChairInCourtyard.avif" alt=""
-                     width="1200" height="1804" loading="lazy" decoding="async">
-            </div>
-
-            <div class="thanksBody">
-                <p class="eyebrow" id="thanksEyebrow">Done</p>
-                <h2 class="sectionTitle" id="thanksTitle">You are on the list</h2>
-                <p class="bodyText" id="thanksText">
-                    That is everything — no link to click and nothing else to do. A short note
-                    is on its way to say hello, and the first letter follows within the week.
-                </p>
-
-                <div class="thanksActions">
-                    <a class="ctaButton" href="https://www.airbnb.co.in/rooms/17852391"
-                       target="_blank" rel="noopener noreferrer">See dates on Airbnb</a>
-                    <a class="thanksQuiet" href="index.html">Back to the villa</a>
-                </div>
-            </div>
-        </div>
 
         <div class="subscribeCard" id="subscribeCard">
             <h2 class="sectionTitle">Write to us</h2>
@@ -165,6 +123,21 @@
                 Only the email address is needed. Everything else simply helps us write
                 something worth your time.
             </p>
+
+            <!-- Every outcome is said here, in one line, and the form stays
+                 where it is.
+
+                 There used to be a second card below this one that replaced
+                 the form on success. It was a large block of markup shipped on
+                 every page load to be shown once, it pushed the form off a
+                 phone screen when it appeared, and it was the last thing still
+                 describing a confirmation step that no longer exists.
+
+                 aria-live: a sighted visitor sees this appear next to the
+                 button they just pressed. Without it, a screen reader
+                 announces nothing at all and the form seems to have done
+                 nothing. -->
+            <p class="formNotice" id="subscribeNotice" role="status" aria-live="polite" hidden></p>
 
             <!-- script.js submits this to the Worker, which stores the address
                  and sends the confirmation. The honeypot below is checked

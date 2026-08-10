@@ -1182,112 +1182,89 @@ function rememberNewsletter(patch) {
  * JSON. Each outcome gets a different sentence, because "your link expired"
  * and "you are already on the list" need different things from the reader —
  * one is an action, the other is reassurance. */
-/* What the landing card says, per state.
+/* What the page says back, per outcome.
  *
- * Five moments, and they need different things from the reader. "Check your
- * inbox" is an instruction and needs the hints; "you are on the list" is
- * reassurance and does not. "Your link expired" is a problem and must leave
- * the form reachable, because telling somebody to try again while hiding the
- * way to do it is a dead end.
+ * One line each, shown in place next to the button that was just pressed.
+ * This used to be a full-width card that replaced the form: a large block of
+ * markup shipped on every load to be shown once, which on a phone pushed the
+ * form off screen the moment it appeared.
  *
- * The Airbnb link is on every one of them. Somebody who has just handed over
- * their address is the most interested they will ever be, and a page that
- * only says thank you wastes that moment. Offered, never forced.
+ * `tone` drives nothing but colour. The distinction that matters is between
+ * "this worked", "this already worked a while ago", and "this did not work" —
+ * and a reader should be able to tell which without reading closely.
  */
-const LANDING = {
-  /* Signing up now finishes at signup. There is no link to wait for, so
-     there is nothing to instruct the reader to do — this is the same
-     reassurance as `yes`, arrived at a different way. The old "check your
-     inbox" wording is gone with the email that justified it. */
-  pending: {
-    eyebrow: 'Done',
-    title: 'You are on the list',
-    text: 'That is everything — no link to click and nothing else to do. The first letter ' +
-      'will reach you within the week: short, from the house, and never more than one a ' +
-      'week. Every letter has an unsubscribe link at the foot of it.',
-    hints: false,
-    formStaysUp: false,
+const OUTCOMES = {
+  subscribed: {
+    tone: 'good',
+    text: 'You are on the list. A short note is on its way to say hello, and the first ' +
+      'letter follows within the week.',
   },
-  yes: {
-    eyebrow: 'Confirmed',
-    title: 'You are on the list',
-    text: 'That is you. The first letter will reach you within the week — short, from the ' +
-      'house, and never more than one a week. While you are here, the dates are on Airbnb.',
-    hints: false,
-    formStaysUp: false,
-  },
+  /* The repeat submission. Not an error, and it must not read like one:
+     somebody who forgot they had already subscribed has done nothing wrong,
+     and the address is safe either way — the API upserts, so there is no
+     duplicate and nothing was overwritten. */
   already: {
-    eyebrow: 'Confirmed',
-    title: 'You were already on the list',
-    text: 'You confirmed this address before, and you still are. Nothing changed, and ' +
-      'nothing has been sent twice.',
-    hints: false,
-    formStaysUp: false,
+    tone: 'good',
+    text: 'Thank you — this address is already on the list, so there is nothing more to ' +
+      'do. Nothing has been sent twice.',
+  },
+  // Reached only by a link from an email sent before the confirmation step
+  // was retired. Those links still work; this is what they land on.
+  confirmed: {
+    tone: 'good',
+    text: 'Confirmed, and thank you. You are on the list.',
   },
   expired: {
-    eyebrow: 'That link has expired',
-    title: 'Links last three days',
-    text: 'Yours has run out — nothing went wrong, it simply stopped working. Put your ' +
-      'address in again below and a fresh link will arrive in a moment.',
-    hints: false,
-    formStaysUp: true,
+    tone: 'warn',
+    text: 'That link has expired — they only last three days. Subscribing again below ' +
+      'takes a moment and needs no link at all now.',
   },
   unknown: {
-    eyebrow: 'That link did not work',
-    title: 'Something got lost on the way',
-    text: 'Email clients sometimes cut long links in half, and a newer link replaces any ' +
-      'older one. Subscribing again below will send a fresh one.',
-    hints: false,
-    formStaysUp: true,
+    tone: 'warn',
+    text: 'That link did not work. Subscribing again below takes a moment and needs no ' +
+      'link at all now.',
   },
 };
 
-function showLanding(state) {
-  const card = document.getElementById('subscribeCard');
-  const thanks = document.getElementById('subscribeThanks');
-  const said = LANDING[state] || LANDING.unknown;
-  if (!thanks) {
+/* The single notifier. Every outcome, success and failure, comes through
+   here so there is one place that decides how the page answers. */
+function notify(text, tone) {
+  const notice = document.getElementById('subscribeNotice');
+  if (!notice) {
     return;
   }
+  notice.textContent = text;
+  notice.className = 'formNotice formNotice--' + (tone || 'good');
+  notice.hidden = false;
+}
 
-  const set = (id, text) => {
-    const node = document.getElementById(id);
-    if (node) { node.textContent = text; }
-  };
-  set('thanksEyebrow', said.eyebrow);
-  set('thanksTitle', said.title);
-  set('thanksText', said.text);
-
-  const hints = document.getElementById('thanksHints');
-  if (hints) { hints.hidden = !said.hints; }
-
-  thanks.hidden = false;
-  if (card) { card.hidden = !said.formStaysUp; }
-  if (state === 'yes' || state === 'already') { rememberNewsletter({ subscribed: true }); }
-
-  thanks.scrollIntoView({ behavior: 'smooth', block: 'center' });
+function showOutcome(state) {
+  const said = OUTCOMES[state] || OUTCOMES.unknown;
+  notify(said.text, said.tone);
+  if (state === 'subscribed' || state === 'already' || state === 'confirmed') {
+    rememberNewsletter({ subscribed: true });
+  }
 }
 
 function initSubscribeConfirmation() {
-  const card = document.getElementById('subscribeCard');
-  const thanks = document.getElementById('subscribeThanks');
-  if (!card || !thanks) {
+  if (!document.getElementById('subscribeNotice')) {
     return;
   }
 
   const params = new URLSearchParams(window.location.search);
 
-  // Back from the link in the email.
+  /* Back from a link in an email sent before the confirmation step was
+     retired. /api/confirm still honours those, so the page still answers
+     them rather than showing nothing. */
   const confirmed = params.get('confirmed');
   if (confirmed) {
-    showLanding(confirmed);
+    showOutcome({ yes: 'confirmed', already: 'already' }[confirmed] || confirmed);
     return;
   }
 
-  /* Back from a native form post. There is no confirmation step any more, so
-     landing here means the address was taken and the reader is done. */
+  // Back from a native form post with no JavaScript in play.
   if (params.get('subscribed') === '1') {
-    showLanding('pending');
+    showOutcome('subscribed');
   }
 }
 
@@ -1657,7 +1634,21 @@ function initSubscribeApi() {
       const body = await res.json().catch(() => ({}));
 
       if (res.ok && body.ok) {
-        showLanding(body.next === 'already-subscribed' ? 'already' : 'pending');
+        /* The API distinguishes a new subscriber from one who was already
+           there, and the page says so rather than thanking both identically.
+           Someone who forgot they had subscribed should be told plainly, not
+           left wondering whether they have now been added twice — they have
+           not, because the store upserts. */
+        showOutcome(body.next === 'already-subscribed' ? 'already' : 'subscribed');
+
+        status.hidden = true;
+        // The form stays, but emptied: leaving a filled form beside "you are
+        // on the list" invites a second submission of the same address.
+        form.reset();
+        if (window.turnstile && typeof window.turnstile.reset === 'function') {
+          try { window.turnstile.reset(); } catch (e) { /* not rendered */ }
+        }
+        button.disabled = false;
         return;
       }
 
