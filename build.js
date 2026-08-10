@@ -417,9 +417,19 @@ function main() {
     let page = fs.readFileSync(subscribeAt, 'utf8');
     const siteKey = process.env.TURNSTILE_SITE_KEY;
 
+    /* The key lives in the page, because it is public — it is served to every
+       visitor either way. The environment variable stays as an override for a
+       second widget or a staging key.
+
+       Order matters here. The strip below keys off the PLACEHOLDER still
+       being present, not off the variable being unset: with a real key
+       committed there is nothing to substitute, and testing the variable
+       alone would have stripped the working widget on every ordinary build. */
     if (siteKey) {
       page = page.replace(/TURNSTILE_SITE_KEY/g, siteKey);
-    } else {
+    }
+
+    if (page.includes('TURNSTILE_SITE_KEY')) {
       page = page
         .replace(/\n\s*<script src="https:\/\/challenges\.cloudflare\.com[^>]*><\/script>/, '')
         .replace(/\n\s*<div class="field fieldCaptcha">[\s\S]*?<\/div>\n\s*<\/div>/, '');
