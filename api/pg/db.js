@@ -95,11 +95,25 @@ async function migrate(pool) {
 /* One address however many times it is submitted, and every message kept.
    ON CONFLICT is the Postgres spelling of the SQLite upsert; COALESCE still
    means a later short form cannot blank a name given earlier. */
-async function subscribe(pool, input) {
+/**
+ * Store a subscription.
+ *
+ * options.verifiedBy — when set, the address is treated as already verified
+ * and becomes mailable at once. The caller passes what did the verifying
+ * ('captcha+mx'), and that string is recorded on the row.
+ *
+ * Left unset, the old double opt-in applies: a token is minted and the row
+ * stays unmailable until somebody clicks the link. Both paths are kept
+ * because the store should not be the thing deciding how consent is proven —
+ * that is policy, and policy lives at the edge where the request arrives.
+ */
+async function subscribe(pool, input, options) {
+  const settings = options || {};
   const { errors, value } = validateSubscription(input);
   if (errors.length) {
     return { ok: false, errors };
   }
+  const verifiedBy = typeof settings.verifiedBy === 'string' ? settings.verifiedBy : null;
 
   const client = await pool.connect();
   try {
@@ -110,15 +124,18 @@ async function subscribe(pool, input) {
     );
     const already = Boolean(before.rows[0] && before.rows[0].confirmed_at);
 
-    const token = already ? null : crypto.randomBytes(32).toString('base64url');
-    const expires = already
-      ? null
-      : new Date(Date.now() + CONFIRM_TTL_HOURS * 3600 * 1000);
+    // No link to send means no token to mint.
+    const token = (already || verifiedBy) ? null : crypto.randomBytes(32).toString('base64url');
+    const expires = token
+      ? new Date(Date.now() + CONFIRM_TTL_HOURS * 3600 * 1000)
+      : null;
 
     const upserted = await client.query(`
       INSERT INTO subscribers
-        (email, name, origin, weekly, seasonal, confirm_hash, confirm_expires)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+        (email, name, origin, weekly, seasonal, confirm_hash, confirm_expires,
+         confirmed_at, verified_by)
+      VALUES ($1, $2, $3, $4, $5, $6, $7,
+              CASE WHEN $8::text IS NULL THEN NULL ELSE now() END, $8)
       ON CONFLICT (email) DO UPDATE SET
         name            = COALESCE(EXCLUDED.name,   subscribers.name),
         origin          = COALESCE(EXCLUDED.origin, subscribers.origin),
@@ -129,10 +146,15 @@ async function subscribe(pool, input) {
         unsubscribed_at = NULL,
         -- Null here means they were already confirmed; leave the old value.
         confirm_hash    = COALESCE(EXCLUDED.confirm_hash,    subscribers.confirm_hash),
-        confirm_expires = COALESCE(EXCLUDED.confirm_expires, subscribers.confirm_expires)
-      RETURNING id
+        confirm_expires = COALESCE(EXCLUDED.confirm_expires, subscribers.confirm_expires),
+        -- COALESCE keeps the ORIGINAL confirmation date and provenance. A
+        -- returning subscriber has not consented afresh, and overwriting the
+        -- date would quietly erase when they actually did.
+        confirmed_at    = COALESCE(subscribers.confirmed_at, EXCLUDED.confirmed_at),
+        verified_by     = COALESCE(subscribers.verified_by,  EXCLUDED.verified_by)
+      RETURNING id, confirmed_at
     `, [value.email, value.name, value.origin, Boolean(value.weekly), Boolean(value.seasonal),
-        token ? hashToken(token) : null, expires]);
+        token ? hashToken(token) : null, expires, verifiedBy]);
 
     const id = upserted.rows[0].id;
 
@@ -148,7 +170,9 @@ async function subscribe(pool, input) {
       id: Number(id),
       created: before.rowCount === 0,
       messageStored: Boolean(value.note),
-      confirmed: already,
+      // Mailable now — either they already were, or this signup verified them.
+      confirmed: already || Boolean(upserted.rows[0].confirmed_at),
+      verifiedBy: verifiedBy,
       confirmToken: token,
       confirmExpires: expires ? expires.toISOString() : null,
     };

@@ -37,9 +37,22 @@ CREATE TABLE IF NOT EXISTS subscribers (
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
 
-    -- Double opt-in. An address is not mailable until its owner proves they
-    -- asked: anyone can type someone else's address into a form.
+    -- When the address became mailable, and what made it so.
+    --
+    -- This was a double opt-in: mail a link, and only write to people who
+    -- click it. That proved the mailbox existed, and it is gone — most
+    -- people who mean to subscribe never click, so the list was mostly
+    -- addresses nobody was allowed to write to.
+    --
+    -- What replaced it happens at signup: a Turnstile challenge, a provider
+    -- policy, and an MX lookup on the domain. Weaker proof, and honestly so
+    -- — none of it shows the MAILBOX exists, only that the domain can
+    -- receive and a human typed it.
+    --
+    -- verified_by records which of the two a row came from, because a
+    -- mailing list has to be able to answer how each person consented.
     confirmed_at    TIMESTAMPTZ,
+    verified_by     TEXT,
     -- The SHA-256 of the token, never the token. A leaked dump cannot be
     -- used to confirm anybody.
     confirm_hash    TEXT,
@@ -135,6 +148,11 @@ CREATE INDEX IF NOT EXISTS outbox_due
 
 -- Additive migration for databases created before the reminder existed.
 ALTER TABLE subscribers ADD COLUMN IF NOT EXISTS reminded_at TIMESTAMPTZ;
+-- Rows that predate the change confirmed by clicking a link; say so rather
+-- than leaving the provenance of existing consent blank.
+ALTER TABLE subscribers ADD COLUMN IF NOT EXISTS verified_by TEXT;
+UPDATE subscribers SET verified_by = 'email-link'
+ WHERE verified_by IS NULL AND confirmed_at IS NOT NULL;
 
 -- Who is due a nudge: subscribed, never confirmed, never reminded, and old
 -- enough that the first email has had a fair chance to be seen.

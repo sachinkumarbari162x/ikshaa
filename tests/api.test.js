@@ -506,3 +506,84 @@ describe('opt-in over HTTP', () => {
         expect(some.json.subscribers[0].email).toBe('yes@example.com');
     });
 });
+
+/* ---------------------------------------------------------------------
+ * Which addresses we will write to
+ *
+ * The confirmation email was the proof an address was real. It is gone, so
+ * these rules are what stands between the sending domain and a bounce rate
+ * that puts every letter in the spam folder. They are worth testing properly.
+ * ------------------------------------------------------------------ */
+describe('email provider policy', () => {
+  const { classifyEmail } = require('../api/validate');
+
+  it.each([
+    'someone@gmail.com', 'a.b@yahoo.co.in', 'guest@outlook.com',
+    'me@proton.me', 'x@rediffmail.com', 'user@icloud.com',
+  ])('accepts %s outright', (email) => {
+    expect(classifyEmail(email).verdict).toBe('accept');
+  });
+
+  it.each([
+    'a@mailinator.com', 'b@guerrillamail.com', 'c@10minutemail.com',
+    'd@yopmail.com', 'e@temp-mail.org', 'f@trashmail.com',
+  ])('refuses the throwaway %s', (email) => {
+    const out = classifyEmail(email);
+    expect(out.verdict).toBe('reject');
+    expect(out.reason).toBe('disposable');
+  });
+
+  it.each([
+    'maria@example.com', 'someone@test.com', 'a@foo.test',
+    'b@something.invalid', 'c@localhost',
+  ])('refuses the test domain %s', (email) => {
+    expect(classifyEmail(email).reason).toBe('test-domain');
+  });
+
+  it.each([
+    'test@gmail.com', 'demo@outlook.com', 'asdf@yahoo.com',
+    'noreply@gmail.com', 'delivered@somewhere.co.uk',
+  ])('refuses the placeholder address %s', (email) => {
+    expect(classifyEmail(email).reason).toBe('test-address');
+  });
+
+  it('sees through plus-addressing on a placeholder', () => {
+    // test+anything@ is still test@; the tag is not part of the identity.
+    expect(classifyEmail('test+realperson@gmail.com').reason).toBe('test-address');
+  });
+
+  it('sends an unknown domain for a DNS check rather than guessing', () => {
+    const out = classifyEmail('carman@ikshaa.com');
+    expect(out.verdict).toBe('unresolved');
+    expect(out.domain).toBe('ikshaa.com');
+  });
+
+  it('lets an owner-side caller reach the mail provider sandbox', () => {
+    /* delivered@resend.dev is how the sender is tested without mailing a
+       stranger. The form must never accept it; a token-authenticated script
+       still needs to. */
+    expect(classifyEmail('delivered@resend.dev').verdict).toBe('reject');
+    expect(classifyEmail('delivered@resend.dev', { allowTestAddresses: true }).verdict)
+      .not.toBe('reject');
+  });
+
+  it('is case and whitespace insensitive', () => {
+    expect(classifyEmail('  TEST@Example.COM  ').reason).toBe('test-domain');
+    expect(classifyEmail('Someone@GMAIL.com').verdict).toBe('accept');
+  });
+
+  it('rejects an address with no domain at all', () => {
+    expect(classifyEmail('nonsense').reason).toBe('malformed');
+    expect(classifyEmail('').reason).toBe('malformed');
+  });
+
+  it('explains itself in words a guest can act on', () => {
+    // "invalid email" teaches nobody anything; they retype the same address.
+    for (const email of ['a@mailinator.com', 'test@gmail.com', 'x@example.com']) {
+      const out = classifyEmail(email);
+      expect(out.message).toMatch(/[a-z]/);
+      expect(out.message.length).toBeGreaterThan(30);
+      expect(out.message).not.toMatch(/invalid|error|failed/i);
+    }
+  });
+});

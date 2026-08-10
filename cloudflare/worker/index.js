@@ -23,6 +23,7 @@ import { confirmation } from '../../api/emails/messages.js';
 import * as campaigns from '../../api/pg/campaigns.js';
 import { httpTransport } from '../../api/mailer.js';
 import { drainOutbox, sendReminders } from './scheduled.js';
+import * as validate from '../../api/validate.js';
 
 /* Only these origins may call the API from a browser.
  *
@@ -135,6 +136,24 @@ export default {
     try {
       /* ---- public ---- */
 
+      /* Subscribing, without a confirmation email.
+       *
+       * The double opt-in is gone. It proved the mailbox existed, and most
+       * people who meant to subscribe never clicked, so the list filled with
+       * addresses nobody was permitted to write to.
+       *
+       * What stands in its place happens here, before the row is stored:
+       *
+       *   1. Turnstile   a human, not a script
+       *   2. policy      not a throwaway, not a test address
+       *   3. MX          the domain can actually receive mail
+       *
+       * Say plainly what this is: weaker proof than a clicked link. None of
+       * it shows the MAILBOX exists — only that the domain accepts mail and
+       * a person typed it. It removes the categories certain to bounce,
+       * which is the part that protects the sending domain, and it accepts
+       * that some typo'd addresses will get through where the old flow would
+       * have caught them. */
       if (route === '/api/subscribe' && request.method === 'POST') {
         const body = await readJson(request);
         if (body === null) {
@@ -142,26 +161,42 @@ export default {
         }
         // The form's honeypot. A human never fills it in.
         if (body['bot-field']) {
-          return json(request, env, 200, { ok: true, next: 'check-your-email' });
+          return json(request, env, 200, { ok: true, next: 'subscribed' });
         }
 
-        const result = await store.subscribe(pool, body);
+        const human = await verifyTurnstile(env, body.captcha, request);
+        if (!human.ok) {
+          return json(request, env, 400, {
+            error: 'captcha',
+            reason: human.reason,
+            message: 'That verification did not go through. Please tick the box and try once more.',
+          });
+        }
+
+        const verdict = validate.classifyEmail(body.email);
+        if (verdict.verdict === 'reject') {
+          return json(request, env, 422, {
+            error: 'email-rejected', reason: verdict.reason, message: verdict.message,
+          });
+        }
+        if (verdict.verdict === 'unresolved' && !(await domainAcceptsMail(verdict.domain))) {
+          return json(request, env, 422, {
+            error: 'email-rejected',
+            reason: 'no-mx',
+            message: 'That domain does not appear to accept email. Please check the spelling.',
+          });
+        }
+
+        const result = await store.subscribe(pool, body, { verifiedBy: 'captcha+mx' });
         if (!result.ok) {
           return json(request, env, 422, { error: 'invalid', details: result.errors });
-        }
-
-        /* The raw token goes to the queue that will email it, never back to
-           the browser. Returning it would let whoever typed an address
-           confirm it themselves, which is the whole thing opt-in prevents. */
-        if (result.confirmToken) {
-          ctx.waitUntil(sendConfirmation(env, body.email, result.confirmToken, body.name));
         }
 
         return json(request, env, result.created ? 201 : 200, {
           ok: true,
           created: result.created,
           confirmed: result.confirmed,
-          next: result.confirmed ? 'already-subscribed' : 'check-your-email',
+          next: result.created ? 'subscribed' : 'already-subscribed',
         });
       }
 
@@ -299,6 +334,107 @@ export default {
  * unconfirmed, and therefore unmailable, which is the safe end of the
  * failure. Nothing here silently promotes an unconfirmed address.
  * ------------------------------------------------------------------ */
+/* ---------------------------------------------------------------------
+ * Turnstile
+ *
+ * Cloudflare's challenge, verified server-side. The token the browser sends
+ * is worthless on its own — anyone can post a made-up string — so it is
+ * exchanged with Cloudflare here, which is the only step that means anything.
+ *
+ * With no secret configured this REFUSES rather than waves everyone through.
+ * A misconfigured deploy that silently accepts every signup is how a form
+ * ends up unprotected without anybody noticing; a form that stops working is
+ * noticed immediately.
+ * ------------------------------------------------------------------ */
+async function verifyTurnstile(env, token, request) {
+  if (!env.TURNSTILE_SECRET) {
+    return { ok: false, reason: 'not-configured' };
+  }
+  if (!token || typeof token !== 'string') {
+    return { ok: false, reason: 'missing' };
+  }
+
+  const form = new FormData();
+  form.append('secret', env.TURNSTILE_SECRET);
+  form.append('response', token);
+  // Binds the token to the address that solved it, so a solved token cannot
+  // be lifted and replayed from somewhere else.
+  const ip = request.headers.get('CF-Connecting-IP');
+  if (ip) { form.append('remoteip', ip); }
+
+  try {
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST', body: form,
+    });
+    const outcome = await res.json();
+    return outcome && outcome.success
+      ? { ok: true }
+      : { ok: false, reason: (outcome && outcome['error-codes'] || ['rejected']).join(',') };
+  } catch (e) {
+    // Cloudflare unreachable from Cloudflare is close to impossible, and if
+    // it happens, failing closed is still the right side to fail on.
+    return { ok: false, reason: 'verify-failed' };
+  }
+}
+
+/* Does this domain accept mail at all?
+ *
+ * DNS over HTTPS, because a Worker has no UDP and therefore no ordinary DNS.
+ * 1.1.1.1 is on the same network, so this costs a few milliseconds.
+ *
+ * An MX record is the closest thing to proof available without sending: a
+ * domain with none cannot receive email, which makes every address at it a
+ * guaranteed bounce. A domain WITH one may still have no such mailbox — this
+ * catches the typo'd domain, not the typo'd name.
+ *
+ * A lookup that fails is treated as acceptable. DNS is not always reachable,
+ * and turning somebody away because a resolver hiccuped is worse than
+ * accepting one address that might bounce. */
+async function domainAcceptsMail(domain) {
+  try {
+    const res = await fetch(
+      'https://cloudflare-dns.com/dns-query?type=MX&name=' + encodeURIComponent(domain),
+      { headers: { Accept: 'application/dns-json' } }
+    );
+    if (!res.ok) { return true; }
+
+    const dns = await res.json();
+    // NXDOMAIN — the domain does not exist at all.
+    if (dns.Status === 3) { return false; }
+    if (dns.Status !== 0) { return true; }
+
+    const mx = (dns.Answer || []).filter((a) => a.type === 15);
+    if (mx.length) {
+      // "." as the exchange is a null MX (RFC 7505): explicitly no mail here.
+      return !mx.every((a) => String(a.data).trim().endsWith(' .'));
+    }
+
+    /* No MX is not quite the end of it: a domain with an A record and no MX
+       still receives mail at that address under the fallback rule, and small
+       self-hosted domains do rely on it. */
+    const a = await fetch(
+      'https://cloudflare-dns.com/dns-query?type=A&name=' + encodeURIComponent(domain),
+      { headers: { Accept: 'application/dns-json' } }
+    );
+    if (!a.ok) { return true; }
+    const arec = await a.json();
+    return Boolean(arec.Answer && arec.Answer.length);
+  } catch (e) {
+    return true;
+  }
+}
+
+/* UNUSED as of the move to captcha + MX. Nothing calls this: signing up no
+   longer mints a token, so there is no link to send.
+ *
+ * Kept, not deleted, for the same reason the Groq router was kept — the
+ * decision to drop double opt-in is a judgement about deliverability, and if
+ * bounce rates argue the other way it should be one call to restore, not a
+ * rewrite. `/api/confirm` is still live too, because links already sitting in
+ * inboxes must keep working.
+ *
+ * `sendReminders` in scheduled.js is a separate thing and IS still running:
+ * it nudges people who subscribed under the old flow and never confirmed. */
 async function sendConfirmation(env, email, token, name) {
   if (!env.MAIL_API_KEY || !env.MAIL_FROM || !env.PUBLIC_BASE_URL) {
     console.warn('[mail] not configured — %s stays unconfirmed', email);

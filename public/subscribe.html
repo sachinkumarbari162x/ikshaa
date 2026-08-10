@@ -20,6 +20,10 @@
          title. This is 1440x956 at 76 KB — twice the pixels of the largest
          JPEG on the site for half the bytes. -->
     <link rel="preload" as="image" href="./media/images/theCourtyard.avif" fetchpriority="high">
+    <!-- The one third-party script on the site, and only on this page. It is
+         deferred: the challenge is needed when the form is submitted, not
+         when the hero paints. -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 
 <body>
@@ -239,6 +243,21 @@
                         <em>You may email me as described above. I can stop it at any time.</em>
                     </span>
                 </label>
+
+                <!-- Cloudflare Turnstile.
+                     There is no confirmation email any more, so this is the
+                     step that establishes a person is behind the form. The
+                     token it produces is verified by the Worker against
+                     Cloudflare — checking it in the browser would prove
+                     nothing, since anything can post a made-up string.
+
+                     data-sitekey is public by design; the secret half never
+                     leaves the Worker. -->
+                <div class="field fieldCaptcha">
+                    <div class="cf-turnstile" data-sitekey="TURNSTILE_SITE_KEY"
+                        data-theme="light" data-appearance="always"></div>
+                    <p class="fieldHint">A quick check that you are a person. Usually nothing to do.</p>
+                </div>
 
                 <button type="submit" class="ctaButton">Subscribe</button>
 

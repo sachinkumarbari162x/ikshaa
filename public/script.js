@@ -1195,12 +1195,17 @@ function rememberNewsletter(patch) {
  * only says thank you wastes that moment. Offered, never forced.
  */
 const LANDING = {
+  /* Signing up now finishes at signup. There is no link to wait for, so
+     there is nothing to instruct the reader to do — this is the same
+     reassurance as `yes`, arrived at a different way. The old "check your
+     inbox" wording is gone with the email that justified it. */
   pending: {
-    eyebrow: 'Almost there',
-    title: 'Check your inbox',
-    text: 'One more step: we have sent you a note with a link in it. Clicking that link ' +
-      'is what puts you on the list — nothing is sent until you do.',
-    hints: true,
+    eyebrow: 'Done',
+    title: 'You are on the list',
+    text: 'That is everything — no link to click and nothing else to do. The first letter ' +
+      'will reach you within the week: short, from the house, and never more than one a ' +
+      'week. Every letter has an unsubscribe link at the foot of it.',
+    hints: false,
     formStaysUp: false,
   },
   yes: {
@@ -1279,10 +1284,8 @@ function initSubscribeConfirmation() {
     return;
   }
 
-  /* Back from a native form post (no JavaScript, or the API was unreachable).
-     They are recorded but NOT confirmed, so this says "check your inbox" —
-     claiming they are subscribed would be the one lie double opt-in exists
-     to prevent. */
+  /* Back from a native form post. There is no confirmation step any more, so
+     landing here means the address was taken and the reader is done. */
   if (params.get('subscribed') === '1') {
     showLanding('pending');
   }
@@ -1624,6 +1627,19 @@ function initSubscribeApi() {
     data.weekly = form.querySelector('[name="weekly"]').checked ? 1 : 0;
     data.seasonal = form.querySelector('[name="seasonal"]').checked ? 1 : 0;
 
+    /* Turnstile writes its token into a hidden input it injects itself, so
+       FormData has already picked it up under Cloudflare's name. Renamed
+       here so the API contract does not carry the vendor in its field
+       names — swapping the challenge later should not change the endpoint. */
+    data.captcha = data['cf-turnstile-response'] || '';
+    delete data['cf-turnstile-response'];
+
+    if (!data.captcha) {
+      status.hidden = false;
+      status.textContent = 'Please complete the "are you a person" check just above the button.';
+      return;
+    }
+
     button.disabled = true;
     status.hidden = false;
     status.textContent = 'Sending…';
@@ -1637,15 +1653,21 @@ function initSubscribeApi() {
       const body = await res.json().catch(() => ({}));
 
       if (res.ok && body.ok) {
-        /* Deliberately not "you are subscribed". They are not, until they
-           click. One wording table for every state, so this cannot drift
-           from what the confirmation page says. */
         showLanding(body.next === 'already-subscribed' ? 'already' : 'pending');
         return;
       }
 
-      status.textContent = (body.details && body.details[0]) ||
+      /* The API explains WHY when it turns an address away — a throwaway
+         domain, a placeholder, a domain that cannot receive mail. Those
+         sentences are written for the reader and are the whole point of
+         checking: "invalid email" teaches nobody anything, and they retype
+         the same address. */
+      status.textContent = body.message || (body.details && body.details[0]) ||
         'That did not go through. Try again, or write to nyaragoa@gmail.com.';
+      // A failed challenge is single-use; the widget must issue a fresh one.
+      if (window.turnstile && typeof window.turnstile.reset === 'function') {
+        try { window.turnstile.reset(); } catch (e) { /* not rendered yet */ }
+      }
       button.disabled = false;
     } catch (e) {
       /* Offline, blocked, or the API is down.
