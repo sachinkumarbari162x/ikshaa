@@ -1,0 +1,266 @@
+===============================================================================
+ IKSHAA — WHERE THE WEBSITE HAS GOT TO
+ Prepared 10 August 2026  ·  ikshaa.pages.dev
+===============================================================================
+
+ Two parts to this file:
+
+   PART 1   a message you can send Carman as it is
+   PART 2   the list of things only she can answer
+
+ Part 2 is the one that matters. Twenty-five details on the site are still
+ blank because nobody has confirmed them, and the site is deliberately
+ written to say "ask the owner" rather than guess at any of them. Every
+ answer she supplies turns one of those into a real answer, in the chat, on
+ the questions page, and in what Google shows.
+
+
+===============================================================================
+ PART 1 — MESSAGE TO SEND
+ (everything between the lines; adjust the greeting to suit)
+-------------------------------------------------------------------------------
+
+Hi Carman,
+
+The new Ikshaa website is live and I wanted to show you where it has got to.
+
+    ikshaa.pages.dev
+
+A few things it does that an ordinary villa site does not.
+
+IT ANSWERS GUESTS ON ITS OWN
+There is a chat assistant on every page that handles the questions people
+actually ask — the pool, breakfast, how to get here from either airport,
+arriving by train, what is included, how many it sleeps. It covers around
+forty-four topics.
+
+It is written so that it will never invent an answer. If it does not know
+something it says so plainly and points the guest to your email, rather than
+guessing and having them plan around something untrue. It costs nothing per
+message, however many people use it.
+
+A WEEKLY LETTER
+Guests can subscribe and get a short note from the house. Five people have
+signed up already. The form turns away temporary and fake addresses, so the
+list stays worth having, and every letter carries a one-click unsubscribe.
+
+A JOURNAL
+Four pieces about Goa — what susegad actually means, what the food really is,
+the great houses at Loutolim and Chandor, and why the monsoon is worth coming
+for. It gives people a reason to stay on the site, and it is the sort of
+writing that helps Google find you.
+
+A ROOM-BY-ROOM TOUR
+Thirty-five photographs you can walk through, and a gallery of another
+thirty-seven sorted by room — bedrooms, bathrooms, the courtyard, the pool,
+the grounds.
+
+IT WORKS PROPERLY ON A PHONE
+Which is where most people will see it.
+
+IT IS BUILT TO BE FOUND
+Set up so Google reads it correctly, and so do the AI assistants people
+increasingly use to plan travel. The site tells those assistants, in writing,
+which things they must not guess at — your rates, your check-in times,
+whether there are cameras — so they point to you instead of inventing a
+figure.
+
+IT COSTS ALMOST NOTHING TO RUN
+The hosting, the database and the email all sit inside free allowances.
+
+I have matched every detail to your Airbnb listing — three bedrooms, four
+beds, two bathrooms, up to nine guests, check-in from 2pm, check-out by 11am
+— and put your Goa registration number, HOTS000253, in the footer of every
+page.
+
+There is a short list below of things only you can answer. Once I have them,
+several parts of the site stop saying "ask the owner" and start giving guests
+a straight answer instead.
+
+HOW TO LOOK ROUND IT
+
+Open ikshaa.pages.dev on your phone. Then:
+
+  1. THE FRONT PAGE
+     The photographs change on their own. Scroll down slowly and you will
+     pass the rooms, the food, the village, things to do, and the signup for
+     the letters at the bottom.
+
+  2. THE MENU
+     Tap the three lines at the top left. Ten pages. Tap any one to go
+     there. Tap the three lines again to close it.
+
+  3. THE VILLA TOUR      (menu, then Villa Tour)
+     Thirty-five photographs, one at a time. Swipe to move, or wait and it
+     moves by itself. The arrow at the top left brings you back.
+
+  4. THE GALLERY         (menu, then Gallery)
+     Nine boxes, one for each part of the house. The photographs inside each
+     box change on their own. Tap a box to see them full size, then swipe
+     left and right.
+
+  5. THE CHAT
+     The round button at the bottom right of every page. Tap it and ask
+     anything the way you would say it out loud. Try:
+         how many people can stay
+         is there hot water
+         how far is the airport
+     Then try asking something it cannot know, such as the price. It should
+     say it does not know and give your email address. That part is the one
+     worth testing, because it is what stops it telling a guest something
+     untrue.
+
+  6. THE JOURNAL         (menu, then The Balcao)
+     Four pieces of writing about Goa. Tap a title in the list at the top to
+     jump straight to it.
+
+  7. THE QUESTIONS PAGE  (menu, then Questions)
+     Seventeen common questions. Tap one to open the answer.
+
+  8. THE LETTERS         (bottom of the front page, Subscribe)
+     Try it with your own address. A welcome note should arrive within a
+     minute, with an unsubscribe link at the bottom of it.
+
+  9. BOOK NOW
+     Top right of every page. It goes to the booking page, and from there to
+     Airbnb.
+
+If anything looks wrong, or reads wrong, just tell me which page and what
+you saw. Small corrections are quick.
+
+-------------------------------------------------------------------------------
+ END OF MESSAGE
+===============================================================================
+
+
+===============================================================================
+ PART 2 — WHAT WE NEED FROM CARMAN
+===============================================================================
+
+ Grouped by how much difference each one makes. If she only answers the first
+ group, that is most of the value.
+
+
+ FIRST — the questions guests ask before they book
+-------------------------------------------------------------------------------
+
+   [ ]  RATES
+        Weekday, weekend and peak — or confirm "the listing only, always",
+        which is a perfectly good answer and the site will say so.
+
+   [ ]  MINIMUM STAY
+        Any, and does it change over Christmas and New Year.
+
+   [ ]  CANCELLATION TERMS
+        What happens, and by when.
+
+   [ ]  DEPOSIT
+        The site says 50% to confirm, non-refundable. Is that still right?
+        And the refundable security deposit — how much?
+
+   [ ]  PAYMENT METHODS
+        Bank transfer, card, UPI, cash on arrival?
+
+   [ ]  HOUSE RULES — the four that decide bookings
+        Pets       — allowed? any size or breed limit?
+        Smoking    — anywhere, outside only, or not at all?
+        Parties    — where is the line between a family dinner and an event?
+        Children   — welcome? cot available? any age limits?
+
+   [ ]  A PHONE OR WHATSAPP NUMBER
+        The site currently offers only email. For a villa booking, a number
+        converts far better — most enquiries in India start on WhatsApp.
+
+
+ SECOND — asked often, currently unanswered
+-------------------------------------------------------------------------------
+
+   [ ]  CAMERAS AND PERIMETER SECURITY
+        Worth handling carefully. A guest asking whether they are recorded is
+        asking a privacy question and deserves a straight answer. The site
+        currently refuses to guess, which is right — but a real answer is
+        better than a refusal. Are there cameras, where are they, and is
+        anyone on the property overnight?
+
+   [ ]  ACCESSIBILITY
+        Steps, doorways, bathrooms. Described honestly rather than
+        generally — somebody is planning around it.
+
+   [ ]  PARKING
+        How many cars, and is it inside the gate.
+
+   [ ]  HOT WATER
+        Every bathroom, around the clock?
+
+   [ ]  MOSQUITO NETS AND REPELLENT
+        Provided, or should guests bring their own?
+
+   [ ]  EV CHARGING
+        Increasingly asked. Is there a point, or somewhere nearby?
+
+   [ ]  TOUR GUIDE AND CATERING
+        Can either be arranged, and roughly what do they cost?
+
+
+ THIRD — two things I am stuck on
+-------------------------------------------------------------------------------
+
+   [ ]  THE BEACH DRIVE
+        The Airbnb listing says "a 20 mins drive away from the Goa airport or
+        from the nearest beaches of south Goa". The website says fifteen
+        minutes to the beaches, in sixteen different places. Which is right?
+        I have left it alone rather than change all sixteen on a guess.
+
+   [ ]  A DOMAIN NAME
+        Everything currently lives at ikshaa.pages.dev. Search reputation
+        builds up on a domain and starts again from nothing when you move, so
+        the sooner this is decided the better. ikshaa.com or similar.
+
+
+ ONE TO RAISE IN CONVERSATION, NOT IN WRITING
+-------------------------------------------------------------------------------
+
+   The Airbnb rating is strong — 4.93 from 165 reviews, Superhost, replies
+   within the hour. That belongs on the site, near the booking button, where
+   it will do more for enquiries than another photograph.
+
+   Two conditions. Ask her permission first. And it should appear as plain
+   text crediting Airbnb, not marked up for Google as the site's own rating —
+   Google penalises sites that present reviews collected elsewhere as theirs,
+   and the penalty applies to the whole domain, not just the page.
+
+
+===============================================================================
+ FOR YOUR REFERENCE — NOT FOR SENDING
+===============================================================================
+
+ What is live and verified as of today:
+
+   Pages                    13, all reachable, no broken links
+   Villa tour               35 photographs
+   Gallery                  37 photographs across 9 rooms and areas
+   Chat topics              44, answering 100% of the test set
+   Published questions      17 on the questions page
+   Journal pieces           4
+   Newsletter subscribers   5, all confirmed
+   Automated checks         431, all passing
+   Monthly running cost     effectively zero
+
+ Recently corrected against the listing:
+
+   Bathrooms                was 3, now 2
+   Capacity                 was "sleeps 6", now 6 comfortably / 9 maximum
+   Check-in / check-out     were unknown, now 2pm–midnight / by 11am
+   Housekeeping             was unknown, now daily
+   Power                    was unknown, now 24/7 generator backup
+   Airport transfers        now correctly stated as free FROM DABOLIM only;
+                            the site was promising a free car to anyone
+                            flying into Mopa
+   Spelling                 Loutulim -> Loutolim, Carmen -> Carman
+
+ Still deliberately blank: 25 facts, listed in Part 2. The site says "ask the
+ owner" for every one of them rather than guessing, which is the behaviour to
+ keep — but each one answered is one less reason for a guest to write in
+ before booking.
+
+===============================================================================
