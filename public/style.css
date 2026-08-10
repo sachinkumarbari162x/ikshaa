@@ -3721,12 +3721,33 @@ html {
  * here — but a name nobody recognises is a link nobody clicks. Both places a
  * visitor meets it now carry the plain word alongside.
  */
+/* The title is position:absolute and centred on its own, so a sibling
+   paragraph landed at the top-left of the hero — off behind the scrim, which
+   is why the line appeared to be missing entirely. Both now sit inside one
+   centred block, and the title stops positioning itself while it is in there.
+   Scoped to the wrapper, so every other page keeps the rule it had. */
+.pageHeroCaption {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.pageHeroCaption .pageHeroTitle {
+  position: static;
+  top: auto;
+  left: auto;
+  transform: none;
+  width: auto;
+  padding: 0;
+}
+
 .pageHeroSub {
-  position: relative;
-  z-index: 1;
-  max-width: 34ch;
-  margin: 0.9em auto 0;
-  padding: 0 var(--gutter);
+  max-width: 36ch;
+  margin: 1em auto 0;
   color: rgba(255, 255, 255, 0.88);
   font-size: var(--text-sm);
   line-height: 1.6;
