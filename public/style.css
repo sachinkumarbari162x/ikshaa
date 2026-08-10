@@ -3545,3 +3545,36 @@ html {
     padding: 0.8em 1.35em;
   }
 }
+
+/* --- Social and platform icons -----------------------------------------
+ *
+ * Inline SVG rather than files. Two icons at a few hundred bytes each cost
+ * less inline than two more requests would, and inline they inherit
+ * currentColor — so each one changes with the link it sits in rather than
+ * needing a second copy for the hover state.
+ *
+ * Both are aria-hidden. The word beside each is the accessible name, and an
+ * icon repeating it only makes a screen reader say Instagram twice.
+ */
+.socialIcon {
+  width: 1.05em;
+  height: 1.05em;
+  flex: 0 0 auto;
+  /* Sits on the text baseline rather than the line box, which is what stops
+     it riding high next to uppercase letterforms. */
+  vertical-align: -0.16em;
+}
+
+.footerSocial a,
+.platformList a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+}
+
+/* The platform chip already centres its contents; the gap is all it needs. */
+.platformList a .socialIcon {
+  width: 1.15em;
+  height: 1.15em;
+  vertical-align: 0;
+}
