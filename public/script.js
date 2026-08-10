@@ -1176,12 +1176,6 @@ function rememberNewsletter(patch) {
   }
 }
 
-/* What the page says after somebody clicks the link in their email.
- *
- * The Worker redirects here with ?confirmed=… rather than showing its own
- * JSON. Each outcome gets a different sentence, because "your link expired"
- * and "you are already on the list" need different things from the reader —
- * one is an action, the other is reassurance. */
 /* What the page says back, per outcome.
  *
  * One line each, shown in place next to the button that was just pressed.
