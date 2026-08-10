@@ -3479,3 +3479,69 @@ html {
 .nav-panel {
   scrollbar-color: rgba(46, 42, 36, 0.3) transparent;
 }
+
+/* ============================================================
+   THE PAIRED IMAGE CARDS, ON A PHONE
+   ============================================================
+
+   Two cards side by side is a wide-screen idea. Held to a phone it gives
+   each card half the viewport minus the gutter — 156px on a 360px screen —
+   and then asks that 156px to hold a 32px uppercase serif heading, a
+   sentence, and a button whose padding alone wants 137px before the label.
+   The button could not fit at any of the sizes measured, so it overflowed
+   its own card on every phone.
+
+   Stacked, each card gets the full width, and everything inside it has room
+   to be read rather than squeezed.
+   ------------------------------------------------------------ */
+@media (max-width: 700px) {
+  .twoImagesContainer {
+    flex-direction: column;
+    gap: 14px;
+    padding-bottom: 60px;
+  }
+
+  /* 4:5 was portrait because the card was half-width. Full width, that is a
+     very tall photograph to scroll past; 4:3 shows more of the room and
+     leaves the overlay sitting over less of it. */
+  .imageCard {
+    aspect-ratio: 4 / 3;
+  }
+
+  /* The rounded corners were split between the two so the pair read as one
+     object. Stacked they are two objects, and each closes its own shape. */
+  .imageCard:first-child,
+  .imageCard:last-child {
+    border-radius: 18px;
+  }
+
+  .pair-overlay {
+    padding: clamp(18px, 5vw, 26px);
+  }
+
+  .pair-overlay h3 {
+    font-size: var(--text-md);
+    letter-spacing: 0.1em;
+  }
+
+  .pair-overlay p {
+    font-size: var(--text-sm);
+    max-width: 42ch;
+  }
+}
+
+/* --- Buttons, at phone size ---
+   1.05em/2.2em is generous on a desktop and simply wide on a phone, where
+   it pushed a two-word label past the edge of anything it sat inside. The
+   tap target stays well above the 44px minimum: 0.85em top and bottom on
+   ~13px text is about 46px of height. */
+@media (max-width: 700px) {
+  .ctaButton {
+    padding: 0.85em 1.5em;
+    letter-spacing: 0.14em;
+  }
+
+  .pair-overlay .ctaButton {
+    padding: 0.8em 1.35em;
+  }
+}
